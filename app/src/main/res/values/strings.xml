@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Bingo</string>
+    <string name="o">O</string>
+    <string name="g">G</string>
+    <string name="n">N</string>
+    <string name="i">I</string>
+    <string name="b">B</string>
+    <string name="undo">UNDO</string>
+    <string name="reset">RESET</string>
+</resources>
