@@ -8,24 +8,33 @@ package com.hmproductions.bingo.data;
 
 public class GridCell {
 
-    private int mValue, mPositionX, mPositionY;
+    private int value, positionX, positionY;
+    private boolean isClicked;
 
-    public GridCell(int value, int positionX, int positionY) {
-
-        mValue = value;
-        mPositionX = positionX;
-        mPositionY = positionY;
+    public GridCell(int value, int positionX, int positionY, boolean isClicked) {
+        this.value = value;
+        this.positionX = positionX;
+        this.positionY = positionY;
+        this.isClicked = isClicked;
     }
 
     public int getValue() {
-        return mValue;
+        return value;
     }
 
     public int getPositionX() {
-        return mPositionX;
+        return positionX;
     }
 
     public int getPositionY() {
-        return mPositionY;
+        return positionY;
+    }
+
+    public boolean getIsClicked() {
+        return isClicked;
+    }
+
+    public void setIsClicked(boolean clicked) {
+        isClicked = clicked;
     }
 }

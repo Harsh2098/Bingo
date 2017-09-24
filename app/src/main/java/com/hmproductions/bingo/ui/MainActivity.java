@@ -1,13 +1,17 @@
 package com.hmproductions.bingo.ui;
 
+import android.content.Context;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,26 +20,47 @@ import android.widget.Toast;
 import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.data.GridCell;
 import com.hmproductions.bingo.utils.GameGridRecyclerAdapter;
+import com.hmproductions.bingo.utils.WifiDirectBroadcastReceiver;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rb.popview.PopField;
 
 public class MainActivity extends AppCompatActivity implements GameGridRecyclerAdapter.GridCellClickListener {
 
     private static final int GRID_SIZE = 5;
+    private boolean isGameStarted = false;
 
     private MediaPlayer celebration;
-    private RecyclerView game_recyclerView;
     private GameGridRecyclerAdapter mGridAdapter;
-    private TextView B, I, N, G, O;
-    private Button resetButton, undoButton;
+
+    @BindView(R.id.game_recyclerView)
+    RecyclerView game_recyclerView;
+
+    @BindView(R.id.B_textView)
+    TextView B;
+
+    @BindView(R.id.I_textView)
+    TextView I;
+
+    @BindView(R.id.N_textView)
+    TextView N;
+
+    @BindView(R.id.G_textView)
+    TextView G;
+
+    @BindView(R.id.O_textView)
+    TextView O;
+
     private View lastClickedView;
     private PopField mPopField;
+    private Button resetButton, undoButton;
 
-    ArrayList<GridCell> mData = new ArrayList<>();
-    boolean[][] cellsClicked = new boolean[GRID_SIZE][GRID_SIZE];
+    ArrayList<GridCell> gameGridCellList = new ArrayList<>();
     int lastClickedPositionX = GRID_SIZE, lastClickedPositionY = GRID_SIZE;
 
     /*
@@ -48,19 +73,15 @@ public class MainActivity extends AppCompatActivity implements GameGridRecyclerA
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         mPopField = PopField.attach2Window(this);
-
-        // Bind all views
-        BindAllViews();
+        BindButtonViews();
 
         // Creates an ArrayList made up of random values
         CreateGameGridList();
 
-        // Makes all the elements of cellsClicked[][] false
-        InitialiseCellsClickedList();
-
-        mGridAdapter = new GameGridRecyclerAdapter(this, GRID_SIZE, mData, this);
+        mGridAdapter = new GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this);
         GridLayoutManager layoutManager = new GridLayoutManager(this, GRID_SIZE);
 
         game_recyclerView.setLayoutManager(layoutManager);
@@ -68,35 +89,18 @@ public class MainActivity extends AppCompatActivity implements GameGridRecyclerA
         game_recyclerView.setHasFixedSize(true);
 
         celebration = MediaPlayer.create(this, R.raw.tada_celebration);
-
-        UndoButtonClickListener();
-        ResetButtonClickListener();
     }
 
-    private void BindAllViews() {
-        game_recyclerView = (RecyclerView) findViewById(R.id.game_recyclerView);
-        resetButton = (Button)findViewById(R.id.resetButton);
-        undoButton = (Button)findViewById(R.id.undoButton);
-        B = (TextView)findViewById(R.id.B_textView);
-        I = (TextView)findViewById(R.id.I_textView);
-        N = (TextView)findViewById(R.id.N_textView);
-        G = (TextView)findViewById(R.id.G_textView);
-        O = (TextView)findViewById(R.id.O_textView);
+    private void BindButtonViews() {
 
-        GradientDrawable resetGradientdrawable = (GradientDrawable)resetButton.getBackground();
+        resetButton = (Button) findViewById(R.id.resetButton);
+        undoButton = (Button) findViewById(R.id.undoButton);
+
+        GradientDrawable resetGradientdrawable = (GradientDrawable) resetButton.getBackground();
         resetGradientdrawable.setColor(Color.parseColor("#CC0000"));
 
-        GradientDrawable undoGradientdrawable = (GradientDrawable)undoButton.getBackground();
+        GradientDrawable undoGradientdrawable = (GradientDrawable) undoButton.getBackground();
         undoGradientdrawable.setColor(Color.parseColor("#009624"));
-    }
-
-    // Creates an ArrayList of GridCell using int[][] made by CreateRandomGameArray()
-    private void CreateGameGridList() {
-        int[][] randomArray = CreateRandomGameArray();
-
-        for(int i=0 ; i<GRID_SIZE ; ++i)
-            for(int j=0 ; j<GRID_SIZE ; ++j)
-                mData.add(new GridCell(randomArray[i][j], i, j));
     }
 
     // Returns an int[GRID_SIZE][GRID_SIZE] containing numbers 1 to 25 randomly placed
@@ -105,14 +109,13 @@ public class MainActivity extends AppCompatActivity implements GameGridRecyclerA
         int[][] randomArray = new int[GRID_SIZE][GRID_SIZE];
         int randomNumber1, randomNumber2, randomNumber3, randomNumber4, temp;
 
-        for(int i=0 ; i<GRID_SIZE ; ++i)
-            for(int j=0 ; j<GRID_SIZE ; ++j)
-                randomArray[i][j] = i*GRID_SIZE+j+1;
+        for (int i = 0; i < GRID_SIZE; ++i)
+            for (int j = 0; j < GRID_SIZE; ++j)
+                randomArray[i][j] = i * GRID_SIZE + j + 1;
 
         // Swapping two random elements of array 100 times
-        for(int i=0 ; i<10 ; ++i)
-            for(int j=0 ; j<10 ; ++j)
-            {
+        for (int i = 0; i < 10; ++i)
+            for (int j = 0; j < 10; ++j) {
                 // Generating 4 random numbers to swap any 2 elements in randomArray
                 Random r1 = new Random();
                 Random r2 = new Random();
@@ -131,101 +134,128 @@ public class MainActivity extends AppCompatActivity implements GameGridRecyclerA
         return randomArray;
     }
 
-    // Makes all the elements of cellsClicked[][] false
-    private void InitialiseCellsClickedList() {
-        for (int i=0 ; i<GRID_SIZE ; ++i)
-            for (int j=0 ; j<GRID_SIZE ; ++j)
-                cellsClicked[i][j]=false;
+    // Creates an ArrayList of GridCell using int[][] made by CreateRandomGameArray()
+    private void CreateGameGridList() {
+        int[][] randomArray = CreateRandomGameArray();
+
+        for (int i = 0; i < GRID_SIZE; ++i)
+            for (int j = 0; j < GRID_SIZE; ++j) {
+                gameGridCellList.add(new GridCell(randomArray[i][j], i, j, false));
+            }
     }
 
     // Returns the number of rows completed
     public int numberOfRowsCompleted() {
 
-        int counter=0;
+        int counter = 0;
 
         // Checking for columns
-        for(int i=0 ; i<GRID_SIZE ; ++i)
-            if(cellsClicked[0][i] && cellsClicked[1][i] && cellsClicked[2][i] && cellsClicked[3][i] && cellsClicked[4][i])
+        for (int i = 0; i < GRID_SIZE; ++i)
+            if (
+                    gameGridCellList.get(i).getIsClicked() &&
+                            gameGridCellList.get(GRID_SIZE + i).getIsClicked() &&
+                            gameGridCellList.get(2 * GRID_SIZE + i).getIsClicked() &&
+                            gameGridCellList.get(3 * GRID_SIZE + i).getIsClicked() &&
+                            gameGridCellList.get(4 * GRID_SIZE + i).getIsClicked())
                 counter++;
 
         // Checking for rows
-        for(int i=0 ; i<GRID_SIZE ; ++i)
-            if(cellsClicked[i][0] && cellsClicked[i][1] && cellsClicked[i][2] && cellsClicked[i][3] && cellsClicked[i][4])
+        for (int i = 0; i < GRID_SIZE; ++i)
+            if (
+                    gameGridCellList.get(i * GRID_SIZE).getIsClicked() &&
+                            gameGridCellList.get(i * GRID_SIZE + 1).getIsClicked() &&
+                            gameGridCellList.get(i * GRID_SIZE + 2).getIsClicked() &&
+                            gameGridCellList.get(i * GRID_SIZE + 3).getIsClicked() &&
+                            gameGridCellList.get(i * GRID_SIZE + 4).getIsClicked())
                 counter++;
 
         // Checking for diagonals
-        if(cellsClicked[0][0] && cellsClicked[1][1] && cellsClicked[2][2] && cellsClicked[3][3] && cellsClicked[4][4])
-            counter++;
-        if(cellsClicked[0][4] && cellsClicked[1][3] && cellsClicked[2][2] && cellsClicked[3][1] && cellsClicked[4][0])
+        if (gameGridCellList.get(0).getIsClicked() &&
+                gameGridCellList.get(GRID_SIZE).getIsClicked() &&
+                gameGridCellList.get(2 * GRID_SIZE).getIsClicked() &&
+                gameGridCellList.get(3 * GRID_SIZE).getIsClicked() &&
+                gameGridCellList.get(4 * GRID_SIZE).getIsClicked())
             counter++;
 
-        if(counter > GRID_SIZE) counter=GRID_SIZE;
+        if (gameGridCellList.get(4).getIsClicked() &&
+                gameGridCellList.get(GRID_SIZE + 3).getIsClicked() &&
+                gameGridCellList.get(2 * GRID_SIZE + 2).getIsClicked() &&
+                gameGridCellList.get(3 * GRID_SIZE + 1).getIsClicked() &&
+                gameGridCellList.get(4 * GRID_SIZE).getIsClicked())
+            counter++;
 
-        switch(counter)
-        {
+        if (counter > GRID_SIZE) counter = GRID_SIZE;
+
+        switch (counter) {
             // severe fall through
-            case 5 : O.setTextColor(Color.parseColor("#FF0000"));
-            case 4 : G.setTextColor(Color.parseColor("#FF0000"));
-            case 3 : N.setTextColor(Color.parseColor("#FF0000"));
-            case 2 : I.setTextColor(Color.parseColor("#FF0000"));
-            case 1 : B.setTextColor(Color.parseColor("#FF0000"));
+            case 5:
+                O.setTextColor(Color.parseColor("#FF0000"));
+            case 4:
+                G.setTextColor(Color.parseColor("#FF0000"));
+            case 3:
+                N.setTextColor(Color.parseColor("#FF0000"));
+            case 2:
+                I.setTextColor(Color.parseColor("#FF0000"));
+            case 1:
+                B.setTextColor(Color.parseColor("#FF0000"));
         }
 
         return counter;
     }
 
     // Undo button click handler
-    private void UndoButtonClickListener(){
+    @OnClick(R.id.undoButton)
+    void onUndoButtonClick() {
 
-        undoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cellsClicked[lastClickedPositionX][lastClickedPositionY] = false;
+        if (!isGameStarted) {
+            Toast.makeText(this, "Please start the game", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                TextView value = (TextView)lastClickedView.findViewById(R.id.value_textView);
-                value.setTextColor(Color.parseColor("#000000"));
-                value.setTypeface(value.getTypeface(), Typeface.NORMAL);
-            }
-        });
+        gameGridCellList.get(lastClickedPositionX * GRID_SIZE + lastClickedPositionY).setIsClicked(false);
+
+        TextView value = (TextView) lastClickedView.findViewById(R.id.value_textView);
+        value.setTextColor(Color.parseColor("#000000"));
+        value.setTypeface(value.getTypeface(), Typeface.NORMAL);
     }
 
     // Creates new ArrayList and swaps the data with adapter
-    private void ResetButtonClickListener() {
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                recreate();
-            }
-        });
+    @OnClick(R.id.resetButton)
+    void onResetButtonClick() {
+
+        if (!isGameStarted) {
+            Toast.makeText(this, "Please start the game", Toast.LENGTH_SHORT).show();
+        } else {
+            recreate();
+        }
     }
 
     @Override
     public void onGridCellClick(int position, View view) {
 
-        /* Updating cellsClicked[][] */
-        cellsClicked[mData.get(position).getPositionX()][mData.get(position).getPositionY()] = true;
+        /* Setting these variables for Undo option */
+        lastClickedPositionX = gameGridCellList.get(position).getPositionX();
+        lastClickedPositionY = gameGridCellList.get(position).getPositionY();
+        lastClickedView = view;
 
-        /* Settings the clicked cell's font style to RED and BOLD */
-        TextView value = (TextView)view.findViewById(R.id.value_textView);
-        value.setTextColor(Color.parseColor("#FF0000"));
-        value.setTypeface(value.getTypeface(), Typeface.BOLD);
+        /* Updating cellsClicked[][] */
+        isGameStarted = true;
+        Log.v(":::",String.valueOf(lastClickedPositionX) + "::" + String.valueOf(lastClickedPositionY));
+        gameGridCellList.get(lastClickedPositionX * GRID_SIZE + lastClickedPositionY).setIsClicked(true);
+
+        mGridAdapter.swapData(gameGridCellList);
 
         /* Checking of 5 rows are completed */
-        if(numberOfRowsCompleted() == 5)
-        {
-            Toast.makeText(MainActivity.this,"CONGRATULATIONS", Toast.LENGTH_LONG).show();
+        if (numberOfRowsCompleted() == 5) {
+            Toast.makeText(MainActivity.this, "CONGRATULATIONS", Toast.LENGTH_LONG).show();
             celebration.start();
             game_recyclerView.setEnabled(false);
             mPopField.popView(undoButton);
             resetButton.setText(R.string.new_game);
 
-            GradientDrawable resetGradientDrawable = (GradientDrawable)resetButton.getBackground();
+            GradientDrawable resetGradientDrawable = (GradientDrawable) resetButton.getBackground();
             resetGradientDrawable.setColor(Color.parseColor("#669900"));
         }
-
-        /* Setting these variables for Undo option */
-        lastClickedPositionX = mData.get(position).getPositionX();
-        lastClickedPositionY = mData.get(position).getPositionY();
-        lastClickedView = view;
     }
+
 }
