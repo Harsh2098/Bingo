@@ -22,6 +22,7 @@ import com.hmproductions.bingo.data.GridCell;
 import com.hmproductions.bingo.utils.GameGridRecyclerAdapter;
 import com.hmproductions.bingo.utils.WifiDirectBroadcastReceiver;
 
+import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -138,10 +139,11 @@ public class MainActivity extends AppCompatActivity implements GameGridRecyclerA
     private void CreateGameGridList() {
         int[][] randomArray = CreateRandomGameArray();
 
-        for (int i = 0; i < GRID_SIZE; ++i)
+        for (int i = 0; i < GRID_SIZE; ++i) {
             for (int j = 0; j < GRID_SIZE; ++j) {
                 gameGridCellList.add(new GridCell(randomArray[i][j], i, j, false));
             }
+        }
     }
 
     // Returns the number of rows completed

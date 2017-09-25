@@ -8,4 +8,6 @@
     <string name="undo">UNDO</string>
     <string name="reset">RESET</string>
     <string name="new_game">NEW GAME</string>
+    <string name="client">CLIENT</string>
+    <string name="host">HOST</string>
 </resources>

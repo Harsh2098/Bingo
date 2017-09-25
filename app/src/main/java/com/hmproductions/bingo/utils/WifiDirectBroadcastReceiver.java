@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.hmproductions.bingo.ui.MainActivity;
@@ -49,16 +52,28 @@ public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
 
             Toast.makeText(context, "P2P Connection changed", Toast.LENGTH_SHORT).show();
+            activity.updatePlayersList();
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
 
-//            DeviceListFragment fragment = (DeviceListFragment) activity.getFragmentManager()
-//                    .findFragmentById(R.id.frag_list);
-//            fragment.updateThisDevice((WifiP2pDevice) intent.getParcelableExtra(
-//                    WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
+            if (manager == null || intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO)==null) {
+                return;
+            }
 
-            Toast.makeText(context, "P2P this device changed", Toast.LENGTH_SHORT).show();
+            NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
+            if (networkInfo.isConnected()) {
+
+                // We are connected with the other device, request connection
+                // info to find group owner IP
+
+                manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
+                    @Override
+                    public void onConnectionInfoAvailable(WifiP2pInfo info) {
+                        Log.v("::::", info.toString());
+                    }
+                });
+            }
         }
     }
 }

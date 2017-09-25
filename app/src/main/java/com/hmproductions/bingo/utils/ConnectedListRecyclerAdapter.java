@@ -16,34 +16,38 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PeersListRecyclerAdapter extends RecyclerView.Adapter<PeersListRecyclerAdapter.PeerViewHolder> {
+public class ConnectedListRecyclerAdapter extends RecyclerView.Adapter<ConnectedListRecyclerAdapter.ConnectedPeerViewHolder> {
 
     private Context context;
     private List<WifiP2pDevice> peerList = new ArrayList<>();
-    private PeerItemClickListener listener;
-    private String displayAddress = null;
+    private ConnectedPeerItemClickListener listener;
+    private boolean isHost = false;
 
-    public interface PeerItemClickListener {
-        void onPeerItemClick(int position);
+    public interface ConnectedPeerItemClickListener {
+        void onConnectedPeerItemClick(int position);
     }
 
-    public PeersListRecyclerAdapter(Context context, List<WifiP2pDevice> peerList, PeerItemClickListener listener) {
+    public ConnectedListRecyclerAdapter(Context context, List<WifiP2pDevice> peerList, ConnectedPeerItemClickListener listener) {
         this.context = context;
         this.peerList = peerList;
         this.listener = listener;
     }
 
     @Override
-    public PeerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ConnectedPeerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View myView = LayoutInflater.from(context).inflate(R.layout.peer_item_list, parent, false);
-        return new PeerViewHolder(myView);
+        return new ConnectedPeerViewHolder(myView);
     }
 
     @Override
-    public void onBindViewHolder(PeerViewHolder holder, int position) {
+    public void onBindViewHolder(ConnectedPeerViewHolder holder, int position) {
 
         holder.deviceNameTextView.setText(peerList.get(position).deviceName);
-        holder.deviceAddressTextView.setText(peerList.get(position).deviceAddress);
+
+        if(isHost)
+            holder.deviceAddressTextView.setText(context.getString(R.string.host));
+        else
+            holder.deviceAddressTextView.setText(context.getString(R.string.client));
     }
 
     @Override
@@ -52,12 +56,13 @@ public class PeersListRecyclerAdapter extends RecyclerView.Adapter<PeersListRecy
         return peerList.size();
     }
 
-    public void swapData(List<WifiP2pDevice> list) {
+    public void swapData(List<WifiP2pDevice> list, boolean isHost) {
         peerList = list;
+        this.isHost = isHost;
         notifyDataSetChanged();
     }
 
-    class PeerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class ConnectedPeerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         @BindView(R.id.deviceAddress_textView)
         TextView deviceAddressTextView;
@@ -65,7 +70,7 @@ public class PeersListRecyclerAdapter extends RecyclerView.Adapter<PeersListRecy
         @BindView(R.id.deviceName_textView)
         TextView deviceNameTextView;
 
-        PeerViewHolder(View itemView) {
+        ConnectedPeerViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
@@ -74,7 +79,7 @@ public class PeersListRecyclerAdapter extends RecyclerView.Adapter<PeersListRecy
 
         @Override
         public void onClick(View v) {
-            listener.onPeerItemClick(getAdapterPosition());
+            listener.onConnectedPeerItemClick(getAdapterPosition());
         }
     }
 }
