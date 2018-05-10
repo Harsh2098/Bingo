@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -17,9 +18,6 @@ import com.hmproductions.bingo.data.GridCell;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 /*
  * Created by harsh on 7/30/17.
  *
@@ -28,7 +26,7 @@ import butterknife.ButterKnife;
 
 public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecyclerAdapter.GridViewHolder> {
     
-    private ArrayList<GridCell> gameGridCellList = new ArrayList<>();
+    private ArrayList<GridCell> gameGridCellList;
     private Context context;
     private int GRID_SIZE;
     private GridCellClickListener mClickListener;
@@ -50,8 +48,9 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
         layoutParams = new RelativeLayout.LayoutParams(displayMetrics.widthPixels/GRID_SIZE,displayMetrics.widthPixels/GRID_SIZE);
     }
 
+    @NonNull
     @Override
-    public GameGridRecyclerAdapter.GridViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public GameGridRecyclerAdapter.GridViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View myView = LayoutInflater.from(context).inflate(R.layout.grid_item,parent, false);
         myView.setLayoutParams(layoutParams);
@@ -60,7 +59,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
     }
 
     @Override
-    public void onBindViewHolder(GameGridRecyclerAdapter.GridViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GameGridRecyclerAdapter.GridViewHolder holder, int position) {
 
         holder.value_textView.setText(String.valueOf(gameGridCellList.get(position).getValue()));
 
@@ -85,13 +84,12 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
 
     class GridViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        @BindView(R.id.value_textView)
         TextView value_textView;
         
         GridViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
 
+            value_textView = itemView.findViewById(R.id.value_textView);
             itemView.setOnClickListener(this);
         }
 

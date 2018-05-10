@@ -10,4 +10,5 @@
     <string name="new_game">NEW GAME</string>
     <string name="client">CLIENT</string>
     <string name="host">HOST</string>
+    <string name="join">Join</string>
 </resources>

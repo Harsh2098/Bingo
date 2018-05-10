@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bingo.proto;
+
+option java_multiple_files = true;
+
+import "actions/GetGridSize.proto";
+
+service BingoActionService {
+    rpc GetGridSize(actions.GetGridSizeRequest) returns (actions.GetGridSizeResponse);
+}
