@@ -1,8 +1,8 @@
-package com.hmproductions.bingo.server;
+package com.hmproductions.bingo;
 
-import bingo.proto.BingoActionServiceGrpc;
-import bingo.proto.actions.GetGridSizeRequest;
-import bingo.proto.actions.GetGridSizeResponse;
+import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeRequest;
+import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeResponse;
+
 import io.grpc.stub.StreamObserver;
 
 public class BingoServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {

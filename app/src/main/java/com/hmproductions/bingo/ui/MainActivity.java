@@ -5,17 +5,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.R;
+import com.hmproductions.bingo.actions.GetGridSize.*;
 import com.hmproductions.bingo.dagger.ChannelModule;
 import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
-import com.hmproductions.bingo.server.BingoServer;
 
 import javax.inject.Inject;
-
-import bingo.proto.BingoActionServiceGrpc;
-import bingo.proto.actions.GetGridSizeRequest;
-import bingo.proto.actions.GetGridSizeResponse;
 
 import static com.hmproductions.bingo.utils.IPAddress.getIPAddress;
 
@@ -42,9 +39,6 @@ public class MainActivity extends AppCompatActivity {
                         .contextModule(new ContextModule(this))
                         .channelModule(new ChannelModule(hostIPAddress))
                         .build().inject(this);
-
-                BingoServer bingoServer = new BingoServer();
-                bingoServer.startServer();
 
                 Toast.makeText(this, "Server Started", Toast.LENGTH_SHORT).show();
         });

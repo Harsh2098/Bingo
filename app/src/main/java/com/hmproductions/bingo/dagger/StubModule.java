@@ -1,8 +1,8 @@
 package com.hmproductions.bingo.dagger;
 
+import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.utils.Constants;
 
-import bingo.proto.BingoActionServiceGrpc;
 import dagger.Module;
 import dagger.Provides;
 import io.grpc.ManagedChannel;

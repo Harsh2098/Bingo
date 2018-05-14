@@ -1,4 +1,4 @@
-package com.hmproductions.bingo.utils;
+package com.hmproductions.bingo;
 
 public class Constants {
 
