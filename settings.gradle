@@ -1,1 +1,1 @@
-include ':app', ':BingoServer'
+include ':app', ':server'

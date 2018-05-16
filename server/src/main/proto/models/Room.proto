@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package com.hmproductions.bingo.models;
+option java_multiple_files = true;
+
+message Room {
+
+    enum StatusCode {
+        WAITING = 0;
+        IN_GAME = 1;
+    }
+
+    uint32 id = 1; // room_id -1 indicates it is an invalid room
+    uint32 count = 2;
+    StatusCode status_code = 3;
+}

@@ -11,4 +11,17 @@
     <string name="client">CLIENT</string>
     <string name="host">HOST</string>
     <string name="join">Join</string>
+    <string name="host_ip_address">Host IP Address</string>
+    <string name="leave">Leave</string>
+    <string name="name">Name</string>
+
+    <string-array name="colors">
+        <item>Red</item>
+        <item>Green</item>
+        <item>Blue</item>
+        <item>Yellow</item>
+        <item>Violet</item>
+        <item>White</item>
+    </string-array>
+
 </resources>

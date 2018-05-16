@@ -34,19 +34,13 @@ import io.grpc.okhttp.OkHttpChannelBuilder;
 @Module(includes = ContextModule.class)
 public class ChannelModule {
 
-    private String hostIPAddress;
-
-    public ChannelModule(String hostIPAddress) {
-        this.hostIPAddress = hostIPAddress;
-    }
-
     @Provides
     @BingoApplicationScope
     public ManagedChannel getManagedChannel(Context context) {
 
 
         return OkHttpChannelBuilder
-                .forAddress(hostIPAddress, Constants.SERVER_PORT)
+                .forAddress(Constants.SERVER_ADDRESS, Constants.SERVER_PORT)
                 //.sslSocketFactory(getSocketFactory(context))
                 .usePlaintext()
                 .connectionSpec(ConnectionSpec.MODERN_TLS)

@@ -10,13 +10,10 @@ public class BingoServer {
 
     static public void main(String args[]) {
 
-        java.security.Security.addProvider(
-                new org.bouncycastle.jce.provider.BouncyCastleProvider()
-        );
-
         Server server = ServerBuilder
                 .forPort(Constants.SERVER_PORT)
-                .addService(new BingoServiceImpl())
+                .addService(new BingoActionServiceImpl())
+                .addService(new BingoStreamServiceImpl())
                 //.useTransportSecurity(new File("BingoServer/server.crt"), new File("BingoServer/server.key"))
                 .build();
 
@@ -34,4 +31,3 @@ public class BingoServer {
         }
     }
 }
-

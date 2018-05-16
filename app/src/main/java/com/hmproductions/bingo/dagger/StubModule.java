@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.dagger;
 
 import com.hmproductions.bingo.BingoActionServiceGrpc;
+import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.utils.Constants;
 
 import dagger.Module;
@@ -14,8 +15,15 @@ public class StubModule {
 
     @Provides
     @BingoApplicationScope
-    public BingoActionServiceGrpc.BingoActionServiceBlockingStub getActionServiceStub(ManagedChannel channel){
+    public BingoActionServiceGrpc.BingoActionServiceBlockingStub getActionServiceBlockingStub(ManagedChannel channel){
         BingoActionServiceGrpc.BingoActionServiceBlockingStub stub = BingoActionServiceGrpc.newBlockingStub(channel);
+        return MetadataUtils.attachHeaders(stub, getStubMetadata());
+    }
+
+    @Provides
+    @BingoApplicationScope
+    public BingoStreamServiceGrpc.BingoStreamServiceStub getStreamServiceStub(ManagedChannel channel) {
+        BingoStreamServiceGrpc.BingoStreamServiceStub stub = BingoStreamServiceGrpc.newStub(channel);
         return MetadataUtils.attachHeaders(stub, getStubMetadata());
     }
     

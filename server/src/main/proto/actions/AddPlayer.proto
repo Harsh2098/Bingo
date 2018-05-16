@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package com.hmproductions.bingo.actions;
+option java_multiple_files = true;
+
+import "models/Player.proto";
+import "models/Room.proto";
+
+message AddPlayerRequest {
+    models.Player player = 1;
+}
+
+message AddPlayerResponse {
+
+    enum StatusCode {
+         OK = 0;
+         ROOM_FULL = 1;
+         SERVER_ERROR = 2;
+    }
+
+    StatusCode status_code = 1;
+    string status_message = 2;
+    models.Room room = 3;
+}

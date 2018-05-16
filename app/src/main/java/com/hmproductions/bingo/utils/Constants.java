@@ -3,6 +3,7 @@ package com.hmproductions.bingo.utils;
 public class Constants {
 
     public static final int SERVER_PORT = 8080;
+    public static final String SERVER_ADDRESS = "192.168.0.182";
 
     public static final String SAMPLE_SESSION_ID = "bingo4lyfxD1020";
 
@@ -35,4 +36,8 @@ public class Constants {
             "EYrt2uzl6wJHiNDrIyEmr1YepVDyNiYaSt0S6T72qd68eBeDZ5q6rI1bQcsrp1/N\n" +
             "4yxybWqAkiH/0e4JsG3sXIABMClz0rcoS4hq6wdin8K45mxnFBZaK1Q=\n" +
             "-----END CERTIFICATE-----";
+
+    public static final int ADD_PLAYER_LOADER_ID = 101;
+    public static final int REMOVE_PLAYER_LOADER_ID = 201;
+    public static final int READY_PLAYER_LOADER_ID = 301;
 }

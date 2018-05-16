@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.hmproductions.bingo.actions;
+option java_multiple_files = true;
+
+message SetPlayerReadyRequest {
+    uint32 player_id = 1;
+    bool isReady = 2;
+}
+
+message SetPlayerReadyResponse {
+
+    enum StatusCode {
+        OK = 0;
+        SERVER_ERROR = 2;
+    }
+
+    StatusCode status_code = 1;
+    string status_message = 2;
+}

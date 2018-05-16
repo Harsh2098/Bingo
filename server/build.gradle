@@ -42,7 +42,6 @@ dependencies {
     compile 'io.grpc:grpc-netty-shaded:1.11.0'
     compile 'io.grpc:grpc-protobuf:1.11.0'
     compile 'io.grpc:grpc-stub:1.11.0'
-    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.56'
 }
 
 sourceCompatibility = "1.8"
