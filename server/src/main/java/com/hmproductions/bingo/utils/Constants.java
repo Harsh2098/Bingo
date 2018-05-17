@@ -1,10 +1,8 @@
-package com.hmproductions.bingo;
+package com.hmproductions.bingo.utils;
 
 public class Constants {
 
     public static final int SERVER_PORT = 8080;
-
-    public static final String SAMPLE_SESSION_ID = "bingo4lyfxD1020";
 
     public static final String SERVER_CERT = "-----BEGIN CERTIFICATE-----\n" +
             "MIIFBTCCA+2gAwIBAgISA+OThMLh+yVPNP5jen9UpZLLMA0GCSqGSIb3DQEBCwUA\n" +

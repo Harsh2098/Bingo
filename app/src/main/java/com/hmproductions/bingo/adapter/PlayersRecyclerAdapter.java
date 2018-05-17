@@ -44,7 +44,7 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
 
         holder.playerNameTextView.setText(currentPlayer.getName());
         holder.playerColorTextView.setText(currentPlayer.getColor());
-        holder.readyView.setBackgroundColor(Color.parseColor(currentPlayer.isReady()?"00FF00":"FF0000"));
+        holder.readyView.setBackgroundColor(Color.parseColor(currentPlayer.isReady()?"#00FF00":"#FF0000"));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
     }
 
     public void swapData(List<Player> newList) {
-        playersList = newList;
+        this.playersList = newList;
         notifyDataSetChanged();
     }
 
@@ -69,6 +69,8 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
             playerNameTextView = itemView.findViewById(R.id.playerName_textView);
             playerColorTextView = itemView.findViewById(R.id.playerColor_textView);
             readyView = itemView.findViewById(R.id.ready_view);
+
+            readyView.setOnClickListener(this);
         }
 
         @Override

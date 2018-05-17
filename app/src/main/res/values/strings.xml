@@ -14,6 +14,8 @@
     <string name="host_ip_address">Host IP Address</string>
     <string name="leave">Leave</string>
     <string name="name">Name</string>
+    <string name="processing_request">Processing request…</string>
+    <string name="player_name">Player Name</string>
 
     <string-array name="colors">
         <item>Red</item>
