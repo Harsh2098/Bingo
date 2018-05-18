@@ -8,8 +8,7 @@ public class Constants {
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;
     public static final int READY_PLAYER_LOADER_ID = 301;
-
-    public static final String REFRESH_PLAYERS_LIST_ACTION = "refresh-list-action";
+    public static final int UNSUBSCRIBE_LOADER_ID = 401;
 
     public static final String SAMPLE_SESSION_ID = "bingo4lyfxD1020";
 

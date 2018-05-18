@@ -5,4 +5,5 @@ option java_multiple_files = true;
 
 message Subscription {
     uint32 room_id = 1;
+    uint32 player_id = 2;
 }

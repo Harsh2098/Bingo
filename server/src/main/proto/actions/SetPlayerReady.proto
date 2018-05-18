@@ -17,4 +17,6 @@ message SetPlayerReadyResponse {
 
     StatusCode status_code = 1;
     string status_message = 2;
+    uint32 player_id = 3;
+    bool isReady = 4;
 }

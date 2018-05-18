@@ -12,7 +12,8 @@ message RoomEvent {
         ADD_PLAYER = 1;
         REMOVE_PLAYER = 2;
         PLAYER_READY_CHANGED = 3;
-        GAME_START = 4;
+        PLAYER_STATE_CHANGED = 4;
+        GAME_START = 5;
     }
 
     EventCode event_code = 1;

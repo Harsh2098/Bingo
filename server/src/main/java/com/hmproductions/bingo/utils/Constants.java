@@ -4,6 +4,8 @@ public class Constants {
 
     public static final int SERVER_PORT = 8080;
 
+    public static final int MAX_PLAYERS = 3;
+
     public static final String SERVER_CERT = "-----BEGIN CERTIFICATE-----\n" +
             "MIIFBTCCA+2gAwIBAgISA+OThMLh+yVPNP5jen9UpZLLMA0GCSqGSIb3DQEBCwUA\n" +
             "MEoxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQD\n" +

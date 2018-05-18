@@ -24,6 +24,7 @@ import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.actions.AddPlayerResponse;
 import com.hmproductions.bingo.actions.RemovePlayerResponse;
 import com.hmproductions.bingo.actions.SetPlayerReadyResponse;
+import com.hmproductions.bingo.actions.Unsubscribe;
 import com.hmproductions.bingo.adapter.PlayersRecyclerAdapter;
 import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
@@ -32,6 +33,7 @@ import com.hmproductions.bingo.datastreams.RoomEventUpdate;
 import com.hmproductions.bingo.loaders.AddPlayerLoader;
 import com.hmproductions.bingo.loaders.RemovePlayerLoader;
 import com.hmproductions.bingo.loaders.SetReadyLoader;
+import com.hmproductions.bingo.loaders.UnsubscribeLoader;
 import com.hmproductions.bingo.models.RoomEvent;
 import com.hmproductions.bingo.models.Subscription;
 import com.hmproductions.bingo.utils.Constants;
@@ -168,22 +170,31 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
 
             if (data.getStatusCode() == SetPlayerReadyResponse.StatusCode.SERVER_ERROR) {
                 Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
-                return;
             }
-
-            // Setting player ready/not ready in the Main activity's data of players
-            for (Player player : playersList) {
-                if (player.getId() == currentPlayerId) {
-                    player.setReady(!player.isReady());
-                    break;
-                }
-            }
-
-            playersRecyclerAdapter.swapData(playersList);
         }
 
         @Override
         public void onLoaderReset(@NonNull Loader<SetPlayerReadyResponse> loader) {
+            // Do nothing
+        }
+    };
+
+    private LoaderCallbacks<Unsubscribe.UnsubscribeResponse> unsubscribeLoader = new LoaderCallbacks<Unsubscribe.UnsubscribeResponse>() {
+        @NonNull
+        @Override
+        public Loader<Unsubscribe.UnsubscribeResponse> onCreateLoader(int id, @Nullable Bundle args) {
+
+            return new UnsubscribeLoader(MainActivity.this, actionServiceBlockingStub, currentPlayerId, currentRoomId);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<Unsubscribe.UnsubscribeResponse> loader, Unsubscribe.UnsubscribeResponse data) {
+            if (data.getStatusCode() == Unsubscribe.UnsubscribeResponse.StatusCode.INTERNAL_SERVER_ERROR)
+                Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<Unsubscribe.UnsubscribeResponse> loader) {
             // Do nothing
         }
     };
@@ -224,8 +235,10 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
     @OnClick(R.id.leave_button)
     void onLeaveButtonClick() {
 
-        if (currentPlayerId != -1)
+        if (currentPlayerId != -1) {
             getSupportLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader);
+            //getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
+        }
         else
             Toast.makeText(this, "You have not joined", Toast.LENGTH_SHORT).show();
     }
@@ -239,12 +252,13 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
 
     private void subscribeToRoomEventsUpdate(int roomId) {
 
-        streamServiceStub.getRoomEventUpdates(Subscription.newBuilder().setRoomId(roomId).build(), new StreamObserver<RoomEventUpdate>() {
+        streamServiceStub.getRoomEventUpdates(Subscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).build(), new StreamObserver<RoomEventUpdate>() {
             @Override
             public void onNext(RoomEventUpdate value) {
 
                 if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER ||
                         value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_READY_CHANGED ||
+                        value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_STATE_CHANGED ||
                         value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
                     List<com.hmproductions.bingo.models.Player> responseList = value.getRoomEvent().getPlayersList();
 
@@ -285,5 +299,15 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                 return currentPlayer.isReady();
         }
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (currentPlayerId != -1) {
+            getSupportLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader);
+            //getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
+        }
     }
 }

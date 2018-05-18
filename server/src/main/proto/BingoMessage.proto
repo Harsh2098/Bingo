@@ -7,6 +7,7 @@ import "actions/GetGridSize.proto";
 import "actions/AddPlayer.proto";
 import "actions/RemovePlayer.proto";
 import "actions/SetPlayerReady.proto";
+import "actions/Unsubscribe.proto";
 
 import "models/Subscription.proto";
 
@@ -19,6 +20,7 @@ service BingoActionService {
     rpc AddPlayer(actions.AddPlayerRequest) returns (actions.AddPlayerResponse);
     rpc RemovePlayer(actions.RemovePlayerRequest) returns (actions.RemovePlayerResponse);
     rpc SetPlayerReady(actions.SetPlayerReadyRequest) returns (actions.SetPlayerReadyResponse);
+    rpc Unsubscribe(actions.UnsubscribeRequest) returns (actions.UnsubscribeResponse);
 }
 
 service BingoStreamService {
