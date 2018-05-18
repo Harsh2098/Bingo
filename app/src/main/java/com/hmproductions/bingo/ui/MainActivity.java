@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                     currentPlayerId = playerNameEditText.getText().toString().length();
                     currentRoomId = data.getRoom().getId();
                     subscribeToRoomEventsUpdate(currentRoomId);
+                    playersRecyclerView.setVisibility(View.VISIBLE);
                     break;
 
                 case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
@@ -143,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                 currentPlayerId = currentRoomId = -1;
                 playersList.clear();
                 playersRecyclerAdapter.swapData(null);
+                playersRecyclerView.setVisibility(View.GONE);
             }
         }
 
