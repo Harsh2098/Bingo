@@ -1,13 +1,18 @@
 package com.hmproductions.bingo.services;
 
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
+import com.hmproductions.bingo.data.GameEventSubscription;
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.data.RoomEventSubscription;
+import com.hmproductions.bingo.datastreams.GameEventUpdate;
 import com.hmproductions.bingo.datastreams.RoomEventUpdate;
+import com.hmproductions.bingo.models.GameEvent;
+import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.models.RoomEvent;
 import com.hmproductions.bingo.models.Subscription;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import io.grpc.stub.StreamObserver;
 
@@ -16,7 +21,11 @@ import static com.hmproductions.bingo.utils.Miscellaneous.getArrayListFromPlayer
 
 public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamServiceImplBase {
 
+    static int totalPlayers = 0, currentPlayerPosition = -1;
+    private static boolean gameStarted = false;
+
     static ArrayList<RoomEventSubscription> subscriptionArrayList = new ArrayList<>();
+    static ArrayList<GameEventSubscription> gameEventSubscriptionArrayList = new ArrayList<>();
 
     @Override
     public void getRoomEventUpdates(Subscription request, StreamObserver<RoomEventUpdate> responseObserver) {
@@ -31,19 +40,80 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
         }
 
         if (!found) {
-            System.out.println("Adding " + request.getPlayerId() + " to the room update list.");
             subscriptionArrayList.add(new RoomEventSubscription(responseObserver, request));
         }
 
         RoomEvent roomEvent = RoomEvent.newBuilder()
                 .addAllPlayers(getArrayListFromPlayersList(playersList)).setEventCode(RoomEvent.EventCode.PLAYER_STATE_CHANGED).build();
 
-        System.out.println("Sending a room event update to " + request.getPlayerId());
+        responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
 
+        boolean allPlayersReady = true;
         for (Player player : playersList) {
-            System.out.print("Name:" + player.getName() + " Id:" + player.getId() + " Ready:" + player.isReady() + "\n");
+            if (!player.isReady()) {
+                allPlayersReady = false;
+            }
         }
 
-        responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
+        if (allPlayersReady && playersList.size() > 1) {
+
+            setupCurrentPlayerAndStartGame();
+
+            System.out.print("Total players = " + totalPlayers + " and Current Player = " + playersList.get(currentPlayerPosition).getId() + "\n");
+
+            roomEvent = RoomEvent.newBuilder().setEventCode(RoomEvent.EventCode.GAME_START)
+                    .addAllPlayers(getArrayListFromPlayersList(playersList)).build();
+
+            responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
+
+            // TODO : Call onCompleted()
+        }
+    }
+
+    @Override
+    public void getGameEventUpdates(GameSubscription request, StreamObserver<GameEventUpdate> responseObserver) {
+
+        if (!gameSubscriptionExists(request.getPlayerId())) {
+            gameEventSubscriptionArrayList.add(new GameEventSubscription(responseObserver, request));
+        }
+
+        GameEvent gameEvent;
+
+        System.out.println("Cell clicked = " + request.getCellClicked() + " current player " + request.getPlayerId());
+
+        if (request.getFirstSubscription()) {
+
+            gameEvent = GameEvent.newBuilder().setEventCode(GameEvent.EventCode.GAME_STARTED)
+                    .setWinner(-1).setCellClicked(-1).setCurrentPlayerId(playersList.get(currentPlayerPosition).getId()).build();
+
+        } else {
+
+            gameEvent = GameEvent.newBuilder().setCurrentPlayerId(playersList.get(currentPlayerPosition).getId())
+                    .setEventCode(request.getWinnerId() == -1 ? GameEvent.EventCode.CELL_CLICKED : GameEvent.EventCode.GAME_WON)
+                    .setCellClicked(request.getCellClicked()).setWinner(request.getWinnerId()).build();
+
+        }
+
+        responseObserver.onNext(GameEventUpdate.newBuilder().setGameEvent(gameEvent).build());
+    }
+
+    private void setupCurrentPlayerAndStartGame() {
+
+        if (!gameStarted) {
+            totalPlayers = playersList.size();
+            currentPlayerPosition = new Random().nextInt(totalPlayers);
+        }
+
+        gameStarted = true;
+    }
+
+    private boolean gameSubscriptionExists(int playerId) {
+
+        for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
+            if (currentSubscription.getGameSubscription().getPlayerId() == playerId)
+                return true;
+        }
+
+        return false;
     }
 }

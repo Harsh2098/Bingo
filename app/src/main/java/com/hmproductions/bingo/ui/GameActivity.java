@@ -1,34 +1,79 @@
 package com.hmproductions.bingo.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hmproductions.bingo.BingoActionServiceGrpc;
+import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
+import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse;
+import com.hmproductions.bingo.adapter.GameGridRecyclerAdapter;
+import com.hmproductions.bingo.dagger.ContextModule;
+import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
+import com.hmproductions.bingo.data.ClickCellRequest;
 import com.hmproductions.bingo.data.GridCell;
-import com.hmproductions.bingo.utils.GameGridRecyclerAdapter;
+import com.hmproductions.bingo.data.Player;
+import com.hmproductions.bingo.datastreams.GameEventUpdate;
+import com.hmproductions.bingo.loaders.ClickCellLoader;
+import com.hmproductions.bingo.models.GameEvent;
+import com.hmproductions.bingo.models.GameSubscription;
+import com.hmproductions.bingo.utils.Constants;
 
 import java.util.ArrayList;
-import java.util.Random;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.grpc.stub.StreamObserver;
 
-public class GameActivity extends AppCompatActivity implements GameGridRecyclerAdapter.GridCellClickListener {
+import static com.hmproductions.bingo.models.GameEvent.EventCode.CELL_CLICKED_VALUE;
+import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VALUE;
+import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
+import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
+import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
+
+public class GameActivity extends AppCompatActivity implements
+        GameGridRecyclerAdapter.GridCellClickListener,
+        LoaderManager.LoaderCallbacks<ClickGridCellResponse> {
+
+    public static final String PLAYER_ID = "player-id";
+    public static final String ROOM_ID = "room-id";
+    public static final String PLAYERS_LIST_ID = "players-list-id";
+
+    public static final String CELL_CLICKED_ID = "cell-clicked-id";
+    public static final String WON_ID = "won-id";
+    public static final String CURRENT_PLAYER_ID = "current-player-id";
+    public static final String EVENT_CODE_ID = "event-code-id";
 
     private static final int GRID_SIZE = 5;
 
+    @Inject
+    BingoStreamServiceGrpc.BingoStreamServiceStub streamServiceStub;
+
+    @Inject
+    BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
+
     @BindView(R.id.game_recyclerView)
-    RecyclerView game_recyclerView;
+    RecyclerView gameRecyclerView;
 
     @BindView(R.id.B_textView)
     TextView B;
@@ -45,13 +90,13 @@ public class GameActivity extends AppCompatActivity implements GameGridRecyclerA
     @BindView(R.id.O_textView)
     TextView O;
 
-    private Button resetButton;
-
     private MediaPlayer celebration;
-    private GameGridRecyclerAdapter mGridAdapter;
+    private GameGridRecyclerAdapter gridRecyclerAdapter;
 
     ArrayList<GridCell> gameGridCellList = new ArrayList<>();
-    private boolean isGameStarted = false;
+
+    private int playerId = -1, roomId = -1;
+    private ArrayList<Player> playersList = new ArrayList<>();
 
     /*
      *  cellsClicked[][] keeps track of the grid cells clicked by the user
@@ -59,74 +104,89 @@ public class GameActivity extends AppCompatActivity implements GameGridRecyclerA
      *  lastClickPosition holds the X,Y position of recently clicked grid cell
      */
 
+    private BroadcastReceiver gridCellReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction() != null && intent.getAction().equals(Constants.GRID_CELL_CLICK_ACTION)) {
+
+                int currentPlayerId = intent.getIntExtra(CURRENT_PLAYER_ID, -1);
+                int cellClicked = intent.getIntExtra(CELL_CLICKED_ID, -1);
+                int winnerId = intent.getIntExtra(WON_ID, -1);
+
+                switch (intent.getIntExtra(EVENT_CODE_ID, -1)) {
+
+                    case GAME_WON_VALUE:
+
+                        if (winnerId == playerId) {
+                            Toast.makeText(GameActivity.this, "You won the game", Toast.LENGTH_SHORT).show();
+                            celebration.start();
+                        } else {
+                            Toast.makeText(GameActivity.this, getNameFromId(playersList, winnerId) + " has won", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+
+                    case CELL_CLICKED_VALUE:
+
+                        for (GridCell gridCell : gameGridCellList) {
+                            if (gridCell.getValue() == cellClicked) {
+                                gridCell.setIsClicked(true);
+                                gridRecyclerAdapter.swapData(gameGridCellList);
+                                break;
+                            }
+                        }
+
+                        gameRecyclerView.setEnabled(currentPlayerId == playerId);
+                        break;
+
+                    case GAME_STARTED_VALUE:
+                        if (currentPlayerId == playerId)
+                            Toast.makeText(GameActivity.this, "Start the game", Toast.LENGTH_SHORT).show();
+                        gameRecyclerView.setEnabled(currentPlayerId == playerId);
+                        break;
+
+                    default:
+                        Toast.makeText(GameActivity.this, "Internal server error", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
 
-        BindButtonViews();
+        DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
+
+        roomId = getIntent().getIntExtra(ROOM_ID, -1);
+        playerId = getIntent().getIntExtra(PLAYER_ID, -1);
+        playersList = getIntent().getParcelableArrayListExtra(PLAYERS_LIST_ID);
+
+        new Handler().post(() -> subscribeToGameEventUpdates(playerId, roomId));
 
         // Creates an ArrayList made up of random values
-        CreateGameGridList();
+        CreateGameGridArrayList();
 
-        mGridAdapter = new GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, GRID_SIZE);
+        gridRecyclerAdapter = new GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this);
 
-        game_recyclerView.setLayoutManager(layoutManager);
-        game_recyclerView.setAdapter(mGridAdapter);
-        game_recyclerView.setHasFixedSize(true);
+        gameRecyclerView.setLayoutManager(new GridLayoutManager(this, GRID_SIZE));
+        gameRecyclerView.setAdapter(gridRecyclerAdapter);
+        gameRecyclerView.setHasFixedSize(true);
 
         celebration = MediaPlayer.create(this, R.raw.tada_celebration);
     }
 
-    private void BindButtonViews() {
-
-        resetButton = findViewById(R.id.resetButton);
-
-        GradientDrawable resetGradientdrawable = (GradientDrawable) resetButton.getBackground();
-        resetGradientdrawable.setColor(Color.parseColor("#CC0000"));
-    }
-
-    // Returns an int[GRID_SIZE][GRID_SIZE] containing numbers 1 to 25 randomly placed
-    private int[][] CreateRandomGameArray() {
-
-        int[][] randomArray = new int[GRID_SIZE][GRID_SIZE];
-        int randomNumber1, randomNumber2, randomNumber3, randomNumber4, temp;
-
-        for (int i = 0; i < GRID_SIZE; ++i)
-            for (int j = 0; j < GRID_SIZE; ++j)
-                randomArray[i][j] = i * GRID_SIZE + j + 1;
-
-        // Swapping two random elements of array 100 times
-        for (int i = 0; i < 10; ++i)
-            for (int j = 0; j < 10; ++j) {
-                // Generating 4 random numbers to swap any 2 elements in randomArray
-                Random r1 = new Random();
-                Random r2 = new Random();
-                Random r3 = new Random();
-                Random r4 = new Random();
-                randomNumber1 = (r1.nextInt(GRID_SIZE));
-                randomNumber2 = (r2.nextInt(GRID_SIZE));
-                randomNumber3 = (r3.nextInt(GRID_SIZE));
-                randomNumber4 = (r4.nextInt(GRID_SIZE));
-
-                temp = randomArray[randomNumber1][randomNumber2];
-                randomArray[randomNumber1][randomNumber2] = randomArray[randomNumber3][randomNumber4];
-                randomArray[randomNumber3][randomNumber4] = temp;
-            }
-
-        return randomArray;
-    }
-
     // Creates an ArrayList of GridCell using int[][] made by CreateRandomGameArray()
-    private void CreateGameGridList() {
-        int[][] randomArray = CreateRandomGameArray();
+    private void CreateGameGridArrayList() {
 
-        for (int i = 0; i < GRID_SIZE; ++i) {
-            for (int j = 0; j < GRID_SIZE; ++j) {
-                gameGridCellList.add(new GridCell(randomArray[i][j], i, j, false));
-            }
+        // Returns an array with numbers 1 to GRID_SIZE * GRID_SIZE randomly placed in it
+        int[] randomArray = CreateRandomGameArray(GRID_SIZE);
+
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; ++i) {
+            gameGridCellList.add(new GridCell(randomArray[i], false));
         }
     }
 
@@ -194,39 +254,94 @@ public class GameActivity extends AppCompatActivity implements GameGridRecyclerA
         return counter;
     }
 
-    // Creates new ArrayList and swaps the data with adapter
     @OnClick(R.id.resetButton)
     void onResetButtonClick() {
+        Toast.makeText(this, "Reset not implemented", Toast.LENGTH_SHORT).show();
+    }
 
-        if (!isGameStarted) {
-            Toast.makeText(this, "Please start the game", Toast.LENGTH_SHORT).show();
+    @Override
+    public void onGridCellClick(int value, View view) {
+
+        if (gameRecyclerView.isEnabled()) {
+
+            /* Updating cellsClicked[][] */
+            Bundle bundle = new Bundle();
+            bundle.putInt(CELL_CLICKED_ID, value);
+            bundle.putBoolean(WON_ID, numberOfLinesCompleted() == 5);
+
+            getSupportLoaderManager().restartLoader(Constants.CLICK_CELL_LOADER_ID, bundle, this);
+        }
+    }
+
+    private void subscribeToGameEventUpdates(int playerId, int roomId) {
+
+        GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(true).setWinnerId(-1)
+                .setCellClicked(-1).setRoomId(roomId).setPlayerId(playerId).build();
+
+        streamServiceStub.getGameEventUpdates(gameSubscription, new StreamObserver<GameEventUpdate>() {
+            @Override
+            public void onNext(GameEventUpdate value) {
+
+                GameEvent gameEvent = value.getGameEvent();
+
+                Intent intent = new Intent(Constants.GRID_CELL_CLICK_ACTION);
+                intent.putExtra(EVENT_CODE_ID, gameEvent.getEventCodeValue());
+                intent.putExtra(CELL_CLICKED_ID, gameEvent.getCellClicked());
+                intent.putExtra(CURRENT_PLAYER_ID, gameEvent.getCurrentPlayerId());
+                intent.putExtra(WON_ID, gameEvent.getWinner());
+                LocalBroadcastManager.getInstance(GameActivity.this).sendBroadcast(intent);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+
+            }
+        });
+    }
+
+    @NonNull
+    @Override
+    public Loader<ClickGridCellResponse> onCreateLoader(int id, @Nullable Bundle args) {
+
+        if (args != null) {
+            return new ClickCellLoader(this, actionServiceBlockingStub,
+                    new ClickCellRequest(roomId, playerId, args.getInt(CELL_CLICKED_ID), args.getBoolean(WON_ID)));
         } else {
-            recreate();
+            return new ClickCellLoader(this, actionServiceBlockingStub,
+                    new ClickCellRequest(roomId, playerId, -1, false));
         }
     }
 
     @Override
-    public void onGridCellClick(int position, View view) {
-
-        /* Updating cellsClicked[][] */
-        isGameStarted = true;
-
-        gameGridCellList.get(
-                gameGridCellList.get(position).getPositionX() * GRID_SIZE +
-                gameGridCellList.get(position).getPositionY()).setIsClicked(true);
-
-        mGridAdapter.swapData(gameGridCellList);
-
-        /* Checking of 5 rows are completed */
-        if (numberOfLinesCompleted() == 5) {
-            Toast.makeText(GameActivity.this, "CONGRATULATIONS", Toast.LENGTH_LONG).show();
-            celebration.start();
-            game_recyclerView.setEnabled(false);
-            resetButton.setText(R.string.new_game);
-
-            GradientDrawable resetGradientDrawable = (GradientDrawable) resetButton.getBackground();
-            resetGradientDrawable.setColor(Color.parseColor("#669900"));
-        }
+    public void onLoadFinished(@NonNull Loader<ClickGridCellResponse> loader, ClickGridCellResponse data) {
+        if (data.getStatusCode() == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR)
+            Toast.makeText(this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onLoaderReset(@NonNull Loader<ClickGridCellResponse> loader) {
+        // Do nothing
+    }
+
+    /*
+        HORRIBLE MISTAKE (2) swapping onResume and onPause methods
+     */
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
+                new IntentFilter(Constants.GRID_CELL_CLICK_ACTION));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver);
+    }
 }

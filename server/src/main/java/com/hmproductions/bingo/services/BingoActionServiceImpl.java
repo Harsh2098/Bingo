@@ -3,15 +3,19 @@ package com.hmproductions.bingo.services;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.AddPlayerRequest;
 import com.hmproductions.bingo.actions.AddPlayerResponse;
+import com.hmproductions.bingo.actions.ClickGridCell.*;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeRequest;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeResponse;
 import com.hmproductions.bingo.actions.RemovePlayerRequest;
 import com.hmproductions.bingo.actions.RemovePlayerResponse;
 import com.hmproductions.bingo.actions.SetPlayerReadyRequest;
 import com.hmproductions.bingo.actions.SetPlayerReadyResponse;
-import com.hmproductions.bingo.actions.Unsubscribe.*;
+import com.hmproductions.bingo.actions.Unsubscribe.UnsubscribeRequest;
+import com.hmproductions.bingo.actions.Unsubscribe.UnsubscribeResponse;
+import com.hmproductions.bingo.data.GameEventSubscription;
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.data.RoomEventSubscription;
+import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.models.Room;
 import com.hmproductions.bingo.utils.Constants;
 
@@ -19,7 +23,10 @@ import java.util.ArrayList;
 
 import io.grpc.stub.StreamObserver;
 
+import static com.hmproductions.bingo.services.BingoStreamServiceImpl.currentPlayerPosition;
+import static com.hmproductions.bingo.services.BingoStreamServiceImpl.gameEventSubscriptionArrayList;
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.subscriptionArrayList;
+import static com.hmproductions.bingo.services.BingoStreamServiceImpl.totalPlayers;
 import static com.hmproductions.bingo.utils.Miscellaneous.playerIsNew;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
@@ -27,6 +34,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     private static final int ROOM_ID = 17;
 
     public static ArrayList<Player> playersList = new ArrayList<>();
+    private BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
 
     private Room room;
 
@@ -184,6 +192,43 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         }
 
         responseObserver.onNext(unsubscribeResponse);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void clickGridCell(ClickGridCellRequest request, StreamObserver<ClickGridCellResponse> responseObserver) {
+
+        room = room.toBuilder().setStatusCode(Room.StatusCode.IN_GAME).build();
+
+        if (request.getCellClicked() == -1) {
+            responseObserver.onNext(ClickGridCellResponse.newBuilder().setStatusMessage("Internal server error")
+                    .setStatusCode(ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR).build());
+            responseObserver.onCompleted();
+            return;
+        }
+
+        System.out.println("HERE : clicked cell = " + request.getCellClicked());
+
+        currentPlayerPosition = (currentPlayerPosition + 1) % totalPlayers;
+
+
+
+        for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
+
+            /*
+                HORRIBLE MISTAKE setPlayerId(request.getPlayerId())
+             */
+
+            GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
+                    .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
+                    .setWinnerId(request.getWin() ? request.getPlayerId() : -1).setCellClicked(request.getCellClicked()).build();
+
+            streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
+        }
+
+        responseObserver.onNext(ClickGridCellResponse.newBuilder().setStatusMessage("Look out for streaming service game update")
+                .setStatusCode(ClickGridCellResponse.StatusCode.OK).build());
+
         responseObserver.onCompleted();
     }
 

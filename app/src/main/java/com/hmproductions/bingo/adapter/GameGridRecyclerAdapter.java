@@ -1,4 +1,4 @@
-package com.hmproductions.bingo.utils;
+package com.hmproductions.bingo.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +19,8 @@ import com.hmproductions.bingo.data.GridCell;
 
 import java.util.ArrayList;
 
-/*
- * Created by harsh on 7/30/17.
- *
- * GameGridRecyclerAdapter is used to load data from ArrayList<GridCell> into the recycler view.
- */
-
 public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecyclerAdapter.GridViewHolder> {
-    
+
     private ArrayList<GridCell> gameGridCellList;
     private Context context;
     private int GRID_SIZE;
@@ -45,14 +40,14 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
         /* Setting layoutParams to match the width of the screen */
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) this.context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        layoutParams = new RelativeLayout.LayoutParams(displayMetrics.widthPixels/GRID_SIZE,displayMetrics.widthPixels/GRID_SIZE);
+        layoutParams = new RelativeLayout.LayoutParams(displayMetrics.widthPixels / GRID_SIZE, displayMetrics.widthPixels / GRID_SIZE);
     }
 
     @NonNull
     @Override
     public GameGridRecyclerAdapter.GridViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View myView = LayoutInflater.from(context).inflate(R.layout.grid_item,parent, false);
+        View myView = LayoutInflater.from(context).inflate(R.layout.grid_item, parent, false);
         myView.setLayoutParams(layoutParams);
 
         return new GridViewHolder(myView);
@@ -66,7 +61,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
         holder.value_textView.setTextColor(Color.parseColor("#000000"));
         holder.value_textView.setTypeface(holder.value_textView.getTypeface(), Typeface.NORMAL);
 
-        if(gameGridCellList.get(position).getIsClicked()) {
+        if (gameGridCellList.get(position).getIsClicked()) {
             holder.value_textView.setTextColor(Color.parseColor("#FF0000"));
             holder.value_textView.setTypeface(holder.value_textView.getTypeface(), Typeface.BOLD);
         }
@@ -82,10 +77,10 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
         notifyDataSetChanged();
     }
 
-    class GridViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class GridViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView value_textView;
-        
+
         GridViewHolder(View itemView) {
             super(itemView);
 
@@ -95,7 +90,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
 
         @Override
         public void onClick(View view) {
-            mClickListener.onGridCellClick(getAdapterPosition(), view);
+            mClickListener.onGridCellClick(Integer.parseInt(value_textView.getText().toString()), view);
         }
     }
 }

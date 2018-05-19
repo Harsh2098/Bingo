@@ -271,7 +271,11 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                     runOnUiThread(() -> playersRecyclerAdapter.swapData(playersList));
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
-                    startActivity(new Intent(MainActivity.this, GameActivity.class));
+                    Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
+                    gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
+                    gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);
+                    gameIntent.putParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID, playersList);
+                    startActivity(gameIntent);
                 }
             }
 

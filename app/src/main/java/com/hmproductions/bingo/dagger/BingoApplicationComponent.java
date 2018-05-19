@@ -1,5 +1,6 @@
 package com.hmproductions.bingo.dagger;
 
+import com.hmproductions.bingo.ui.GameActivity;
 import com.hmproductions.bingo.ui.MainActivity;
 
 import dagger.Component;
@@ -9,4 +10,5 @@ import dagger.Component;
 public interface BingoApplicationComponent {
 
     void inject(MainActivity mainActivity);
+    void inject(GameActivity gameActivity);
 }

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.hmproductions.bingo.actions;
+
+message ClickGridCellRequest {
+    uint32 room_id = 1;
+    uint32 player_id = 2;
+    uint32 cell_clicked = 3;
+    bool win = 4;
+}
+
+message ClickGridCellResponse {
+    enum StatusCode {
+        OK = 0;
+        INTERNAL_SERVER_ERROR = 1;
+    }
+
+    StatusCode status_code = 1;
+    string status_message = 2;
+}

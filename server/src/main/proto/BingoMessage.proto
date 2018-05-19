@@ -8,10 +8,13 @@ import "actions/AddPlayer.proto";
 import "actions/RemovePlayer.proto";
 import "actions/SetPlayerReady.proto";
 import "actions/Unsubscribe.proto";
+import "actions/ClickGridCell.proto";
 
 import "models/Subscription.proto";
+import "models/GameSubscription.proto";
 
 import "datastreams/RoomEvents.proto";
+import "datastreams/GameEvents.proto";
 
 
 service BingoActionService {
@@ -21,8 +24,10 @@ service BingoActionService {
     rpc RemovePlayer(actions.RemovePlayerRequest) returns (actions.RemovePlayerResponse);
     rpc SetPlayerReady(actions.SetPlayerReadyRequest) returns (actions.SetPlayerReadyResponse);
     rpc Unsubscribe(actions.UnsubscribeRequest) returns (actions.UnsubscribeResponse);
+    rpc ClickGridCell(actions.ClickGridCellRequest) returns (actions.ClickGridCellResponse);
 }
 
 service BingoStreamService {
     rpc GetRoomEventUpdates(models.Subscription) returns (stream datastreams.RoomEventUpdate);
+    rpc GetGameEventUpdates(models.GameSubscription) returns (stream datastreams.GameEventUpdate);
 }
