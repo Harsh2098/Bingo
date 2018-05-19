@@ -74,10 +74,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK)
                         .setStatusMessage("New player added").setRoom(room).build();
 
-                BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
-                for (RoomEventSubscription currentSubscription : subscriptionArrayList) {
-                    streamService.getRoomEventUpdates(currentSubscription.getSubscription(), currentSubscription.getObserver());
-                }
+                sendRoomEventUpdate();
 
                 // Server logs
                 System.out.println(request.getPlayer().getName() + " added to the game.");
@@ -117,11 +114,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
             room = room.toBuilder().setCount(room.getCount() - 1).build();
 
-            BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
-
-            for (RoomEventSubscription currentSubscription : subscriptionArrayList) {
-                streamService.getRoomEventUpdates(currentSubscription.getSubscription(), currentSubscription.getObserver());
-            }
+            sendRoomEventUpdate();
 
             //Server logs
             System.out.println(request.getPlayer().getName() + " removed from the game.");
@@ -147,10 +140,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 // Server logs
                 System.out.println(request.getPlayerId() + " id set to " + player.isReady());
 
-                BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
-                for (RoomEventSubscription currentSubscription : subscriptionArrayList) {
-                    streamService.getRoomEventUpdates(currentSubscription.getSubscription(), currentSubscription.getObserver());
-                }
+                sendRoomEventUpdate();
 
                 break;
             }
@@ -178,6 +168,8 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             if (request.getPlayerId() == currentSubscription.getSubscription().getPlayerId()) {
                 subscriptionArrayList.remove(currentSubscription);
                 found = true;
+
+                System.out.print("Unsubscribing " + currentSubscription.getSubscription().getPlayerId() + " from this list.");
                 break;
             }
         }
@@ -193,5 +185,13 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         responseObserver.onNext(unsubscribeResponse);
         responseObserver.onCompleted();
+    }
+
+    private void sendRoomEventUpdate() {
+        BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
+
+        for (RoomEventSubscription currentSubscription : subscriptionArrayList) {
+            streamService.getRoomEventUpdates(currentSubscription.getSubscription(), currentSubscription.getObserver());
+        }
     }
 }

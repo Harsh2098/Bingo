@@ -38,7 +38,7 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
         RoomEvent roomEvent = RoomEvent.newBuilder()
                 .addAllPlayers(getArrayListFromPlayersList(playersList)).setEventCode(RoomEvent.EventCode.PLAYER_STATE_CHANGED).build();
 
-        System.out.println("Sending a room event update");
+        System.out.println("Sending a room event update to " + request.getPlayerId());
 
         for (Player player : playersList) {
             System.out.print("Name:" + player.getName() + " Id:" + player.getId() + " Ready:" + player.isReady() + "\n");

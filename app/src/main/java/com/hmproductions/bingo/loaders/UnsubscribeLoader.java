@@ -2,6 +2,7 @@ package com.hmproductions.bingo.loaders;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.Unsubscribe;
@@ -16,6 +17,11 @@ public class UnsubscribeLoader extends AsyncTaskLoader<Unsubscribe.UnsubscribeRe
         this.actionServiceBlockingStub = stub;
         this.playerId = playerId;
         this.roomId = roomId;
+    }
+
+    @Override
+    protected void onStartLoading() {
+        forceLoad();
     }
 
     @Override

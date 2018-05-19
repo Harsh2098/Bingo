@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                     currentPlayerId = playerNameEditText.getText().toString().length();
                     currentRoomId = data.getRoom().getId();
                     subscribeToRoomEventsUpdate(currentRoomId);
-                    playersRecyclerView.setVisibility(View.VISIBLE);
                     break;
 
                 case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
@@ -144,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                 currentPlayerId = currentRoomId = -1;
                 playersList.clear();
                 playersRecyclerAdapter.swapData(null);
-                playersRecyclerView.setVisibility(View.GONE);
             }
         }
 
@@ -238,8 +236,8 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
     void onLeaveButtonClick() {
 
         if (currentPlayerId != -1) {
+            getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
             getSupportLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader);
-            //getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
         }
         else
             Toast.makeText(this, "You have not joined", Toast.LENGTH_SHORT).show();
@@ -309,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
 
         if (currentPlayerId != -1) {
             getSupportLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader);
-            //getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
+            getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
         }
     }
 }
