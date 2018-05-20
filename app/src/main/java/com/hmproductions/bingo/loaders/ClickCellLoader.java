@@ -26,8 +26,7 @@ public class ClickCellLoader extends AsyncTaskLoader<ClickGridCellResponse> {
     @Override
     public ClickGridCellResponse loadInBackground() {
 
-        return actionServiceBlockingStub.clickGridCell(ClickGridCellRequest.newBuilder().setWin(clickCellRequest.isWon())
-                .setPlayerId(clickCellRequest.getPlayerId()).setCellClicked(clickCellRequest.getCellClicked())
-                .setRoomId(clickCellRequest.getRoomId()).build());
+        return actionServiceBlockingStub.clickGridCell(ClickGridCellRequest.newBuilder().setRoomId(clickCellRequest.getRoomId())
+                .setPlayerId(clickCellRequest.getPlayerId()).setCellClicked(clickCellRequest.getCellClicked()).build());
     }
 }

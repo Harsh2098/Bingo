@@ -3,6 +3,8 @@ package com.hmproductions.bingo.services;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.AddPlayerRequest;
 import com.hmproductions.bingo.actions.AddPlayerResponse;
+import com.hmproductions.bingo.actions.BroadcastWinnerRequest;
+import com.hmproductions.bingo.actions.BroadcastWinnerResponse;
 import com.hmproductions.bingo.actions.ClickGridCell.*;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeRequest;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeResponse;
@@ -207,11 +209,31 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             return;
         }
 
-        System.out.println("HERE : clicked cell = " + request.getCellClicked());
-
         currentPlayerPosition = (currentPlayerPosition + 1) % totalPlayers;
 
+        for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
 
+            /*
+                HORRIBLE MISTAKE setPlayerId(request.getPlayerId()) Oh Btw, this is to check if player has subscribed to stream
+             */
+
+            GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
+                    .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
+                    .setWinnerId(-1).setCellClicked(request.getCellClicked()).build();
+
+            streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
+        }
+
+        responseObserver.onNext(ClickGridCellResponse.newBuilder().setStatusMessage("Look out for streaming service game update")
+                .setStatusCode(ClickGridCellResponse.StatusCode.OK).build());
+
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void broadcastWinner(BroadcastWinnerRequest request, StreamObserver<BroadcastWinnerResponse> responseObserver) {
+
+        com.hmproductions.bingo.models.Player player = request.getPlayer();
 
         for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
 
@@ -221,15 +243,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
             GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
                     .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
-                    .setWinnerId(request.getWin() ? request.getPlayerId() : -1).setCellClicked(request.getCellClicked()).build();
+                    .setWinnerId(player.getId()).setCellClicked(-1).build();
 
             streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
         }
-
-        responseObserver.onNext(ClickGridCellResponse.newBuilder().setStatusMessage("Look out for streaming service game update")
-                .setStatusCode(ClickGridCellResponse.StatusCode.OK).build());
-
-        responseObserver.onCompleted();
     }
 
     private void sendRoomEventUpdate() {

@@ -43,4 +43,13 @@ public class Miscellaneous {
 
         return null;
     }
+
+    public static String getColorFromId(ArrayList<Player> playerArrayList, int id) {
+        for (Player player : playerArrayList) {
+            if (player.getId() == id)
+                return player.getColor();
+        }
+
+        return null;
+    }
 }

@@ -9,6 +9,7 @@ import "actions/RemovePlayer.proto";
 import "actions/SetPlayerReady.proto";
 import "actions/Unsubscribe.proto";
 import "actions/ClickGridCell.proto";
+import "actions/BroadcastWinner.proto";
 
 import "models/Subscription.proto";
 import "models/GameSubscription.proto";
@@ -24,7 +25,9 @@ service BingoActionService {
     rpc RemovePlayer(actions.RemovePlayerRequest) returns (actions.RemovePlayerResponse);
     rpc SetPlayerReady(actions.SetPlayerReadyRequest) returns (actions.SetPlayerReadyResponse);
     rpc Unsubscribe(actions.UnsubscribeRequest) returns (actions.UnsubscribeResponse);
+
     rpc ClickGridCell(actions.ClickGridCellRequest) returns (actions.ClickGridCellResponse);
+    rpc BroadcastWinner(actions.BroadcastWinnerRequest) returns (actions.BroadcastWinnerResponse);
 }
 
 service BingoStreamService {

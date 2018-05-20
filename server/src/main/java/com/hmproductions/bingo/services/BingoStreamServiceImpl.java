@@ -58,9 +58,7 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
         if (allPlayersReady && playersList.size() > 1) {
 
             setupCurrentPlayerAndStartGame();
-
-            System.out.print("Total players = " + totalPlayers + " and Current Player = " + playersList.get(currentPlayerPosition).getId() + "\n");
-
+            
             roomEvent = RoomEvent.newBuilder().setEventCode(RoomEvent.EventCode.GAME_START)
                     .addAllPlayers(getArrayListFromPlayersList(playersList)).build();
 
@@ -78,8 +76,6 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
         }
 
         GameEvent gameEvent;
-
-        System.out.println("Cell clicked = " + request.getCellClicked() + " current player " + request.getPlayerId());
 
         if (request.getFirstSubscription()) {
 

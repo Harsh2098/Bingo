@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
+import com.hmproductions.bingo.actions.BroadcastWinnerResponse;
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse;
 import com.hmproductions.bingo.adapter.GameGridRecyclerAdapter;
 import com.hmproductions.bingo.dagger.ContextModule;
@@ -31,6 +32,7 @@ import com.hmproductions.bingo.data.ClickCellRequest;
 import com.hmproductions.bingo.data.GridCell;
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.datastreams.GameEventUpdate;
+import com.hmproductions.bingo.loaders.BroadcastWinnerLoader;
 import com.hmproductions.bingo.loaders.ClickCellLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
@@ -49,11 +51,12 @@ import static com.hmproductions.bingo.models.GameEvent.EventCode.CELL_CLICKED_VA
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
 import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
+import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 
 public class GameActivity extends AppCompatActivity implements
         GameGridRecyclerAdapter.GridCellClickListener,
-        LoaderManager.LoaderCallbacks<ClickGridCellResponse> {
+        LoaderCallbacks<ClickGridCellResponse> {
 
     public static final String PLAYER_ID = "player-id";
     public static final String ROOM_ID = "room-id";
@@ -99,10 +102,32 @@ public class GameActivity extends AppCompatActivity implements
     private ArrayList<Player> playersList = new ArrayList<>();
 
     /*
-     *  cellsClicked[][] keeps track of the grid cells clicked by the user
+     *  cellsClicked[] keeps track of the grid cells clicked by the user
      *  mData holds the list of GridCells
      *  lastClickPosition holds the X,Y position of recently clicked grid cell
      */
+
+    private LoaderCallbacks<BroadcastWinnerResponse> broadcastWinnerLoader = new LoaderCallbacks<BroadcastWinnerResponse>() {
+
+        @NonNull
+        @Override
+        public Loader<BroadcastWinnerResponse> onCreateLoader(int id, @Nullable Bundle args) {
+            return new BroadcastWinnerLoader(GameActivity.this, actionServiceBlockingStub, roomId,
+                    com.hmproductions.bingo.models.Player.newBuilder().setName(getNameFromId(playersList, playerId))
+                        .setId(playerId).setColor(getColorFromId(playersList, playerId)).setReady(true).build());
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<BroadcastWinnerResponse> loader, BroadcastWinnerResponse data) {
+            if (data.getStatusCode() == BroadcastWinnerResponse.StatusCode.INTERNAL_SERVER_ERROR)
+                Toast.makeText(GameActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<BroadcastWinnerResponse> loader) {
+            // Do nothing
+        }
+    };
 
     private BroadcastReceiver gridCellReceiver = new BroadcastReceiver() {
         @Override
@@ -135,6 +160,10 @@ public class GameActivity extends AppCompatActivity implements
                                 break;
                             }
                         }
+
+                        if (numberOfLinesCompleted() == 5)
+                            getSupportLoaderManager().restartLoader(Constants.BROADCAST_WINNER_LOADER_ID, null,
+                                    broadcastWinnerLoader);
 
                         gameRecyclerView.setEnabled(currentPlayerId == playerId);
                         break;
@@ -310,10 +339,10 @@ public class GameActivity extends AppCompatActivity implements
 
         if (args != null) {
             return new ClickCellLoader(this, actionServiceBlockingStub,
-                    new ClickCellRequest(roomId, playerId, args.getInt(CELL_CLICKED_ID), args.getBoolean(WON_ID)));
+                    new ClickCellRequest(roomId, playerId, args.getInt(CELL_CLICKED_ID)));
         } else {
             return new ClickCellLoader(this, actionServiceBlockingStub,
-                    new ClickCellRequest(roomId, playerId, -1, false));
+                    new ClickCellRequest(roomId, playerId, -1));
         }
     }
 

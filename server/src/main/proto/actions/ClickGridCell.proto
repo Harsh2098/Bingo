@@ -6,7 +6,6 @@ message ClickGridCellRequest {
     uint32 room_id = 1;
     uint32 player_id = 2;
     uint32 cell_clicked = 3;
-    bool win = 4;
 }
 
 message ClickGridCellResponse {
