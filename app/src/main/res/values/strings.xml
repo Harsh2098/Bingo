@@ -16,14 +16,40 @@
     <string name="name">Name</string>
     <string name="processing_request">Processing request…</string>
     <string name="player_name">Player Name</string>
+    <string name="quit">Quit</string>
+    <string name="no">No</string>
 
-    <string-array name="colors">
-        <item>Red</item>
-        <item>Green</item>
-        <item>Blue</item>
-        <item>Yellow</item>
-        <item>Violet</item>
-        <item>White</item>
+    <string-array name="colorsName">
+        <item>Ravaging Red</item>
+        <item>Gorgeous Green</item>
+        <item>Blazing Blue</item>
+        <item>Obnoxious Orange</item>
+        <item>Vibrant Violet</item>
+        <item>Yakkaty Yellow</item>
+        <item>Benzoic Black</item>
+        <item>Deep Blue</item>
+    </string-array>
+
+    <string-array name="colorsHex">
+        <item>#CC0000</item>
+        <item>#99CC00</item>
+        <item>#00DDFF</item>
+        <item>#FF8800</item>
+        <item>#FF00FF</item>
+        <item>#FFFF00</item>
+        <item>#111111</item>
+        <item>#0077FF</item>
+    </string-array>
+
+    <string-array name="colorsRim">
+        <item>#CC0000</item>
+        <item>#669900</item>
+        <item>#0099CC</item>
+        <item>#FF6600</item>
+        <item>#AA66CC</item>
+        <item>#FFBB00</item>
+        <item>#000000</item>
+        <item>#0033FF</item>
     </string-array>
 
 </resources>

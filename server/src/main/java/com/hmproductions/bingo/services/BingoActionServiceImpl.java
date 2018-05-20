@@ -5,9 +5,12 @@ import com.hmproductions.bingo.actions.AddPlayerRequest;
 import com.hmproductions.bingo.actions.AddPlayerResponse;
 import com.hmproductions.bingo.actions.BroadcastWinnerRequest;
 import com.hmproductions.bingo.actions.BroadcastWinnerResponse;
-import com.hmproductions.bingo.actions.ClickGridCell.*;
+import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellRequest;
+import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeRequest;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeResponse;
+import com.hmproductions.bingo.actions.QuitPlayerRequest;
+import com.hmproductions.bingo.actions.QuitPlayerResponse;
 import com.hmproductions.bingo.actions.RemovePlayerRequest;
 import com.hmproductions.bingo.actions.RemovePlayerResponse;
 import com.hmproductions.bingo.actions.SetPlayerReadyRequest;
@@ -237,16 +240,67 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
 
-            /*
-                HORRIBLE MISTAKE setPlayerId(request.getPlayerId())
-             */
-
             GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
                     .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
                     .setWinnerId(player.getId()).setCellClicked(-1).build();
 
             streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
         }
+
+        responseObserver.onNext(BroadcastWinnerResponse.newBuilder().setStatusCode(BroadcastWinnerResponse.StatusCode.OK)
+                .setStatusMessage("Player declared as winner").build());
+
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void quitPlayer(QuitPlayerRequest request, StreamObserver<QuitPlayerResponse> responseObserver) {
+
+        com.hmproductions.bingo.models.Player player = request.getPlayer();
+
+        for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
+
+            GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
+                    .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
+                    .setWinnerId(player.getId()).setCellClicked(-2).build();
+
+            streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
+        }
+
+        gameEventSubscriptionArrayList.clear();
+
+        boolean found = false;
+        Player removePlayer = null;
+
+        for (Player currentPlayer : playersList) {
+            if (currentPlayer.getId() == request.getPlayer().getId()) {
+                removePlayer = currentPlayer;
+                found = true;
+            } else {
+                currentPlayer.setReady(false);
+            }
+        }
+
+        if (found)
+            playersList.remove(removePlayer);
+
+        found = false;
+        RoomEventSubscription removeSubscription = null;
+
+        for (RoomEventSubscription subscription : subscriptionArrayList) {
+            if (subscription.getSubscription().getPlayerId() == request.getPlayer().getId()) {
+                found = true;
+                removeSubscription = subscription;
+            }
+        }
+
+        if (found)
+            subscriptionArrayList.remove(removeSubscription);
+
+        responseObserver.onNext(QuitPlayerResponse.newBuilder().setStatusCode(QuitPlayerResponse.StatusCode.OK)
+                .setStatusMessage("Player quit the game").build());
+
+        responseObserver.onCompleted();
     }
 
     private void sendRoomEventUpdate() {

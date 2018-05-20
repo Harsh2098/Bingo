@@ -9,7 +9,8 @@ message GameEvent {
         GAME_STARTED = 0;
         GAME_WON = 1;
         CELL_CLICKED = 2;
-        INTERNAL_SERVER_ERROR = 3;
+        PLAYER_QUIT = 3;
+        INTERNAL_SERVER_ERROR = 4;
     }
 
     EventCode event_code = 1;

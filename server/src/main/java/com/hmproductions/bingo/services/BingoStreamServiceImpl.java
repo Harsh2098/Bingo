@@ -58,7 +58,7 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
         if (allPlayersReady && playersList.size() > 1) {
 
             setupCurrentPlayerAndStartGame();
-            
+
             roomEvent = RoomEvent.newBuilder().setEventCode(RoomEvent.EventCode.GAME_START)
                     .addAllPlayers(getArrayListFromPlayersList(playersList)).build();
 
@@ -81,6 +81,12 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
 
             gameEvent = GameEvent.newBuilder().setEventCode(GameEvent.EventCode.GAME_STARTED)
                     .setWinner(-1).setCellClicked(-1).setCurrentPlayerId(playersList.get(currentPlayerPosition).getId()).build();
+
+        } else if (request.getCellClicked() == -2) {
+
+            gameEvent = GameEvent.newBuilder().setCurrentPlayerId(playersList.get(currentPlayerPosition).getId())
+                    .setEventCode(GameEvent.EventCode.PLAYER_QUIT)
+                    .setCellClicked(request.getCellClicked()).setWinner(request.getWinnerId()).build();
 
         } else {
 

@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -48,7 +49,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.grpc.stub.StreamObserver;
 
-public class MainActivity extends AppCompatActivity implements PlayersRecyclerAdapter.OnPlayerClickListener{
+import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
+
+public class MainActivity extends AppCompatActivity implements PlayersRecyclerAdapter.OnPlayerClickListener {
+
+    public static final String PLAYER_LEFT_ID = "player-left-id";
 
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
@@ -85,8 +90,10 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
             String name = playerNameEditText.getText().toString();
             loadingDialog.show();
 
+            currentPlayerId = nameToIdHash(name);
+
             return new AddPlayerLoader(MainActivity.this, actionServiceBlockingStub,
-                    new Player(name, colorSpinner.getSelectedItem().toString(), name.length(), false));
+                    new Player(name, colorSpinner.getSelectedItem().toString(), currentPlayerId, false));
         }
 
         @Override
@@ -97,13 +104,13 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
             switch (data.getStatusCodeValue()) {
 
                 case AddPlayerResponse.StatusCode.OK_VALUE:
-                    currentPlayerId = playerNameEditText.getText().toString().length();
                     currentRoomId = data.getRoom().getId();
                     subscribeToRoomEventsUpdate(currentRoomId);
                     break;
 
                 case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
                 default:
+                    currentPlayerId = -1;
                     Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -218,6 +225,16 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
         View dialogView = LayoutInflater.from(this).inflate(R.layout.loading_dialog, null);
         ((TextView) dialogView.findViewById(R.id.progressDialog_textView)).setText(R.string.processing_request);
         loadingDialog = new AlertDialog.Builder(this).setView(dialogView).setCancelable(false).create();
+
+        if (getIntent().getAction() != null && getIntent().getAction().equals(Constants.QUIT_GAME_ACTION)) {
+
+            if (getIntent().getBooleanExtra(PLAYER_LEFT_ID, true)) {
+                playersRecyclerAdapter.swapData(null);
+            } else {
+                playersList = getIntent().getParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID);
+                playersRecyclerAdapter.swapData(playersList);
+            }
+        }
     }
 
     @OnClick(R.id.join_button)
@@ -245,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
 
     @Override
     public void onPlayerClick(int position) {
-        if(playersList.get(position).getName().length() == currentPlayerId) {
+        if(playersList.get(position).getId() == currentPlayerId) {
             getSupportLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, null, setPlayerReadyLoader);
         }
     }
@@ -271,11 +288,15 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                     runOnUiThread(() -> playersRecyclerAdapter.swapData(playersList));
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
+
+                    Log.v(":::", "here !!");
                     Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
                     gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
                     gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);
                     gameIntent.putParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID, playersList);
                     startActivity(gameIntent);
+
+                    finish();
                 }
             }
 
@@ -292,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
     }
 
     private void setupSpinner() {
-        ArrayAdapter colorSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.colors, android.R.layout.simple_list_item_1);
+        ArrayAdapter colorSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.colorsName, android.R.layout.simple_list_item_1);
         colorSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         colorSpinner.setAdapter(colorSpinnerAdapter);
     }

@@ -32,7 +32,8 @@ public class Miscellaneous {
     }
 
     public static int nameToIdHash(String name) {
-        return ((int)name.charAt(0) * (int)name.charAt(name.length()/2) * (int)name.charAt(name.length() - 1)) % 41;
+        return ((int)name.charAt(0) * (int)name.charAt(name.length()/2) * (int)name.charAt(name.length() - 1) *
+                (int)(System.currentTimeMillis() % 100)) % 101;
     }
 
     public static String getNameFromId(ArrayList<Player> playerArrayList, int id) {

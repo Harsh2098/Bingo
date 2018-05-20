@@ -14,24 +14,24 @@
         android:layout_marginTop="10dp" />
 
     <Button
-        android:id="@+id/resetButton"
+        android:id="@+id/quitButton"
         style="@style/Widget.AppCompat.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:padding="4dp"
-        android:layout_margin="20dp"
+        android:layout_margin="12dp"
         android:background="@drawable/rounded_button"
         android:gravity="center"
-        android:text="@string/reset"
+        android:text="@string/quit"
         android:textColor="@android:color/background_light"
         android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/resetButton"
+        android:layout_above="@id/quitButton"
         android:layout_gravity="center"
         android:layout_marginEnd="70dp"
         android:layout_marginStart="70dp"

@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.actions.BroadcastWinnerResponse;
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse;
+import com.hmproductions.bingo.actions.QuitPlayerResponse;
 import com.hmproductions.bingo.adapter.GameGridRecyclerAdapter;
 import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
@@ -34,6 +36,7 @@ import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.datastreams.GameEventUpdate;
 import com.hmproductions.bingo.loaders.BroadcastWinnerLoader;
 import com.hmproductions.bingo.loaders.ClickCellLoader;
+import com.hmproductions.bingo.loaders.QuitLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.utils.Constants;
@@ -50,6 +53,7 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.CELL_CLICKED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
+import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
 import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
@@ -99,6 +103,7 @@ public class GameActivity extends AppCompatActivity implements
     ArrayList<GridCell> gameGridCellList = new ArrayList<>();
 
     private int playerId = -1, roomId = -1;
+    private boolean gameCompleted = false;
     private ArrayList<Player> playersList = new ArrayList<>();
 
     /*
@@ -114,7 +119,7 @@ public class GameActivity extends AppCompatActivity implements
         public Loader<BroadcastWinnerResponse> onCreateLoader(int id, @Nullable Bundle args) {
             return new BroadcastWinnerLoader(GameActivity.this, actionServiceBlockingStub, roomId,
                     com.hmproductions.bingo.models.Player.newBuilder().setName(getNameFromId(playersList, playerId))
-                        .setId(playerId).setColor(getColorFromId(playersList, playerId)).setReady(true).build());
+                            .setId(playerId).setColor(getColorFromId(playersList, playerId)).setReady(true).build());
         }
 
         @Override
@@ -125,6 +130,27 @@ public class GameActivity extends AppCompatActivity implements
 
         @Override
         public void onLoaderReset(@NonNull Loader<BroadcastWinnerResponse> loader) {
+            // Do nothing
+        }
+    };
+
+    private LoaderCallbacks<QuitPlayerResponse> quitPlayerLoader = new LoaderCallbacks<QuitPlayerResponse>() {
+        @NonNull
+        @Override
+        public Loader<QuitPlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
+            return new QuitLoader(GameActivity.this, actionServiceBlockingStub,
+                    com.hmproductions.bingo.models.Player.newBuilder().setColor(getColorFromId(playersList, playerId))
+                            .setId(playerId).setReady(true).setName(getNameFromId(playersList, playerId)).build(), roomId);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<QuitPlayerResponse> loader, QuitPlayerResponse data) {
+            if (data.getStatusCode() == QuitPlayerResponse.StatusCode.SERVER_ERROR)
+                Toast.makeText(GameActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<QuitPlayerResponse> loader) {
             // Do nothing
         }
     };
@@ -149,6 +175,38 @@ public class GameActivity extends AppCompatActivity implements
                         } else {
                             Toast.makeText(GameActivity.this, getNameFromId(playersList, winnerId) + " has won", Toast.LENGTH_SHORT).show();
                         }
+
+                        gameCompleted = true;
+                        break;
+
+                    case PLAYER_QUIT_VALUE:
+                        Intent quitIntent = new Intent(GameActivity.this, MainActivity.class);
+                        quitIntent.putExtra(MainActivity.PLAYER_LEFT_ID, false);
+
+                        boolean flag = false;
+                        Player removePlayer = null;
+
+                        for (Player player : playersList) {
+                            if (playerId == winnerId) {
+                                intent.putExtra(MainActivity.PLAYER_LEFT_ID, true);
+                            } else if (player.getId() == winnerId) {
+                                flag = true;
+                                removePlayer = player;
+                            } else {
+                                player.setReady(false);
+                            }
+
+                            if (flag)
+                                playersList.remove(removePlayer);
+                        }
+
+
+                        quitIntent.setAction(Constants.QUIT_GAME_ACTION);
+                        quitIntent.putParcelableArrayListExtra(PLAYERS_LIST_ID, playersList);
+
+                        startActivity(quitIntent);
+                        finish();
+
                         break;
 
                     case CELL_CLICKED_VALUE:
@@ -283,9 +341,16 @@ public class GameActivity extends AppCompatActivity implements
         return counter;
     }
 
-    @OnClick(R.id.resetButton)
-    void onResetButtonClick() {
-        Toast.makeText(this, "Reset not implemented", Toast.LENGTH_SHORT).show();
+    @OnClick(R.id.quitButton)
+    void onQuitButtonClick() {
+        new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setTitle("Confirm Quit")
+                .setMessage("Game will be cancelled. Do you want to forfeit ?")
+                .setPositiveButton(R.string.quit, (dialogInterface, i) ->
+                        getSupportLoaderManager().restartLoader(Constants.QUIT_PLAYER_LOADER_ID, null, quitPlayerLoader))
+                .setNegativeButton(R.string.no, (dI, i) -> dI.dismiss())
+                .show();
     }
 
     @Override
@@ -360,7 +425,6 @@ public class GameActivity extends AppCompatActivity implements
     /*
         HORRIBLE MISTAKE (2) swapping onResume and onPause methods
      */
-
     @Override
     protected void onResume() {
         super.onResume();
