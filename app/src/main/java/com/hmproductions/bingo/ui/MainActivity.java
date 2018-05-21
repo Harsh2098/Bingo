@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -234,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
             } else {
                 playersList = getIntent().getParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID);
                 playersRecyclerAdapter.swapData(playersList);
+                currentPlayerId = getIntent().getIntExtra(GameActivity.PLAYER_ID, -1);
+                currentRoomId = getIntent().getIntExtra(GameActivity.ROOM_ID, -1);
             }
         }
 
@@ -294,7 +295,6 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 
-                    Log.v(":::", "here !!");
                     Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
                     gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
                     gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);

@@ -67,14 +67,15 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
 
             holder.value_textView.setTypeface(holder.value_textView.getTypeface(), Typeface.BOLD);
             holder.value_textView.setTextColor(
-                    Color.parseColor(context.getResources().getStringArray(R.array.colorsHex)[colorPosition])
+                    Color.parseColor(context.getResources().getStringArray(R.array.colorsRim)[colorPosition])
             );
 
             holder.value_textView.setBackgroundResource(R.drawable.cell_circle_foreground);
             GradientDrawable backgroundDrawable = (GradientDrawable) holder.value_textView.getBackground();
 
             backgroundDrawable.setStroke(8,
-                    Color.parseColor(context.getResources().getStringArray(R.array.colorsRim)[colorPosition]));
+                    Color.parseColor(context.getResources().getStringArray(R.array.colorsHex)[colorPosition]));
+
         } else {
 
             holder.value_textView.setTypeface(holder.value_textView.getTypeface(), Typeface.NORMAL);

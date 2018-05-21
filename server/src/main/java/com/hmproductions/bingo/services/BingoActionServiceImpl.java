@@ -32,7 +32,6 @@ import static com.hmproductions.bingo.services.BingoStreamServiceImpl.currentPla
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.gameEventSubscriptionArrayList;
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.subscriptionArrayList;
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.totalPlayers;
-import static com.hmproductions.bingo.utils.Miscellaneous.playerIsNew;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
 
@@ -113,6 +112,8 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     public void removePlayer(RemovePlayerRequest request, StreamObserver<RemovePlayerResponse> responseObserver) {
 
         boolean found = false;
+
+        // TODO : Fix concurrent
 
         for (Player player : playersList) {
             if (request.getPlayer().getId() == player.getId()) {

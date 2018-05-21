@@ -98,6 +98,9 @@ public class GameActivity extends AppCompatActivity implements
     @BindView(R.id.O_textView)
     TextView O;
 
+    @BindView(R.id.turnOrder_textView)
+    TextView turnOrderTextView;
+
     private MediaPlayer celebration;
     private GameGridRecyclerAdapter gridRecyclerAdapter;
 
@@ -182,27 +185,27 @@ public class GameActivity extends AppCompatActivity implements
 
                     case PLAYER_QUIT_VALUE:
                         Intent quitIntent = new Intent(GameActivity.this, MainActivity.class);
-                        quitIntent.putExtra(MainActivity.PLAYER_LEFT_ID, false);
+                        quitIntent.putExtra(MainActivity.PLAYER_LEFT_ID, playerId == winnerId);
 
                         boolean flag = false;
                         Player removePlayer = null;
 
                         for (Player player : playersList) {
-                            if (playerId == winnerId) {
-                                intent.putExtra(MainActivity.PLAYER_LEFT_ID, true);
-                            } else if (player.getId() == winnerId) {
+                            if (player.getId() == winnerId) {
                                 flag = true;
                                 removePlayer = player;
                             } else {
                                 player.setReady(false);
                             }
-
-                            if (flag)
-                                playersList.remove(removePlayer);
                         }
+
+                        if (flag)
+                            playersList.remove(removePlayer);
 
 
                         quitIntent.setAction(Constants.QUIT_GAME_ACTION);
+                        quitIntent.putExtra(PLAYER_ID, playerId);
+                        quitIntent.putExtra(ROOM_ID, roomId);
                         quitIntent.putParcelableArrayListExtra(PLAYERS_LIST_ID, playersList);
 
                         startActivity(quitIntent);
@@ -226,12 +229,16 @@ public class GameActivity extends AppCompatActivity implements
                                     broadcastWinnerLoader);
 
                         gameRecyclerView.setEnabled(currentPlayerId == playerId);
+
+                        setTurnOrderText(currentPlayerId);
                         break;
 
                     case GAME_STARTED_VALUE:
                         if (currentPlayerId == playerId)
                             Toast.makeText(GameActivity.this, "Start the game", Toast.LENGTH_SHORT).show();
+
                         gameRecyclerView.setEnabled(currentPlayerId == playerId);
+                        setTurnOrderText(currentPlayerId);
                         break;
 
                     default:
@@ -438,5 +445,15 @@ public class GameActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver);
+    }
+
+    private void setTurnOrderText(int currentPlayerId) {
+        String turnOrder;
+        if (currentPlayerId == playerId)
+            turnOrder = "Your turn";
+        else
+            turnOrder = getNameFromId(playersList, currentPlayerId) + "\'s turn";
+
+        turnOrderTextView.setText(turnOrder);
     }
 }
