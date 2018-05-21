@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +18,7 @@ import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.data.GridCell;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecyclerAdapter.GridViewHolder> {
 
@@ -56,14 +57,30 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
     @Override
     public void onBindViewHolder(@NonNull GameGridRecyclerAdapter.GridViewHolder holder, int position) {
 
-        holder.value_textView.setText(String.valueOf(gameGridCellList.get(position).getValue()));
+        GridCell currentGridCell = gameGridCellList.get(position);
 
-        holder.value_textView.setTextColor(Color.parseColor("#000000"));
-        holder.value_textView.setTypeface(holder.value_textView.getTypeface(), Typeface.NORMAL);
+        holder.value_textView.setText(String.valueOf(currentGridCell.getValue()));
 
         if (gameGridCellList.get(position).getIsClicked()) {
-            holder.value_textView.setTextColor(Color.parseColor("#FF0000"));
+
+            int colorPosition = Arrays.asList(context.getResources().getStringArray(R.array.colorsName)).indexOf(currentGridCell.getColor());
+
             holder.value_textView.setTypeface(holder.value_textView.getTypeface(), Typeface.BOLD);
+            holder.value_textView.setTextColor(
+                    Color.parseColor(context.getResources().getStringArray(R.array.colorsHex)[colorPosition])
+            );
+
+            holder.value_textView.setBackgroundResource(R.drawable.cell_circle_foreground);
+            GradientDrawable backgroundDrawable = (GradientDrawable) holder.value_textView.getBackground();
+
+            backgroundDrawable.setStroke(8,
+                    Color.parseColor(context.getResources().getStringArray(R.array.colorsRim)[colorPosition]));
+        } else {
+
+            holder.value_textView.setTypeface(holder.value_textView.getTypeface(), Typeface.NORMAL);
+            holder.value_textView.setTextColor(Color.parseColor("#000000"));
+
+            holder.value_textView.setBackground(null);
         }
     }
 

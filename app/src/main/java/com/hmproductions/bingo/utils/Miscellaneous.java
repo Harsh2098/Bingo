@@ -53,4 +53,23 @@ public class Miscellaneous {
 
         return null;
     }
+
+    public static String getColorFromNextPlayerId(ArrayList<Player> playerArrayList, int nextPlayerId) {
+
+        int nextPlayerIndex = 0;
+
+        for (Player player : playerArrayList) {
+            if (player.getId() == nextPlayerId) {
+                nextPlayerIndex = playerArrayList.indexOf(player);
+                break;
+            }
+        }
+
+        if (nextPlayerIndex == 0)
+            nextPlayerIndex = playerArrayList.size() - 1;
+        else
+            nextPlayerIndex--;
+
+        return playerArrayList.get(nextPlayerIndex).getColor();
+    }
 }

@@ -75,7 +75,8 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         } else if (room.getCount() < 4) {
 
-            if (playerIsNew(request.getPlayer().getId())) {
+            // player id -1 denotes player already in game (currently -1 is not sent from app)
+            if (request.getPlayer().getId() != -1) {
 
                 com.hmproductions.bingo.models.Player currentPlayer = request.getPlayer();
 

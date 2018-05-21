@@ -2,7 +2,9 @@ package com.hmproductions.bingo.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.data.Player;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecyclerAdapter.PlayerViewHolder> {
@@ -43,8 +46,14 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
         Player currentPlayer = playersList.get(position);
 
         holder.playerNameTextView.setText(currentPlayer.getName());
-        holder.playerColorTextView.setText(currentPlayer.getColor());
-        holder.readyView.setBackgroundColor(Color.parseColor(currentPlayer.isReady()?"#00FF00":"#FF0000"));
+        holder.readyView.setCardBackgroundColor(Color.parseColor(currentPlayer.isReady()?"#99CC00":"#CC0000"));
+
+        int colorPosition = Arrays.asList(context.getResources().getStringArray(R.array.colorsName)).indexOf(currentPlayer.getColor());
+
+        GradientDrawable backgroundDrawable = (GradientDrawable) holder.colorView.getBackground();
+        backgroundDrawable.setStroke(2,
+                Color.parseColor(context.getResources().getStringArray(R.array.colorsRim)[colorPosition]));
+        backgroundDrawable.setColor(Color.parseColor(context.getResources().getStringArray(R.array.colorsHex)[colorPosition]));
     }
 
     @Override
@@ -60,15 +69,16 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
 
     class PlayerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        TextView playerNameTextView, playerColorTextView;
-        View readyView;
+        TextView playerNameTextView;
+        View colorView;
+        CardView readyView;
 
         PlayerViewHolder(View itemView) {
             super(itemView);
 
             playerNameTextView = itemView.findViewById(R.id.playerName_textView);
-            playerColorTextView = itemView.findViewById(R.id.playerColor_textView);
-            readyView = itemView.findViewById(R.id.ready_view);
+            colorView = itemView.findViewById(R.id.color_view);
+            readyView = itemView.findViewById(R.id.ready_cardView);
 
             readyView.setOnClickListener(this);
         }

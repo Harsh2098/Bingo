@@ -56,6 +56,7 @@ import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
 import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
+import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromNextPlayerId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 
 public class GameActivity extends AppCompatActivity implements
@@ -214,6 +215,7 @@ public class GameActivity extends AppCompatActivity implements
                         for (GridCell gridCell : gameGridCellList) {
                             if (gridCell.getValue() == cellClicked) {
                                 gridCell.setIsClicked(true);
+                                gridCell.setColor(getColorFromNextPlayerId(playersList, currentPlayerId));
                                 gridRecyclerAdapter.swapData(gameGridCellList);
                                 break;
                             }

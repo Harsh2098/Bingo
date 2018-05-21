@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -235,6 +236,8 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                 playersRecyclerAdapter.swapData(playersList);
             }
         }
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     @OnClick(R.id.join_button)
@@ -243,6 +246,9 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
         if (playerNameEditText.getText().toString().isEmpty()) {
             playerNameEditText.setError("A-Z, 0-9");
             Toast.makeText(this, "Please enter the name", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (currentRoomId != -1) {
+            Toast.makeText(this, "Player already joined", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -255,14 +261,13 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
         if (currentPlayerId != -1) {
             getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
             getSupportLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader);
-        }
-        else
+        } else
             Toast.makeText(this, "You have not joined", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPlayerClick(int position) {
-        if(playersList.get(position).getId() == currentPlayerId) {
+        if (playersList.get(position).getId() == currentPlayerId) {
             getSupportLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, null, setPlayerReadyLoader);
         }
     }
