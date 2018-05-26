@@ -112,18 +112,19 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     public void removePlayer(RemovePlayerRequest request, StreamObserver<RemovePlayerResponse> responseObserver) {
 
         boolean found = false;
-
-        // TODO : Fix concurrent
+        Player removePlayer = null;
 
         for (Player player : playersList) {
             if (request.getPlayer().getId() == player.getId()) {
-                playersList.remove(player);
+                removePlayer = player;
                 found = true;
                 break;
             }
         }
 
         if (found) {
+            playersList.remove(removePlayer);
+
             responseObserver.onNext(RemovePlayerResponse.newBuilder().setStatusMessage("Player removed")
                     .setStatusCode(RemovePlayerResponse.StatusCode.OK).build());
 
@@ -239,6 +240,12 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     public void broadcastWinner(BroadcastWinnerRequest request, StreamObserver<BroadcastWinnerResponse> responseObserver) {
 
         com.hmproductions.bingo.models.Player player = request.getPlayer();
+
+        for (Player currentPlayer : playersList) {
+            if (currentPlayer.getId() == player.getId()) {
+                currentPlayer.setWinCount(currentPlayer.getWinCount() + 1);
+            }
+        }
 
         for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
 

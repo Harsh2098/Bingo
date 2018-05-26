@@ -18,6 +18,7 @@
     <string name="player_name">Player Name</string>
     <string name="quit">Quit</string>
     <string name="no">No</string>
+    <string name="next_round">Next Round</string>
 
     <string-array name="colorsName">
         <item>Ravaging Red</item>

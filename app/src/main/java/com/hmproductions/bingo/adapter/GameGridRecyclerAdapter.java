@@ -8,6 +8,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +21,16 @@ import com.hmproductions.bingo.data.GridCell;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
+import static com.hmproductions.bingo.utils.Constants.SCALING_FACTOR;
+
 public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecyclerAdapter.GridViewHolder> {
+
+    private static final String GRID_LOG_TAG = GameGridRecyclerAdapter.class.getSimpleName() + CLASSIC_TAG;
 
     private ArrayList<GridCell> gameGridCellList;
     private Context context;
-    private int GRID_SIZE;
+    private int gridSize;
     private GridCellClickListener mClickListener;
     private RelativeLayout.LayoutParams layoutParams;
 
@@ -33,7 +39,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
     }
 
     public GameGridRecyclerAdapter(Context context, int size, ArrayList<GridCell> data, GridCellClickListener listener) {
-        GRID_SIZE = size;
+        gridSize = size;
         this.context = context;
         gameGridCellList = data;
         mClickListener = listener;
@@ -41,7 +47,11 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
         /* Setting layoutParams to match the width of the screen */
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) this.context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        layoutParams = new RelativeLayout.LayoutParams(displayMetrics.widthPixels / GRID_SIZE, displayMetrics.widthPixels / GRID_SIZE);
+        layoutParams = new RelativeLayout.LayoutParams(
+                (int) (displayMetrics.widthPixels / gridSize * SCALING_FACTOR),
+                (int) (displayMetrics.widthPixels / gridSize * SCALING_FACTOR));
+
+        Log.v(GRID_LOG_TAG, "Setting cell size to " + displayMetrics.widthPixels / gridSize);
     }
 
     @NonNull
@@ -87,7 +97,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
 
     @Override
     public int getItemCount() {
-        return GRID_SIZE * GRID_SIZE;
+        return gridSize * gridSize;
     }
 
     public void swapData(ArrayList<GridCell> data) {

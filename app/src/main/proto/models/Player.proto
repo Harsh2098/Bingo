@@ -8,4 +8,5 @@ message Player {
     string name = 2;
     string color = 3;
     bool ready = 4;
+    uint32 win_count = 5;
 }

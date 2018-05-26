@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,10 +29,12 @@ import com.hmproductions.bingo.actions.BroadcastWinnerResponse;
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse;
 import com.hmproductions.bingo.actions.QuitPlayerResponse;
 import com.hmproductions.bingo.adapter.GameGridRecyclerAdapter;
+import com.hmproductions.bingo.adapter.LeaderboardRecyclerAdapter;
 import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
 import com.hmproductions.bingo.data.ClickCellRequest;
 import com.hmproductions.bingo.data.GridCell;
+import com.hmproductions.bingo.data.LeaderboardPlayer;
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.datastreams.GameEventUpdate;
 import com.hmproductions.bingo.loaders.BroadcastWinnerLoader;
@@ -54,10 +57,13 @@ import static com.hmproductions.bingo.models.GameEvent.EventCode.CELL_CLICKED_VA
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
+import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
+import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
 import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromNextPlayerId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
+import static com.hmproductions.bingo.utils.Miscellaneous.valueClicked;
 
 public class GameActivity extends AppCompatActivity implements
         GameGridRecyclerAdapter.GridCellClickListener,
@@ -66,13 +72,12 @@ public class GameActivity extends AppCompatActivity implements
     public static final String PLAYER_ID = "player-id";
     public static final String ROOM_ID = "room-id";
     public static final String PLAYERS_LIST_ID = "players-list-id";
+    private static final String LEADERBOARD_LIST_KEY = "leaderboard-list-key";
 
     public static final String CELL_CLICKED_ID = "cell-clicked-id";
     public static final String WON_ID = "won-id";
     public static final String CURRENT_PLAYER_ID = "current-player-id";
     public static final String EVENT_CODE_ID = "event-code-id";
-
-    private static final int GRID_SIZE = 5;
 
     @Inject
     BingoStreamServiceGrpc.BingoStreamServiceStub streamServiceStub;
@@ -80,8 +85,14 @@ public class GameActivity extends AppCompatActivity implements
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
 
+    @BindView(R.id.bingo_linearLayout)
+    LinearLayout bingoLinearLayout;
+
     @BindView(R.id.game_recyclerView)
     RecyclerView gameRecyclerView;
+
+    @BindView(R.id.leaderBoard_recyclerView)
+    RecyclerView leaderBoardRecyclerView;
 
     @BindView(R.id.B_textView)
     TextView B;
@@ -180,7 +191,29 @@ public class GameActivity extends AppCompatActivity implements
                             Toast.makeText(GameActivity.this, getNameFromId(playersList, winnerId) + " has won", Toast.LENGTH_SHORT).show();
                         }
 
-                        gameCompleted = true;
+                        bingoLinearLayout.setVisibility(View.GONE);
+                        leaderBoardRecyclerView.setVisibility(View.VISIBLE);
+                        findViewById(R.id.nextRound_button).setVisibility(View.VISIBLE);
+
+                        leaderBoardRecyclerView.setLayoutManager(new GridLayoutManager(GameActivity.this, LEADERBOARD_COL_SPAN));
+                        leaderBoardRecyclerView.setAdapter(new LeaderboardRecyclerAdapter(
+                                GameActivity.this, intent.getParcelableArrayListExtra(LEADERBOARD_LIST_KEY), null));
+                        leaderBoardRecyclerView.setHasFixedSize(true);
+
+                        if (gameCompleted) {
+                            StringBuilder winnerTextBuilder = new StringBuilder(turnOrderTextView.getText().toString());
+                            winnerTextBuilder.insert(winnerTextBuilder.indexOf(" "), getNameFromId(playersList, winnerId));
+                            turnOrderTextView.setText(winnerTextBuilder.toString());
+                        } else {
+                            String winnerText;
+                            if (winnerId == playerId)
+                                winnerText = "You won";
+                            else
+                                winnerText = getNameFromId(playersList, winnerId) + " won";
+                            turnOrderTextView.setText(winnerText);
+                            gameCompleted = true;
+                        }
+
                         break;
 
                     case PLAYER_QUIT_VALUE:
@@ -201,7 +234,6 @@ public class GameActivity extends AppCompatActivity implements
 
                         if (flag)
                             playersList.remove(removePlayer);
-
 
                         quitIntent.setAction(Constants.QUIT_GAME_ACTION);
                         quitIntent.putExtra(PLAYER_ID, playerId);
@@ -224,7 +256,7 @@ public class GameActivity extends AppCompatActivity implements
                             }
                         }
 
-                        if (numberOfLinesCompleted() == 5)
+                        if (numberOfLinesCompleted() == 5 && !gameCompleted)
                             getSupportLoaderManager().restartLoader(Constants.BROADCAST_WINNER_LOADER_ID, null,
                                     broadcastWinnerLoader);
 
@@ -362,12 +394,16 @@ public class GameActivity extends AppCompatActivity implements
                 .show();
     }
 
+    @OnClick(R.id.nextRound_button)
+    void onNextRoundButtonClick() {
+        recreate();
+    }
+
     @Override
     public void onGridCellClick(int value, View view) {
 
-        if (gameRecyclerView.isEnabled()) {
+        if (gameRecyclerView.isEnabled() && !valueClicked(gameGridCellList, value)) {
 
-            /* Updating cellsClicked[][] */
             Bundle bundle = new Bundle();
             bundle.putInt(CELL_CLICKED_ID, value);
             bundle.putBoolean(WON_ID, numberOfLinesCompleted() == 5);
@@ -386,12 +422,19 @@ public class GameActivity extends AppCompatActivity implements
             public void onNext(GameEventUpdate value) {
 
                 GameEvent gameEvent = value.getGameEvent();
+                ArrayList<LeaderboardPlayer> leaderboardPlayerArrayList = new ArrayList<>();
+
+                for (com.hmproductions.bingo.models.Player currentPlayer : gameEvent.getLeaderboardList()) {
+                    leaderboardPlayerArrayList.add(new LeaderboardPlayer(currentPlayer.getName(), currentPlayer.getColor(),
+                            currentPlayer.getWinCount()));
+                }
 
                 Intent intent = new Intent(Constants.GRID_CELL_CLICK_ACTION);
                 intent.putExtra(EVENT_CODE_ID, gameEvent.getEventCodeValue());
                 intent.putExtra(CELL_CLICKED_ID, gameEvent.getCellClicked());
                 intent.putExtra(CURRENT_PLAYER_ID, gameEvent.getCurrentPlayerId());
                 intent.putExtra(WON_ID, gameEvent.getWinner());
+                intent.putParcelableArrayListExtra(LEADERBOARD_LIST_KEY, leaderboardPlayerArrayList);
                 LocalBroadcastManager.getInstance(GameActivity.this).sendBroadcast(intent);
             }
 

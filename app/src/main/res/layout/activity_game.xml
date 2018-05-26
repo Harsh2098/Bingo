@@ -19,8 +19,8 @@
         android:id="@+id/turnOrder_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/game_recyclerView"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/game_recyclerView"
         android:layout_marginEnd="6dp"
         android:layout_marginStart="6dp"
         android:textAllCaps="true"
@@ -34,7 +34,8 @@
         android:layout_above="@+id/quitButton"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginTop="2dp">
+        android:layout_marginTop="2dp"
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/B_textView"
@@ -103,14 +104,37 @@
 
     </LinearLayout>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/leaderBoard_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/quitButton"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/nextRound_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="6dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/green_rounded_button"
+        android:padding="6dp"
+        android:text="@string/next_round"
+        android:textColor="@android:color/background_light"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
     <Button
         android:id="@+id/quitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_margin="6dp"
-        android:background="@drawable/rounded_button"
+        android:layout_marginBottom="6dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/red_rounded_button"
         android:padding="4dp"
         android:text="@string/quit"
         android:textColor="@android:color/background_light"

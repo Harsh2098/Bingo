@@ -3,7 +3,7 @@ package com.hmproductions.bingo.data;
 public class Player {
 
     private String name, color;
-    private int id;
+    private int id, winCount;
     private boolean isReady;
 
     public Player(String name, String color, int id, boolean isReady) {
@@ -23,6 +23,14 @@ public class Player {
 
     public int getId() {
         return id;
+    }
+
+    public int getWinCount() {
+        return winCount;
+    }
+
+    public void setWinCount(int winCount) {
+        this.winCount = winCount;
     }
 
     public boolean isReady() {

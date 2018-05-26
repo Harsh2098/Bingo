@@ -2,6 +2,12 @@ package com.hmproductions.bingo.utils;
 
 public class Constants {
 
+    public static final String CLASSIC_TAG = ":::";
+
+    public static final int GRID_SIZE = 5;
+    public static final double SCALING_FACTOR = 0.95;
+    public static final int LEADERBOARD_COL_SPAN = 2;
+
     public static final int SERVER_PORT = 8080;
     public static final String SERVER_ADDRESS = "192.168.0.182";
 

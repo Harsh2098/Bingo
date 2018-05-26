@@ -64,6 +64,9 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
 
             responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
 
+            for (Player player : playersList) {
+                player.setWinCount(0);
+            }
             // TODO : Call onCompleted()
         }
     }
@@ -90,9 +93,28 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
 
         } else {
 
-            gameEvent = GameEvent.newBuilder().setCurrentPlayerId(playersList.get(currentPlayerPosition).getId())
-                    .setEventCode(request.getWinnerId() == -1 ? GameEvent.EventCode.CELL_CLICKED : GameEvent.EventCode.GAME_WON)
-                    .setCellClicked(request.getCellClicked()).setWinner(request.getWinnerId()).build();
+            if (request.getWinnerId() == -1) {
+
+                gameEvent = GameEvent.newBuilder().setCurrentPlayerId(playersList.get(currentPlayerPosition).getId())
+                        .setEventCode(GameEvent.EventCode.CELL_CLICKED).setCellClicked(request.getCellClicked())
+                        .setWinner(request.getWinnerId()).build();
+            } else {
+
+                ArrayList<com.hmproductions.bingo.models.Player> modelsPlayerList = new ArrayList<>();
+
+                for (Player player : playersList) {
+                    if (player.getId() == request.getWinnerId())
+                        player.setWinCount(player.getWinCount());
+
+                    modelsPlayerList.add(com.hmproductions.bingo.models.Player.newBuilder().setName(player.getName())
+                            .setColor(player.getColor()).setId(player.getId()).setReady(player.isReady())
+                            .setWinCount(player.getWinCount()).build());
+                }
+
+                gameEvent = GameEvent.newBuilder().setCurrentPlayerId(playersList.get(currentPlayerPosition).getId())
+                        .setEventCode(GameEvent.EventCode.GAME_WON).setCellClicked(request.getCellClicked())
+                        .addAllLeaderboard(modelsPlayerList).setWinner(request.getWinnerId()).build();
+            }
 
         }
 

@@ -1,5 +1,6 @@
 package com.hmproductions.bingo.utils;
 
+import com.hmproductions.bingo.data.GridCell;
 import com.hmproductions.bingo.data.Player;
 
 import java.util.ArrayList;
@@ -71,5 +72,13 @@ public class Miscellaneous {
             nextPlayerIndex--;
 
         return playerArrayList.get(nextPlayerIndex).getColor();
+    }
+
+    public static boolean valueClicked(ArrayList<GridCell> gridCellArrayList, int value) {
+        for (GridCell gridCell : gridCellArrayList) {
+            if (gridCell.getValue() == value && gridCell.getIsClicked())
+                return true;
+        }
+        return false;
     }
 }

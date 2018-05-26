@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -49,17 +51,24 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.grpc.stub.StreamObserver;
 
+import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
 
 public class MainActivity extends AppCompatActivity implements PlayersRecyclerAdapter.OnPlayerClickListener {
 
     public static final String PLAYER_LEFT_ID = "player-left-id";
 
+    private static final String PLAYER_NAME_KEY = "player-name-key";
+    private static final String PLAYER_COLOR_KEY = "player-color-key";
+
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
 
     @Inject
     BingoStreamServiceGrpc.BingoStreamServiceStub streamServiceStub;
+
+    @Inject
+    SharedPreferences preferences;
 
     @BindView(R.id.hostIP_editText)
     EditText hostIP_editText;
@@ -86,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
         @NonNull
         @Override
         public Loader<AddPlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
+
+            loadingDialog.dismiss();;
 
             String name = playerNameEditText.getText().toString();
             loadingDialog.show();
@@ -233,12 +244,19 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
             } else {
                 playersList = getIntent().getParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID);
                 playersRecyclerAdapter.swapData(playersList);
+
+                Log.v(":::", playersList.get(0).getName() + " is ready = " + playersList.get(0).isReady());
+
                 currentPlayerId = getIntent().getIntExtra(GameActivity.PLAYER_ID, -1);
                 currentRoomId = getIntent().getIntExtra(GameActivity.ROOM_ID, -1);
+                playerNameEditText.setText(getNameFromId(playersList, currentPlayerId));
             }
         }
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        playerNameEditText.setText(preferences.getString(PLAYER_NAME_KEY, ""));
+        colorSpinner.setSelection(preferences.getInt(PLAYER_COLOR_KEY, 0));
     }
 
     @OnClick(R.id.join_button)
@@ -291,7 +309,9 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                                 currentPlayer.getReady()));
                     }
 
-                    runOnUiThread(() -> playersRecyclerAdapter.swapData(playersList));
+                    runOnUiThread(() ->  {
+                        playersRecyclerAdapter.swapData(playersList);
+                    });
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 
@@ -329,6 +349,15 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                 return currentPlayer.isReady();
         }
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(PLAYER_NAME_KEY, playerNameEditText.getText().toString());
+        editor.putInt(PLAYER_COLOR_KEY, colorSpinner.getSelectedItemPosition());
+        editor.apply();
     }
 
     @Override
