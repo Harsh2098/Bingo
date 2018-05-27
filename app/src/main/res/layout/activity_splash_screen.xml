@@ -2,7 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="0dp">
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/loading_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bingo_imageView"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="@string/starting"
+        android:textAllCaps="true"
+        android:textColor="@android:color/background_dark"
+        android:textSize="28sp" />
+
+    <ImageView
+        android:id="@+id/bingo_imageView"
+        android:layout_width="match_parent"
+        android:layout_height="360dp"
+        android:layout_centerInParent="true"
+        android:contentDescription="@string/bingo_splash_image"
+        android:padding="12dp"
+        android:src="@raw/splash"
+        android:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/loading_progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="24dp"
+        android:indeterminate="true" />
 
 </RelativeLayout>
