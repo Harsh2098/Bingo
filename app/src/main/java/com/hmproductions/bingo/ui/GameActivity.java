@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognitionListener;
+import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -59,12 +61,12 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.CELL_CLICKED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
-import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
 import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
 import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_LOADER_ID;
+import static com.hmproductions.bingo.utils.Constants.QUIT_PLAYER_LOADER_ID;
 import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromNextPlayerId;
@@ -74,7 +76,8 @@ import static com.hmproductions.bingo.utils.Miscellaneous.valueClicked;
 public class GameActivity extends AppCompatActivity implements
         GameGridRecyclerAdapter.GridCellClickListener,
         LoaderCallbacks<ClickGridCellResponse>,
-        ConnectionUtils.OnNetworkDownHandler {
+        ConnectionUtils.OnNetworkDownHandler,
+        RecognitionListener {
 
     public static final String PLAYER_ID = "player-id";
     public static final String ROOM_ID = "room-id";
@@ -243,7 +246,7 @@ public class GameActivity extends AppCompatActivity implements
 
                         if (gameCompleted) {
                             StringBuilder winnerTextBuilder = new StringBuilder(turnOrderTextView.getText().toString());
-                            winnerTextBuilder.insert(winnerTextBuilder.indexOf(" "), ", " + getNameFromId(playersList, winnerId));
+                            winnerTextBuilder.insert(winnerTextBuilder.lastIndexOf(" "), ", " + getNameFromId(playersList, winnerId));
                             turnOrderTextView.setText(winnerTextBuilder.toString());
                         } else {
                             String winnerText;
@@ -550,5 +553,64 @@ public class GameActivity extends AppCompatActivity implements
     public void onNetworkDownError() {
         startActivity(new Intent(this, SplashActivity.class));
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getSupportLoaderManager().restartLoader(QUIT_PLAYER_LOADER_ID, null, quitPlayerLoader);
+    }
+
+    // ================================== Speech Recognition Methods Implementations ==================================
+    @Override
+    public void onReadyForSpeech(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onBeginningOfSpeech() {
+
+    }
+
+    @Override
+    public void onRmsChanged(float v) {
+
+    }
+
+    @Override
+    public void onBufferReceived(byte[] bytes) {
+
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+
+    }
+
+    @Override
+    public void onError(int i) {
+
+    }
+
+    @Override
+    public void onResults(Bundle bundle) {
+        ArrayList<String> speechResult = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        if (speechResult != null) {
+            for (String currentWord : speechResult) {
+                if (Integer.parseInt(currentWord) > 0 && Integer.parseInt(currentWord) < 26) {
+                    // TODO : Do something
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPartialResults(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onEvent(int i, Bundle bundle) {
+
     }
 }

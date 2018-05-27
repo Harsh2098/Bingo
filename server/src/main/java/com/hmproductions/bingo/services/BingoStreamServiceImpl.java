@@ -49,7 +49,6 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
 
         responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
 
-
         if (allPlayersReady(playersList) && playersList.size() > 1) {
 
             setupCurrentPlayerAndStartGame();
