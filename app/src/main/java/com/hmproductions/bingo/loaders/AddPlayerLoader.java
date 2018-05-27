@@ -2,12 +2,17 @@ package com.hmproductions.bingo.loaders;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.AddPlayerRequest;
 import com.hmproductions.bingo.actions.AddPlayerResponse;
 import com.hmproductions.bingo.data.Player;
+import com.hmproductions.bingo.utils.Constants;
+
+import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
+import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
+import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
+import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
 
 public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
 
@@ -27,9 +32,14 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
 
     @Override
     public AddPlayerResponse loadInBackground() {
-        com.hmproductions.bingo.models.Player player = com.hmproductions.bingo.models.Player.newBuilder().setId(this.player.getId())
-                .setName(this.player.getName()).setReady(this.player.isReady()).setColor(this.player.getColor()).build();
 
-        return actionServiceBlockingStub.addPlayer(AddPlayerRequest.newBuilder().setPlayer(player).build());
+        if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
+            com.hmproductions.bingo.models.Player player = com.hmproductions.bingo.models.Player.newBuilder().setId(this.player.getId())
+                    .setName(this.player.getName()).setReady(this.player.isReady()).setColor(this.player.getColor()).build();
+
+            return actionServiceBlockingStub.addPlayer(AddPlayerRequest.newBuilder().setPlayer(player).build());
+        } else {
+            return null;
+        }
     }
 }

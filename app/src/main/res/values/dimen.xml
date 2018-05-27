@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="cell_edge_length">60dp</dimen>
-
 </resources>

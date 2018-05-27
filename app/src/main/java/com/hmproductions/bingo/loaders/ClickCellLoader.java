@@ -7,6 +7,11 @@ import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.ClickGridCell.*;
 import com.hmproductions.bingo.data.ClickCellRequest;
 
+import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
+import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
+import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
+import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
+
 public class ClickCellLoader extends AsyncTaskLoader<ClickGridCellResponse> {
 
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
@@ -25,8 +30,12 @@ public class ClickCellLoader extends AsyncTaskLoader<ClickGridCellResponse> {
 
     @Override
     public ClickGridCellResponse loadInBackground() {
+        if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
 
-        return actionServiceBlockingStub.clickGridCell(ClickGridCellRequest.newBuilder().setRoomId(clickCellRequest.getRoomId())
+            return actionServiceBlockingStub.clickGridCell(ClickGridCellRequest.newBuilder().setRoomId(clickCellRequest.getRoomId())
                 .setPlayerId(clickCellRequest.getPlayerId()).setCellClicked(clickCellRequest.getCellClicked()).build());
+        } else {
+            return null;
+        }
     }
 }

@@ -10,6 +10,11 @@ import com.hmproductions.bingo.actions.BroadcastWinnerRequest;
 import com.hmproductions.bingo.actions.BroadcastWinnerResponse;
 import com.hmproductions.bingo.models.Player;
 
+import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
+import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
+import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
+import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
+
 public class BroadcastWinnerLoader extends AsyncTaskLoader<BroadcastWinnerResponse> {
 
     private int roomId;
@@ -31,7 +36,13 @@ public class BroadcastWinnerLoader extends AsyncTaskLoader<BroadcastWinnerRespon
     @Nullable
     @Override
     public BroadcastWinnerResponse loadInBackground() {
-        return actionServiceBlockingStub.broadcastWinner(BroadcastWinnerRequest.newBuilder().setPlayer(player)
+
+        if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
+
+            return actionServiceBlockingStub.broadcastWinner(BroadcastWinnerRequest.newBuilder().setPlayer(player)
                 .setRoomId(roomId).build());
+        } else {
+            return null;
+        }
     }
 }

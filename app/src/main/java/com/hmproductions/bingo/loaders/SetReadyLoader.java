@@ -7,6 +7,11 @@ import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.SetPlayerReadyRequest;
 import com.hmproductions.bingo.actions.SetPlayerReadyResponse;
 
+import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
+import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
+import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
+import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
+
 public class SetReadyLoader extends AsyncTaskLoader<SetPlayerReadyResponse> {
 
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
@@ -27,7 +32,12 @@ public class SetReadyLoader extends AsyncTaskLoader<SetPlayerReadyResponse> {
 
     @Override
     public SetPlayerReadyResponse loadInBackground() {
-        return actionServiceBlockingStub.setPlayerReady(SetPlayerReadyRequest.newBuilder()
+        if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
+
+            return actionServiceBlockingStub.setPlayerReady(SetPlayerReadyRequest.newBuilder()
                 .setPlayerId(playerId).setIsReady(ready).build());
+        } else {
+            return null;
+        }
     }
 }

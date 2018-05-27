@@ -10,6 +10,11 @@ import com.hmproductions.bingo.actions.QuitPlayerRequest;
 import com.hmproductions.bingo.actions.QuitPlayerResponse;
 import com.hmproductions.bingo.models.Player;
 
+import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
+import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
+import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
+import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
+
 public class QuitLoader extends AsyncTaskLoader<QuitPlayerResponse> {
 
     private int roomId;
@@ -31,6 +36,11 @@ public class QuitLoader extends AsyncTaskLoader<QuitPlayerResponse> {
     @Nullable
     @Override
     public QuitPlayerResponse loadInBackground() {
-        return actionServiceBlockingStub.quitPlayer(QuitPlayerRequest.newBuilder().setRoomId(roomId).setPlayer(player).build());
+        if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
+
+            return actionServiceBlockingStub.quitPlayer(QuitPlayerRequest.newBuilder().setRoomId(roomId).setPlayer(player).build());
+        } else {
+            return null;
+        }
     }
 }

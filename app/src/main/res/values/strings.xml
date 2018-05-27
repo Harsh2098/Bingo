@@ -5,15 +5,9 @@
     <string name="n">N</string>
     <string name="i">I</string>
     <string name="b">B</string>
-    <string name="undo">UNDO</string>
-    <string name="reset">RESET</string>
-    <string name="new_game">NEW GAME</string>
-    <string name="client">CLIENT</string>
-    <string name="host">HOST</string>
     <string name="join">Join</string>
     <string name="host_ip_address">Host IP Address</string>
     <string name="leave">Leave</string>
-    <string name="name">Name</string>
     <string name="processing_request">Processing request…</string>
     <string name="player_name">Player Name</string>
     <string name="quit">Quit</string>

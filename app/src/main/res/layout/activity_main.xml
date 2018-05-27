@@ -21,7 +21,6 @@
         android:text="@string/leave" />
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/hostIpAddress_textInputLayout"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -40,7 +39,6 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/name_textInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"

@@ -39,6 +39,7 @@ import com.hmproductions.bingo.loaders.SetReadyLoader;
 import com.hmproductions.bingo.loaders.UnsubscribeLoader;
 import com.hmproductions.bingo.models.RoomEvent;
 import com.hmproductions.bingo.models.Subscription;
+import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 
 import java.util.ArrayList;
@@ -54,7 +55,9 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
 
-public class MainActivity extends AppCompatActivity implements PlayersRecyclerAdapter.OnPlayerClickListener {
+public class MainActivity extends AppCompatActivity implements
+        PlayersRecyclerAdapter.OnPlayerClickListener,
+        ConnectionUtils.OnNetworkDownHandler {
 
     public static final String PLAYER_LEFT_ID = "player-left-id";
 
@@ -96,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
         @Override
         public Loader<AddPlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
 
-            loadingDialog.dismiss();;
+            loadingDialog.dismiss();
 
             String name = playerNameEditText.getText().toString();
             loadingDialog.show();
@@ -112,18 +115,23 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
 
             loadingDialog.dismiss();
 
-            switch (data.getStatusCodeValue()) {
+            if (data == null) {
+                onNetworkDownError();
+            } else {
 
-                case AddPlayerResponse.StatusCode.OK_VALUE:
-                    currentRoomId = data.getRoom().getId();
-                    subscribeToRoomEventsUpdate(currentRoomId);
-                    break;
+                switch (data.getStatusCodeValue()) {
 
-                case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
-                default:
-                    currentPlayerId = -1;
-                    Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
-                    break;
+                    case AddPlayerResponse.StatusCode.OK_VALUE:
+                        currentRoomId = data.getRoom().getId();
+                        subscribeToRoomEventsUpdate(currentRoomId);
+                        break;
+
+                    case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
+                    default:
+                        currentPlayerId = -1;
+                        Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+                        break;
+                }
             }
         }
 
@@ -155,12 +163,17 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
         public void onLoadFinished(@NonNull Loader<RemovePlayerResponse> loader, RemovePlayerResponse data) {
 
             loadingDialog.dismiss();
-            Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
 
-            if (data.getStatusCode() == RemovePlayerResponse.StatusCode.OK) {
-                currentPlayerId = currentRoomId = -1;
-                playersList.clear();
-                playersRecyclerAdapter.swapData(null);
+            if (data == null) {
+                onNetworkDownError();
+            } else {
+                Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+
+                if (data.getStatusCode() == RemovePlayerResponse.StatusCode.OK) {
+                    currentPlayerId = currentRoomId = -1;
+                    playersList.clear();
+                    playersRecyclerAdapter.swapData(null);
+                }
             }
         }
 
@@ -186,8 +199,12 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
 
             loadingDialog.dismiss();
 
-            if (data.getStatusCode() == SetPlayerReadyResponse.StatusCode.SERVER_ERROR) {
-                Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            if (data == null) {
+                onNetworkDownError();
+            } else {
+                if (data.getStatusCode() == SetPlayerReadyResponse.StatusCode.SERVER_ERROR) {
+                    Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         }
 
@@ -207,8 +224,13 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
 
         @Override
         public void onLoadFinished(@NonNull Loader<Unsubscribe.UnsubscribeResponse> loader, Unsubscribe.UnsubscribeResponse data) {
-            if (data.getStatusCode() == Unsubscribe.UnsubscribeResponse.StatusCode.INTERNAL_SERVER_ERROR)
-                Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+
+            if (data == null) {
+                onNetworkDownError();
+            } else {
+                if (data.getStatusCode() == Unsubscribe.UnsubscribeResponse.StatusCode.INTERNAL_SERVER_ERROR)
+                    Toast.makeText(MainActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
@@ -309,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
                                 currentPlayer.getReady()));
                     }
 
-                    runOnUiThread(() ->  {
+                    runOnUiThread(() -> {
                         playersRecyclerAdapter.swapData(playersList);
                     });
 
@@ -368,5 +390,11 @@ public class MainActivity extends AppCompatActivity implements PlayersRecyclerAd
             getSupportLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader);
             getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
         }
+    }
+
+    @Override
+    public void onNetworkDownError() {
+        startActivity(new Intent(this, SplashActivity.class));
+        finish();
     }
 }

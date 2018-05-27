@@ -42,6 +42,7 @@ import com.hmproductions.bingo.loaders.ClickCellLoader;
 import com.hmproductions.bingo.loaders.QuitLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
+import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 
 import java.util.ArrayList;
@@ -67,7 +68,8 @@ import static com.hmproductions.bingo.utils.Miscellaneous.valueClicked;
 
 public class GameActivity extends AppCompatActivity implements
         GameGridRecyclerAdapter.GridCellClickListener,
-        LoaderCallbacks<ClickGridCellResponse> {
+        LoaderCallbacks<ClickGridCellResponse>,
+        ConnectionUtils.OnNetworkDownHandler {
 
     public static final String PLAYER_ID = "player-id";
     public static final String ROOM_ID = "room-id";
@@ -139,8 +141,12 @@ public class GameActivity extends AppCompatActivity implements
 
         @Override
         public void onLoadFinished(@NonNull Loader<BroadcastWinnerResponse> loader, BroadcastWinnerResponse data) {
-            if (data.getStatusCode() == BroadcastWinnerResponse.StatusCode.INTERNAL_SERVER_ERROR)
-                Toast.makeText(GameActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            if (data == null) {
+                onNetworkDownError();
+            } else {
+                if (data.getStatusCode() == BroadcastWinnerResponse.StatusCode.INTERNAL_SERVER_ERROR)
+                    Toast.makeText(GameActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
@@ -160,8 +166,13 @@ public class GameActivity extends AppCompatActivity implements
 
         @Override
         public void onLoadFinished(@NonNull Loader<QuitPlayerResponse> loader, QuitPlayerResponse data) {
-            if (data.getStatusCode() == QuitPlayerResponse.StatusCode.SERVER_ERROR)
-                Toast.makeText(GameActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+
+            if (data == null) {
+                onNetworkDownError();
+            } else {
+                if (data.getStatusCode() == QuitPlayerResponse.StatusCode.SERVER_ERROR)
+                    Toast.makeText(GameActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
@@ -202,7 +213,7 @@ public class GameActivity extends AppCompatActivity implements
 
                         if (gameCompleted) {
                             StringBuilder winnerTextBuilder = new StringBuilder(turnOrderTextView.getText().toString());
-                            winnerTextBuilder.insert(winnerTextBuilder.indexOf(" "), getNameFromId(playersList, winnerId));
+                            winnerTextBuilder.insert(winnerTextBuilder.indexOf(" "), ", " + getNameFromId(playersList, winnerId));
                             turnOrderTextView.setText(winnerTextBuilder.toString());
                         } else {
                             String winnerText;
@@ -498,5 +509,11 @@ public class GameActivity extends AppCompatActivity implements
             turnOrder = getNameFromId(playersList, currentPlayerId) + "\'s turn";
 
         turnOrderTextView.setText(turnOrder);
+    }
+
+    @Override
+    public void onNetworkDownError() {
+        startActivity(new Intent(this, SplashActivity.class));
+        finish();
     }
 }
