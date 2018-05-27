@@ -1,8 +1,10 @@
 package com.hmproductions.bingo.utils;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.DisplayMetrics;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -90,5 +92,11 @@ public class Miscellaneous {
                 return true;
         }
         return false;
+    }
+
+    public static float convertDpToPixel(Context context, float dp){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        return dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }

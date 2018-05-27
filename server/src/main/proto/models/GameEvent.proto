@@ -12,7 +12,8 @@ message GameEvent {
         GAME_WON = 1;
         CELL_CLICKED = 2;
         PLAYER_QUIT = 3;
-        INTERNAL_SERVER_ERROR = 4;
+        NEXT_ROUND = 4;
+        INTERNAL_SERVER_ERROR = 5;
     }
 
     EventCode event_code = 1;

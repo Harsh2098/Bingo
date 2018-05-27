@@ -33,4 +33,11 @@ public class Miscellaneous {
 
         return convertedList;
     }
+
+    public static boolean allPlayersReady(ArrayList<com.hmproductions.bingo.data.Player> playerArrayList) {
+        for (com.hmproductions.bingo.data.Player player : playerArrayList)
+            if (!player.isReady())
+                return false;
+        return true;
+    }
 }

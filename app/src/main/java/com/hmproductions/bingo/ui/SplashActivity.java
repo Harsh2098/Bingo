@@ -22,8 +22,9 @@ import com.hmproductions.bingo.loaders.ConnectionLoader;
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isGooglePlayServicesAvailable;
 import static com.hmproductions.bingo.utils.Constants.INTERNET_CONNECTION_LOADER_ID;
+import static com.hmproductions.bingo.utils.Miscellaneous.convertDpToPixel;
 
-public class SplashActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Boolean>{
+public class SplashActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Boolean> {
 
     private TextView loadingTextView;
     private ProgressBar loadingProgressBar;
@@ -40,8 +41,9 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        LayoutParams layoutParams = new LayoutParams(displayMetrics.widthPixels,displayMetrics.heightPixels / 2);
+        LayoutParams layoutParams = new LayoutParams(displayMetrics.widthPixels, displayMetrics.heightPixels / 2);
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        layoutParams.setMargins(0, (int) convertDpToPixel(this, 20), 0, 0);
         findViewById(R.id.bingo_imageView).setLayoutParams(layoutParams);
 
         if (!isGooglePlayServicesAvailable(this)) {

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.hmproductions.bingo.actions;
+option java_multiple_files = true;
+
+message StartNextRoundRequest {
+    uint32 player_id = 1;
+    uint32 room_id = 2;
+}
+
+message StartNextRoundResponse {
+
+    enum StatusCode {
+        OK = 0;
+        INTERNAL_SERVER_ERROR = 1;
+    }
+
+    StatusCode status_code = 1;
+    string status_message = 2;
+}

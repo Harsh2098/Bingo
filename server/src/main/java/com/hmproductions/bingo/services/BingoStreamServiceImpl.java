@@ -17,6 +17,7 @@ import java.util.Random;
 import io.grpc.stub.StreamObserver;
 
 import static com.hmproductions.bingo.services.BingoActionServiceImpl.playersList;
+import static com.hmproductions.bingo.utils.Miscellaneous.allPlayersReady;
 import static com.hmproductions.bingo.utils.Miscellaneous.getArrayListFromPlayersList;
 
 public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamServiceImplBase {
@@ -48,14 +49,8 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
 
         responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
 
-        boolean allPlayersReady = true;
-        for (Player player : playersList) {
-            if (!player.isReady()) {
-                allPlayersReady = false;
-            }
-        }
 
-        if (allPlayersReady && playersList.size() > 1) {
+        if (allPlayersReady(playersList) && playersList.size() > 1) {
 
             setupCurrentPlayerAndStartGame();
 
@@ -91,6 +86,11 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
                     .setEventCode(GameEvent.EventCode.PLAYER_QUIT)
                     .setCellClicked(request.getCellClicked()).setWinner(request.getWinnerId()).build();
 
+        } else if (request.getCellClicked() == -3) {
+
+            gameEvent = GameEvent.newBuilder().setCurrentPlayerId(playersList.get(currentPlayerPosition).getId())
+                    .setEventCode(GameEvent.EventCode.NEXT_ROUND)
+                    .setCellClicked(request.getCellClicked()).setWinner(request.getWinnerId()).build();
         } else {
 
             if (request.getWinnerId() == -1) {

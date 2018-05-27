@@ -15,6 +15,8 @@ import com.hmproductions.bingo.actions.RemovePlayerRequest;
 import com.hmproductions.bingo.actions.RemovePlayerResponse;
 import com.hmproductions.bingo.actions.SetPlayerReadyRequest;
 import com.hmproductions.bingo.actions.SetPlayerReadyResponse;
+import com.hmproductions.bingo.actions.StartNextRoundRequest;
+import com.hmproductions.bingo.actions.StartNextRoundResponse;
 import com.hmproductions.bingo.actions.Unsubscribe.UnsubscribeRequest;
 import com.hmproductions.bingo.actions.Unsubscribe.UnsubscribeResponse;
 import com.hmproductions.bingo.data.GameEventSubscription;
@@ -32,6 +34,7 @@ import static com.hmproductions.bingo.services.BingoStreamServiceImpl.currentPla
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.gameEventSubscriptionArrayList;
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.subscriptionArrayList;
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.totalPlayers;
+import static com.hmproductions.bingo.utils.Miscellaneous.allPlayersReady;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
 
@@ -247,6 +250,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             }
         }
 
+        for (Player currentPlayer : playersList) {
+            currentPlayer.setReady(false);
+        }
+
         for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
 
             GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
@@ -308,6 +315,31 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         responseObserver.onNext(QuitPlayerResponse.newBuilder().setStatusCode(QuitPlayerResponse.StatusCode.OK)
                 .setStatusMessage("Player quit the game").build());
+
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void startNextRound(StartNextRoundRequest request, StreamObserver<StartNextRoundResponse> responseObserver) {
+
+        for (Player player : playersList) {
+            if (player.getId() == request.getPlayerId())
+                player.setReady(true);
+        }
+
+        if (allPlayersReady(playersList)) {
+            for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
+
+                GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
+                        .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
+                        .setWinnerId(-1).setCellClicked(-3).build();
+
+                streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
+            }
+        }
+
+        responseObserver.onNext(StartNextRoundResponse.newBuilder().setStatusCode(StartNextRoundResponse.StatusCode.OK)
+                .setStatusMessage("Player next round request accepted").build());
 
         responseObserver.onCompleted();
     }

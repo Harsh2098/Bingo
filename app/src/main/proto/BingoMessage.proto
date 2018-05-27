@@ -11,6 +11,7 @@ import "actions/Unsubscribe.proto";
 import "actions/ClickGridCell.proto";
 import "actions/BroadcastWinner.proto";
 import "actions/QuitPlayer.proto";
+import "actions/StartNextRound.proto";
 
 import "models/Subscription.proto";
 import "models/GameSubscription.proto";
@@ -30,6 +31,7 @@ service BingoActionService {
     rpc ClickGridCell(actions.ClickGridCellRequest) returns (actions.ClickGridCellResponse);
     rpc BroadcastWinner(actions.BroadcastWinnerRequest) returns (actions.BroadcastWinnerResponse);
     rpc QuitPlayer(actions.QuitPlayerRequest) returns (actions.QuitPlayerResponse);
+    rpc StartNextRound(actions.StartNextRoundRequest) returns (actions.StartNextRoundResponse);
 }
 
 service BingoStreamService {

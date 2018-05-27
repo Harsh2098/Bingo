@@ -28,6 +28,7 @@ import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.actions.BroadcastWinnerResponse;
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse;
 import com.hmproductions.bingo.actions.QuitPlayerResponse;
+import com.hmproductions.bingo.actions.StartNextRoundResponse;
 import com.hmproductions.bingo.adapter.GameGridRecyclerAdapter;
 import com.hmproductions.bingo.adapter.LeaderboardRecyclerAdapter;
 import com.hmproductions.bingo.dagger.ContextModule;
@@ -39,6 +40,7 @@ import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.datastreams.GameEventUpdate;
 import com.hmproductions.bingo.loaders.BroadcastWinnerLoader;
 import com.hmproductions.bingo.loaders.ClickCellLoader;
+import com.hmproductions.bingo.loaders.NextRoundLoader;
 import com.hmproductions.bingo.loaders.QuitLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
@@ -57,9 +59,12 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.CELL_CLICKED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
+import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND;
+import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
 import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
 import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
+import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_LOADER_ID;
 import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromNextPlayerId;
@@ -181,6 +186,29 @@ public class GameActivity extends AppCompatActivity implements
         }
     };
 
+    private LoaderCallbacks<StartNextRoundResponse> startNextRoundLoader = new LoaderCallbacks<StartNextRoundResponse>() {
+        @NonNull
+        @Override
+        public Loader<StartNextRoundResponse> onCreateLoader(int id, @Nullable Bundle args) {
+            return new NextRoundLoader(GameActivity.this, actionServiceBlockingStub, playerId, roomId);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<StartNextRoundResponse> loader, StartNextRoundResponse data) {
+            if (data == null) {
+                onNetworkDownError();
+            } else {
+                if (data.getStatusCode() == StartNextRoundResponse.StatusCode.INTERNAL_SERVER_ERROR)
+                    Toast.makeText(GameActivity.this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<StartNextRoundResponse> loader) {
+
+        }
+    };
+
     private BroadcastReceiver gridCellReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -201,6 +229,8 @@ public class GameActivity extends AppCompatActivity implements
                         } else {
                             Toast.makeText(GameActivity.this, getNameFromId(playersList, winnerId) + " has won", Toast.LENGTH_SHORT).show();
                         }
+
+                        gameRecyclerView.setEnabled(false);
 
                         bingoLinearLayout.setVisibility(View.GONE);
                         leaderBoardRecyclerView.setVisibility(View.VISIBLE);
@@ -282,6 +312,10 @@ public class GameActivity extends AppCompatActivity implements
 
                         gameRecyclerView.setEnabled(currentPlayerId == playerId);
                         setTurnOrderText(currentPlayerId);
+                        break;
+
+                    case NEXT_ROUND_VALUE:
+                        recreate();
                         break;
 
                     default:
@@ -407,7 +441,8 @@ public class GameActivity extends AppCompatActivity implements
 
     @OnClick(R.id.nextRound_button)
     void onNextRoundButtonClick() {
-        recreate();
+        Toast.makeText(this, "Waiting for other players", Toast.LENGTH_SHORT).show();
+        getSupportLoaderManager().restartLoader(NEXT_ROUND_LOADER_ID, null, startNextRoundLoader);
     }
 
     @Override
