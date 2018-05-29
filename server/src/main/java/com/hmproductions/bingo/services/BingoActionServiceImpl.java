@@ -229,10 +229,6 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
 
-            /*
-                HORRIBLE MISTAKE setPlayerId(request.getPlayerId()) Oh Btw, this is to check if player has subscribed to stream
-             */
-
             GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
                     .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
                     .setWinnerId(-1).setCellClicked(request.getCellClicked()).build();

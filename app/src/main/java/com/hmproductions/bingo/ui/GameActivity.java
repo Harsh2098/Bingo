@@ -576,9 +576,6 @@ public class GameActivity extends AppCompatActivity implements
         // Do nothing
     }
 
-    /*
-        HORRIBLE MISTAKE (2) swapping onResume and onPause methods
-     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -656,14 +653,9 @@ public class GameActivity extends AppCompatActivity implements
 
         if (speechResult != null) {
             for (String currentWord : speechResult) {
-                Log.v(CLASSIC_TAG, currentWord);
-
-                Log.v(CLASSIC_TAG, "is numeric = " + NumberUtils.isNumeric(currentWord));
-
                 if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= GRID_SIZE*GRID_SIZE) {
                     onGridCellClick(Integer.parseInt(currentWord));
                     foundMatch = true;
-                    Log.v(CLASSIC_TAG, "found match");
                 }
             }
         }
@@ -680,14 +672,9 @@ public class GameActivity extends AppCompatActivity implements
 
         if (speechResult != null) {
             for (String currentWord : speechResult) {
-                Log.v(CLASSIC_TAG, currentWord);
-
-                Log.v(CLASSIC_TAG, "is numeric = " + NumberUtils.isNumeric(currentWord));
-
                 if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= GRID_SIZE * GRID_SIZE) {
                     onGridCellClick(Integer.parseInt(currentWord));
                     foundMatch = true;
-                    Log.v(CLASSIC_TAG, "found match");
                 }
             }
         }
