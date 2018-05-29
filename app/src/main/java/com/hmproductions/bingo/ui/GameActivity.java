@@ -388,7 +388,6 @@ public class GameActivity extends AppCompatActivity implements
 
         speechRecognitionIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-        speechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Call a number");
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
@@ -411,44 +410,46 @@ public class GameActivity extends AppCompatActivity implements
         int counter = 0;
 
         // Checking for columns
-        for (int i = 0; i < GRID_SIZE; ++i)
-            if (
-                    gameGridCellList.get(i).getIsClicked() &&
-                            gameGridCellList.get(GRID_SIZE + i).getIsClicked() &&
-                            gameGridCellList.get(2 * GRID_SIZE + i).getIsClicked() &&
-                            gameGridCellList.get(3 * GRID_SIZE + i).getIsClicked() &&
-                            gameGridCellList.get(4 * GRID_SIZE + i).getIsClicked()) {
-                counter++;
-            }
+        for (int i = 0; i < GRID_SIZE; ++i) {
+            boolean columnFormed = true;
+            for (int j = 0; j < GRID_SIZE; ++j)
+                if (!gameGridCellList.get(j * GRID_SIZE + i).getIsClicked()) {
+                    columnFormed = false;
+                    break;
+                }
+            if (columnFormed) counter++;
+        }
 
         // Checking for rows
-        for (int i = 0; i < GRID_SIZE; ++i)
-            if (
-                    gameGridCellList.get(i * GRID_SIZE).getIsClicked() &&
-                            gameGridCellList.get(i * GRID_SIZE + 1).getIsClicked() &&
-                            gameGridCellList.get(i * GRID_SIZE + 2).getIsClicked() &&
-                            gameGridCellList.get(i * GRID_SIZE + 3).getIsClicked() &&
-                            gameGridCellList.get(i * GRID_SIZE + 4).getIsClicked()) {
-                counter++;
+        for (int i = 0; i < GRID_SIZE; ++i) {
+            boolean rowFormed = true;
+            for (int j = 0; j < GRID_SIZE; ++j) {
+                if (!gameGridCellList.get(i * GRID_SIZE + j).getIsClicked()) {
+                    rowFormed = false;
+                    break;
+                }
             }
+            if (rowFormed) counter++;
+        }
 
         // Checking for diagonals
-        if (gameGridCellList.get(0).getIsClicked() &&
-                gameGridCellList.get(GRID_SIZE + 1).getIsClicked() &&
-                gameGridCellList.get(2 * GRID_SIZE + 2).getIsClicked() &&
-                gameGridCellList.get(3 * GRID_SIZE + 3).getIsClicked() &&
-                gameGridCellList.get(4 * GRID_SIZE + 4).getIsClicked()) {
-            counter++;
-
+        boolean mainDiagonalFormed = true;
+        for (int i = 0; i < GRID_SIZE; ++i) {
+            if (!gameGridCellList.get(i * GRID_SIZE + i).getIsClicked()) {
+                mainDiagonalFormed = false;
+                break;
+            }
         }
+        if (mainDiagonalFormed) counter++;
 
-        if (gameGridCellList.get(4).getIsClicked() &&
-                gameGridCellList.get(GRID_SIZE + 3).getIsClicked() &&
-                gameGridCellList.get(2 * GRID_SIZE + 2).getIsClicked() &&
-                gameGridCellList.get(3 * GRID_SIZE + 1).getIsClicked() &&
-                gameGridCellList.get(4 * GRID_SIZE).getIsClicked()) {
-            counter++;
+        boolean secondaryDiagonalFormed = true;
+        for (int i=0 ; i<GRID_SIZE ; ++i) {
+            if (!gameGridCellList.get(i * GRID_SIZE + (GRID_SIZE-i-1)).getIsClicked()) {
+                secondaryDiagonalFormed = false;
+                break;
+            }
         }
+        if (secondaryDiagonalFormed) counter++;
 
         if (counter > GRID_SIZE) counter = GRID_SIZE;
 
@@ -659,7 +660,7 @@ public class GameActivity extends AppCompatActivity implements
 
                 Log.v(CLASSIC_TAG, "is numeric = " + NumberUtils.isNumeric(currentWord));
 
-                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= 25) {
+                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= GRID_SIZE*GRID_SIZE) {
                     onGridCellClick(Integer.parseInt(currentWord));
                     foundMatch = true;
                     Log.v(CLASSIC_TAG, "found match");
@@ -683,7 +684,7 @@ public class GameActivity extends AppCompatActivity implements
 
                 Log.v(CLASSIC_TAG, "is numeric = " + NumberUtils.isNumeric(currentWord));
 
-                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= 25) {
+                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= GRID_SIZE * GRID_SIZE) {
                     onGridCellClick(Integer.parseInt(currentWord));
                     foundMatch = true;
                     Log.v(CLASSIC_TAG, "found match");
