@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -88,6 +91,9 @@ public class GameActivity extends AppCompatActivity implements
     public static final String WON_ID = "won-id";
     public static final String CURRENT_PLAYER_ID = "current-player-id";
     public static final String EVENT_CODE_ID = "event-code-id";
+
+    @Inject
+    SharedPreferences preferences;
 
     @Inject
     BingoStreamServiceGrpc.BingoStreamServiceStub streamServiceStub;
@@ -304,7 +310,14 @@ public class GameActivity extends AppCompatActivity implements
                             getSupportLoaderManager().restartLoader(Constants.BROADCAST_WINNER_LOADER_ID, null,
                                     broadcastWinnerLoader);
 
-                        gameRecyclerView.setEnabled(currentPlayerId == playerId);
+                        if (currentPlayerId == playerId) {
+                            if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
+                                startListening();
+                            else
+                                gameRecyclerView.setEnabled(true);
+                        } else {
+                            gameRecyclerView.setEnabled(false);
+                        }
 
                         setTurnOrderText(currentPlayerId);
                         break;
@@ -313,7 +326,15 @@ public class GameActivity extends AppCompatActivity implements
                         if (currentPlayerId == playerId)
                             Toast.makeText(GameActivity.this, "Start the game", Toast.LENGTH_SHORT).show();
 
-                        gameRecyclerView.setEnabled(currentPlayerId == playerId);
+                        if (currentPlayerId == playerId) {
+                            if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
+                                startListening();
+                            else
+                                gameRecyclerView.setEnabled(true);
+                        } else {
+                            gameRecyclerView.setEnabled(false);
+                        }
+
                         setTurnOrderText(currentPlayerId);
                         break;
 
@@ -451,12 +472,9 @@ public class GameActivity extends AppCompatActivity implements
     @Override
     public void onGridCellClick(int value, View view) {
 
-        if (gameRecyclerView.isEnabled() && !valueClicked(gameGridCellList, value)) {
-
+        if (preferences.getBoolean(getString(R.string.tts_preference_key), false) && gameRecyclerView.isEnabled() && !valueClicked(gameGridCellList, value)) {
             Bundle bundle = new Bundle();
             bundle.putInt(CELL_CLICKED_ID, value);
-            bundle.putBoolean(WON_ID, numberOfLinesCompleted() == 5);
-
             getSupportLoaderManager().restartLoader(Constants.CLICK_CELL_LOADER_ID, bundle, this);
         }
     }
@@ -547,6 +565,30 @@ public class GameActivity extends AppCompatActivity implements
             turnOrder = getNameFromId(playersList, currentPlayerId) + "\'s turn";
 
         turnOrderTextView.setText(turnOrder);
+    }
+
+    private void startListening() {
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.settings_action:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+
+            default:
+                Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

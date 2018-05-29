@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -13,14 +14,14 @@
         android:roundIcon="@mipmap/ic_launcher2"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".ui.GameActivity"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".ui.MainActivity"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".ui.SplashActivity"
@@ -31,6 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:label="@string/title_activity_settings"/>
 
     </application>
 
