@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,13 +21,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.util.NumberUtils;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
@@ -66,6 +67,7 @@ import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VA
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
 import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_LOADER_ID;
@@ -128,13 +130,15 @@ public class GameActivity extends AppCompatActivity implements
     @BindView(R.id.turnOrder_textView)
     TextView turnOrderTextView;
 
-    private MediaPlayer celebration;
+    private SpeechRecognizer speechRecognizer;
+    private MediaPlayer celebrationSound, popSound;
     private GameGridRecyclerAdapter gridRecyclerAdapter;
+    private Intent speechRecognitionIntent;
 
     ArrayList<GridCell> gameGridCellList = new ArrayList<>();
 
     private int playerId = -1, roomId = -1;
-    private boolean gameCompleted = false;
+    private boolean gameCompleted = false, myTurn = false;
     private ArrayList<Player> playersList = new ArrayList<>();
 
     /*
@@ -234,12 +238,13 @@ public class GameActivity extends AppCompatActivity implements
 
                         if (winnerId == playerId) {
                             Toast.makeText(GameActivity.this, "You won the game", Toast.LENGTH_SHORT).show();
-                            celebration.start();
+                            celebrationSound.start();
                         } else {
                             Toast.makeText(GameActivity.this, getNameFromId(playersList, winnerId) + " has won", Toast.LENGTH_SHORT).show();
                         }
 
                         gameRecyclerView.setEnabled(false);
+                        myTurn = false;
 
                         bingoLinearLayout.setVisibility(View.GONE);
                         leaderBoardRecyclerView.setVisibility(View.VISIBLE);
@@ -296,6 +301,7 @@ public class GameActivity extends AppCompatActivity implements
                         break;
 
                     case CELL_CLICKED_VALUE:
+                        popSound.start();
 
                         for (GridCell gridCell : gameGridCellList) {
                             if (gridCell.getValue() == cellClicked) {
@@ -310,7 +316,9 @@ public class GameActivity extends AppCompatActivity implements
                             getSupportLoaderManager().restartLoader(Constants.BROADCAST_WINNER_LOADER_ID, null,
                                     broadcastWinnerLoader);
 
-                        if (currentPlayerId == playerId) {
+                        myTurn = currentPlayerId == playerId;
+
+                        if (myTurn) {
                             if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
                                 startListening();
                             else
@@ -323,10 +331,12 @@ public class GameActivity extends AppCompatActivity implements
                         break;
 
                     case GAME_STARTED_VALUE:
-                        if (currentPlayerId == playerId)
+
+                        myTurn = currentPlayerId == playerId;
+
+                        if (myTurn) {
                             Toast.makeText(GameActivity.this, "Start the game", Toast.LENGTH_SHORT).show();
 
-                        if (currentPlayerId == playerId) {
                             if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
                                 startListening();
                             else
@@ -373,7 +383,15 @@ public class GameActivity extends AppCompatActivity implements
         gameRecyclerView.setAdapter(gridRecyclerAdapter);
         gameRecyclerView.setHasFixedSize(true);
 
-        celebration = MediaPlayer.create(this, R.raw.tada_celebration);
+        celebrationSound = MediaPlayer.create(this, R.raw.tada_celebration);
+        popSound = MediaPlayer.create(this, R.raw.pop);
+
+        speechRecognitionIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        speechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+        speechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Call a number");
+
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        speechRecognizer.setRecognitionListener(this);
     }
 
     // Creates an ArrayList of GridCell using int[][] made by CreateRandomGameArray()
@@ -469,12 +487,27 @@ public class GameActivity extends AppCompatActivity implements
         getSupportLoaderManager().restartLoader(NEXT_ROUND_LOADER_ID, null, startNextRoundLoader);
     }
 
-    @Override
-    public void onGridCellClick(int value, View view) {
+    @OnClick(R.id.talkToSpeak_imageButton)
+    void onImageButtonClick() {
+        if (myTurn && preferences.getBoolean(getString(R.string.tts_preference_key), false))
+            speechRecognizer.startListening(speechRecognitionIntent);
+        else if (myTurn && !preferences.getBoolean(getString(R.string.tts_preference_key), false))
+            Toast.makeText(this, "Mic is disabled", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(this, "Not your turn", Toast.LENGTH_SHORT).show();
+    }
 
-        if (preferences.getBoolean(getString(R.string.tts_preference_key), false) && gameRecyclerView.isEnabled() && !valueClicked(gameGridCellList, value)) {
+    @Override
+    public void onGridCellClick(int value) {
+
+        if (preferences.getBoolean(getString(R.string.tts_preference_key), false)) {
+            speechRecognizer.stopListening();
+        }
+
+        if (myTurn && !valueClicked(gameGridCellList, value)) {
             Bundle bundle = new Bundle();
             bundle.putInt(CELL_CLICKED_ID, value);
+            Log.v(CLASSIC_TAG, "restarting loader with value:" + value);
             getSupportLoaderManager().restartLoader(Constants.CLICK_CELL_LOADER_ID, bundle, this);
         }
     }
@@ -532,7 +565,8 @@ public class GameActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(@NonNull Loader<ClickGridCellResponse> loader, ClickGridCellResponse data) {
-        if (data.getStatusCode() == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR)
+        if (data.getStatusCode() == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR ||
+                data.getStatusCode() == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
             Toast.makeText(this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
     }
 
@@ -568,27 +602,7 @@ public class GameActivity extends AppCompatActivity implements
     }
 
     private void startListening() {
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.settings_action:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-
-            default:
-                Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
-        }
-        return super.onOptionsItemSelected(item);
+        speechRecognizer.startListening(speechRecognitionIntent);
     }
 
     @Override
@@ -606,12 +620,10 @@ public class GameActivity extends AppCompatActivity implements
     // ================================== Speech Recognition Methods Implementations ==================================
     @Override
     public void onReadyForSpeech(Bundle bundle) {
-
     }
 
     @Override
     public void onBeginningOfSpeech() {
-
     }
 
     @Override
@@ -636,19 +648,51 @@ public class GameActivity extends AppCompatActivity implements
 
     @Override
     public void onResults(Bundle bundle) {
+
+        boolean foundMatch = false;
+
         ArrayList<String> speechResult = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
         if (speechResult != null) {
             for (String currentWord : speechResult) {
-                if (Integer.parseInt(currentWord) > 0 && Integer.parseInt(currentWord) < 26) {
-                    // TODO : Do something
+                Log.v(CLASSIC_TAG, currentWord);
+
+                Log.v(CLASSIC_TAG, "is numeric = " + NumberUtils.isNumeric(currentWord));
+
+                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= 25) {
+                    onGridCellClick(Integer.parseInt(currentWord));
+                    foundMatch = true;
+                    Log.v(CLASSIC_TAG, "found match");
                 }
             }
         }
+
+        if (!foundMatch)
+            speechRecognizer.startListening(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH));
     }
 
     @Override
     public void onPartialResults(Bundle bundle) {
+        boolean foundMatch = false;
 
+        ArrayList<String> speechResult = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+        if (speechResult != null) {
+            for (String currentWord : speechResult) {
+                Log.v(CLASSIC_TAG, currentWord);
+
+                Log.v(CLASSIC_TAG, "is numeric = " + NumberUtils.isNumeric(currentWord));
+
+                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= 25) {
+                    onGridCellClick(Integer.parseInt(currentWord));
+                    foundMatch = true;
+                    Log.v(CLASSIC_TAG, "found match");
+                }
+            }
+        }
+
+        if (!foundMatch)
+            speechRecognizer.startListening(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH));
     }
 
     @Override

@@ -216,7 +216,14 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                     .setStatusCode(ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR).build());
             responseObserver.onCompleted();
             return;
+        } else if (request.getPlayerId() != playersList.get(currentPlayerPosition).getId()) {
+            responseObserver.onNext(ClickGridCellResponse.newBuilder().setStatusMessage("Not your turn")
+                    .setStatusCode(ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN).build());
+            responseObserver.onCompleted();
+            return;
         }
+
+        System.out.print("Cell clicked = " + request.getCellClicked() + "\n");
 
         currentPlayerPosition = (currentPlayerPosition + 1) % totalPlayers;
 

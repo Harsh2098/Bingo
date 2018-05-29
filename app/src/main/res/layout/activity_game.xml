@@ -140,4 +140,17 @@
         android:textColor="@android:color/background_light"
         android:textSize="20sp" />
 
+    <ImageButton
+        android:id="@+id/talkToSpeak_imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="6dp"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/green_rounded_button"
+        android:contentDescription="@string/talk_to_speak_button"
+        android:padding="8dp"
+        android:src="@drawable/mic_icon_white" />
+
 </RelativeLayout>

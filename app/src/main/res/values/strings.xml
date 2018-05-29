@@ -124,5 +124,6 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="tts_preference_key">Speech to Text</string>
+    <string name="talk_to_speak_button">Talk to Speak Button</string>
 
 </resources>

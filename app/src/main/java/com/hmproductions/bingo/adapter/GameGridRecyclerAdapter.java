@@ -35,7 +35,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
     private RelativeLayout.LayoutParams layoutParams;
 
     public interface GridCellClickListener {
-        void onGridCellClick(int position, View view);
+        void onGridCellClick(int position);
     }
 
     public GameGridRecyclerAdapter(Context context, int size, ArrayList<GridCell> data, GridCellClickListener listener) {
@@ -118,7 +118,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
 
         @Override
         public void onClick(View view) {
-            mClickListener.onGridCellClick(Integer.parseInt(value_textView.getText().toString()), view);
+            mClickListener.onGridCellClick(Integer.parseInt(value_textView.getText().toString()));
         }
     }
 }
