@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.google.protobuf'
 
 android {
@@ -99,6 +100,9 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.1'
 
+    // Celebration
+    implementation 'nl.dionsegijn:konfetti:1.1.2'
+
     // Testing-only dependencies
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
@@ -107,4 +111,8 @@ dependencies {
     androidTestImplementation 'com.android.support:support-annotations:27.1.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.2'
     testImplementation 'junit:junit:4.12'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

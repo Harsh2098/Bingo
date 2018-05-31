@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:orientation="vertical"
-    android:padding="6dp">
+    android:padding="4dp">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/game_recyclerView"
@@ -152,5 +152,10 @@
         android:contentDescription="@string/talk_to_speak_button"
         android:padding="8dp"
         android:src="@drawable/mic_icon_white" />
+
+    <nl.dionsegijn.konfetti.KonfettiView
+        android:id="@+id/konfettiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

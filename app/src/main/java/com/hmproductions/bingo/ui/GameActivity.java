@@ -61,6 +61,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.grpc.stub.StreamObserver;
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
 
 import static com.hmproductions.bingo.models.GameEvent.EventCode.CELL_CLICKED_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VALUE;
@@ -129,6 +132,9 @@ public class GameActivity extends AppCompatActivity implements
 
     @BindView(R.id.turnOrder_textView)
     TextView turnOrderTextView;
+
+    @BindView(R.id.konfettiView)
+    KonfettiView konfettiView;
 
     private SpeechRecognizer speechRecognizer;
     private MediaPlayer celebrationSound, popSound;
@@ -239,6 +245,17 @@ public class GameActivity extends AppCompatActivity implements
                         if (winnerId == playerId) {
                             Toast.makeText(GameActivity.this, "You won the game", Toast.LENGTH_SHORT).show();
                             celebrationSound.start();
+
+                            konfettiView.build()
+                                    .addColors(Color.parseColor("#9162e4"), Color.YELLOW, Color.RED)
+                                    .setDirection(0.0, 359.0)
+                                    .setSpeed(3f, 6f)
+                                    .setFadeOutEnabled(true)
+                                    .setTimeToLive(3000)
+                                    .addShapes(Shape.RECT, Shape.CIRCLE)
+                                    .addSizes(new Size(12, 5))
+                                    .setPosition(-50f, konfettiView.getWidth() + 50f, -50f, -50f)
+                                    .streamFor(400, 2000);
                         } else {
                             Toast.makeText(GameActivity.this, getNameFromId(playersList, winnerId) + " has won", Toast.LENGTH_SHORT).show();
                         }
