@@ -3,31 +3,32 @@ package com.hmproductions.bingo;
 import com.hmproductions.bingo.services.BingoActionServiceImpl;
 import com.hmproductions.bingo.services.BingoStreamServiceImpl;
 import com.hmproductions.bingo.utils.Constants;
+import com.hmproductions.bingo.utils.ServerHeaderInterceptor;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
+import java.util.ArrayList;
+import java.util.List;
 
-import io.grpc.Attributes;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.ServerTransportFilter;
 
 public class BingoServer {
 
+    public static List<String> sessionIdsList = new ArrayList<>();
+
     static public void main(String args[]) {
+
+        File serverCertificateFile = new File("server_cert.pem");
+        File serverKeyFile = new File("server_key.pem");
 
         Server server = ServerBuilder
                 .forPort(Constants.SERVER_PORT)
                 .addService(new BingoActionServiceImpl())
                 .addService(new BingoStreamServiceImpl())
-//                .addTransportFilter(new ServerTransportFilter() {
-//                    @Override
-//                    public void transportTerminated(Attributes transportAttrs) {
-//                        super.transportTerminated(transportAttrs);
-//                        transportAttrs.
-//                    }
-//                })
-                //.useTransportSecurity(new File("BingoServer/server.crt"), new File("BingoServer/server.key"))
+                .intercept(new ServerHeaderInterceptor())
+                //.useTransportSecurity(serverCertificateFile, serverKeyFile)
                 .build();
 
         try {

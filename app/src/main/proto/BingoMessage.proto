@@ -12,6 +12,7 @@ import "actions/ClickGridCell.proto";
 import "actions/BroadcastWinner.proto";
 import "actions/QuitPlayer.proto";
 import "actions/StartNextRound.proto";
+import "actions/GetSessionId.proto";
 
 import "models/Subscription.proto";
 import "models/GameSubscription.proto";
@@ -23,6 +24,7 @@ import "datastreams/GameEvents.proto";
 service BingoActionService {
     rpc GetGridSize(actions.GetGridSizeRequest) returns (actions.GetGridSizeResponse);
 
+    rpc GetSessionId(actions.GetSessionIdRequest) returns (actions.GetSessionIdResponse);
     rpc AddPlayer(actions.AddPlayerRequest) returns (actions.AddPlayerResponse);
     rpc RemovePlayer(actions.RemovePlayerRequest) returns (actions.RemovePlayerResponse);
     rpc SetPlayerReady(actions.SetPlayerReadyRequest) returns (actions.SetPlayerReadyResponse);

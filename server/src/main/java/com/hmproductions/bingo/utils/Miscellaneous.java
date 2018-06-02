@@ -3,23 +3,18 @@ package com.hmproductions.bingo.utils;
 import com.hmproductions.bingo.models.Player;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static com.hmproductions.bingo.services.BingoActionServiceImpl.playersList;
 
 public class Miscellaneous {
 
-    public static boolean playerIsNew(int playerId) {
+    private static final String randomStringGenerationString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=";
 
-        boolean exists = false;
-
-        for (com.hmproductions.bingo.data.Player currentPlayer : playersList) {
-            if (currentPlayer.getId() == playerId) {
-                exists = true;
-                break;
-            }
-        }
-
-        return !exists;
+    public static boolean playerExists(int playerId) {
+        for (com.hmproductions.bingo.data.Player currentPlayer : playersList)
+            if (currentPlayer.getId() == playerId) return true;
+        return false;
     }
 
     public static ArrayList<Player> getArrayListFromPlayersList(ArrayList<com.hmproductions.bingo.data.Player> playerArrayList) {
@@ -39,5 +34,14 @@ public class Miscellaneous {
             if (!player.isReady())
                 return false;
         return true;
+    }
+
+    public static String generateSessionId(int length) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        for (int i = 0; i < length; i++) {
+            stringBuilder.append(randomStringGenerationString.charAt(new Random().nextInt(randomStringGenerationString.length())));
+        }
+
+        return stringBuilder.toString();
     }
 }

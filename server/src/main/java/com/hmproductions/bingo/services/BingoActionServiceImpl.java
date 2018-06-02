@@ -9,6 +9,8 @@ import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellRequest;
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeRequest;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeResponse;
+import com.hmproductions.bingo.actions.GetSessionIdRequest;
+import com.hmproductions.bingo.actions.GetSessionIdResponse;
 import com.hmproductions.bingo.actions.QuitPlayerRequest;
 import com.hmproductions.bingo.actions.QuitPlayerResponse;
 import com.hmproductions.bingo.actions.RemovePlayerRequest;
@@ -34,7 +36,9 @@ import static com.hmproductions.bingo.services.BingoStreamServiceImpl.currentPla
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.gameEventSubscriptionArrayList;
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.subscriptionArrayList;
 import static com.hmproductions.bingo.services.BingoStreamServiceImpl.totalPlayers;
+import static com.hmproductions.bingo.utils.Constants.SESSION_ID_LENGTH;
 import static com.hmproductions.bingo.utils.Miscellaneous.allPlayersReady;
+import static com.hmproductions.bingo.utils.Miscellaneous.generateSessionId;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
 
@@ -42,7 +46,6 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
     public static ArrayList<Player> playersList = new ArrayList<>();
     private BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
-
     private Room room;
 
     public BingoActionServiceImpl() {
@@ -61,6 +64,18 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         }
 
         responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getSessionId(GetSessionIdRequest request, StreamObserver<GetSessionIdResponse> responseObserver) {
+
+        String sessionId = generateSessionId(SESSION_ID_LENGTH);
+        System.out.println("New session ID: " + sessionId);
+
+        responseObserver.onNext(GetSessionIdResponse.newBuilder().setStatusCode(GetSessionIdResponse.StatusCode.OK)
+                .setStatusMessage("New session ID attached").setSessionId(sessionId).build());
+
         responseObserver.onCompleted();
     }
 
@@ -87,8 +102,8 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
                 room = room.toBuilder().setCount(room.getCount() + 1).build();
 
-                addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK)
-                        .setStatusMessage("New player added").setRoom(room).build();
+                addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK).setRoom(room)
+                        .setStatusMessage("New player added").build();
 
                 sendRoomEventUpdate();
 

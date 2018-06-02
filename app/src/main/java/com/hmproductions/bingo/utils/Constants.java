@@ -9,7 +9,7 @@ public class Constants {
     public static final int LEADERBOARD_COL_SPAN = 2;
 
     public static final int SERVER_PORT = 8080;
-    public static final String SERVER_ADDRESS = "192.168.0.160";
+    public static final String SERVER_ADDRESS = "192.168.0.182";
 
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;
@@ -24,7 +24,8 @@ public class Constants {
     public static final String GRID_CELL_CLICK_ACTION = "grid-cell-click-action";
     public static final String QUIT_GAME_ACTION = "quit-game-action";
 
-    public static final String SAMPLE_SESSION_ID = "bingo4lyfxD1020";
+    public static String SESSION_ID = null;
+    public static final String SESSION_ID_KEY = "sessionid";
 
     public static final String SERVER_CERT = "-----BEGIN CERTIFICATE-----\n" +
             "MIIFBTCCA+2gAwIBAgISA+OThMLh+yVPNP5jen9UpZLLMA0GCSqGSIb3DQEBCwUA\n" +

@@ -10,6 +10,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 
+import static com.hmproductions.bingo.utils.Constants.SESSION_ID_KEY;
+
 @Module (includes = ChannelModule.class)
 public class StubModule {
 
@@ -29,8 +31,8 @@ public class StubModule {
     
     private Metadata getStubMetadata() {
         Metadata metadata = new Metadata();
-        Metadata.Key<String> metadataKey = Metadata.Key.of("sessionid", Metadata.ASCII_STRING_MARSHALLER);
-        metadata.put(metadataKey, Constants.SAMPLE_SESSION_ID);
+        Metadata.Key<String> metadataKey = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
+        metadata.put(metadataKey, Constants.SESSION_ID);
         return metadata;
     }
 }
