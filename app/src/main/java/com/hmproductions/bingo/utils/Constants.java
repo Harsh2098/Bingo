@@ -27,33 +27,29 @@ public class Constants {
     public static String SESSION_ID = null;
     public static final String SESSION_ID_KEY = "sessionid";
 
-    public static final String SERVER_CERT = "-----BEGIN CERTIFICATE-----\n" +
-            "MIIFBTCCA+2gAwIBAgISA+OThMLh+yVPNP5jen9UpZLLMA0GCSqGSIb3DQEBCwUA\n" +
-            "MEoxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQD\n" +
-            "ExpMZXQncyBFbmNyeXB0IEF1dGhvcml0eSBYMzAeFw0xODAyMTgxNDQ3MDRaFw0x\n" +
-            "ODA1MTkxNDQ3MDRaMBwxGjAYBgNVBAMTEWRhbGFsLnByYWd5YW4ub3JnMIIBIjAN\n" +
-            "BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvGT5r53rUVLDgTRitxcf76Y+3p0O\n" +
-            "AVVDR+EZdSwlGNFyaZeBc3cwPUodevPImvhfCDvL5LoJAwIwpIQ/Ufqdcb6I2Duh\n" +
-            "27QcxDXAId3PQPSrV6ubAAxeLUNRoqvGoxJ5hebUSuVmwfIvx4seO/f1VqD8gqiR\n" +
-            "cZFkOag+sRRYGqwxWlaTcTQ6r1RZmW5FxSfvwUHOLYWzcc1pdP1XBWZ4n0KEdgCa\n" +
-            "N8ht7XDp3xRlZp+Oo+Avu6TnyJsOGob5YuxbzZC3S1sHDvtGY6czmaxOCCT1IRC9\n" +
-            "8q16RhC9aYL7iouEH2XOK/QRYXS5oKXQoQmaAlKIkYpUE3Cor5GrJwN9UwIDAQAB\n" +
-            "o4ICETCCAg0wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr\n" +
-            "BgEFBQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBTLe29ihoYDX3nePTMkeKR+\n" +
-            "8Y7axjAfBgNVHSMEGDAWgBSoSmpjBH3duubRObemRWXv86jsoTBvBggrBgEFBQcB\n" +
-            "AQRjMGEwLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwLmludC14My5sZXRzZW5jcnlw\n" +
-            "dC5vcmcwLwYIKwYBBQUHMAKGI2h0dHA6Ly9jZXJ0LmludC14My5sZXRzZW5jcnlw\n" +
-            "dC5vcmcvMBwGA1UdEQQVMBOCEWRhbGFsLnByYWd5YW4ub3JnMIH+BgNVHSAEgfYw\n" +
-            "gfMwCAYGZ4EMAQIBMIHmBgsrBgEEAYLfEwEBATCB1jAmBggrBgEFBQcCARYaaHR0\n" +
-            "cDovL2Nwcy5sZXRzZW5jcnlwdC5vcmcwgasGCCsGAQUFBwICMIGeDIGbVGhpcyBD\n" +
-            "ZXJ0aWZpY2F0ZSBtYXkgb25seSBiZSByZWxpZWQgdXBvbiBieSBSZWx5aW5nIFBh\n" +
-            "cnRpZXMgYW5kIG9ubHkgaW4gYWNjb3JkYW5jZSB3aXRoIHRoZSBDZXJ0aWZpY2F0\n" +
-            "ZSBQb2xpY3kgZm91bmQgYXQgaHR0cHM6Ly9sZXRzZW5jcnlwdC5vcmcvcmVwb3Np\n" +
-            "dG9yeS8wDQYJKoZIhvcNAQELBQADggEBACepTdQrvrR+BKRZHhkhExrtbYELPgeF\n" +
-            "X5TUz3yKeUCmf1CJfgyCuRBAPrrDU1LKlImRbUGnAxt+IHk3GgmdbbImyL/8x22j\n" +
-            "DYHdsy/3x4wkAMMDeOiDI84KWKLNGXYCUx9XMT394djNpAtynhuINFgTKpi1U1aw\n" +
-            "JxHjr5qGna4LLoL2OyUtLZnLPfrhBdbe1EfQTQ5TZgr5g6rgtGIX2o/g3ORLYUGM\n" +
-            "EYrt2uzl6wJHiNDrIyEmr1YepVDyNiYaSt0S6T72qd68eBeDZ5q6rI1bQcsrp1/N\n" +
-            "4yxybWqAkiH/0e4JsG3sXIABMClz0rcoS4hq6wdin8K45mxnFBZaK1Q=\n" +
-            "-----END CERTIFICATE-----";
+    public static final String SERVER_CERT = "" +
+            "-----BEGIN CERTIFICATE-----\n" +
+            "MIIEDzCCAvegAwIBAgIJALz3nK5gc6keMA0GCSqGSIb3DQEBCwUAMIGdMQswCQYD\n" +
+            "VQQGEwJTRzESMBAGA1UECAwJU2luZ2Fwb3JlMRIwEAYDVQQHDAlTaW5nYXBvcmUx\n" +
+            "FjAUBgNVBAoMDWhhcnNoIG1haGFqYW4xFDASBgNVBAsMC2RldmVsb3BtZW50MQ4w\n" +
+            "DAYDVQQDDAVoYXJzaDEoMCYGCSqGSIb3DQEJARYZaGFyc2htYWhhamFuOTI3QHlh\n" +
+            "aG9vLmNvbTAeFw0xODA2MDIwMzMyMjZaFw0yODA1MzAwMzMyMjZaMIGdMQswCQYD\n" +
+            "VQQGEwJTRzESMBAGA1UECAwJU2luZ2Fwb3JlMRIwEAYDVQQHDAlTaW5nYXBvcmUx\n" +
+            "FjAUBgNVBAoMDWhhcnNoIG1haGFqYW4xFDASBgNVBAsMC2RldmVsb3BtZW50MQ4w\n" +
+            "DAYDVQQDDAVoYXJzaDEoMCYGCSqGSIb3DQEJARYZaGFyc2htYWhhamFuOTI3QHlh\n" +
+            "aG9vLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANZT8fGK0KaM\n" +
+            "c4tbGU+RkpxsCoBUqQVvAGWMy9iSya6hhGzUkeiFN+KNpx+ygUJyEDdq8TVEJqhl\n" +
+            "7TfZ+xfYmBNomwXI4NayzjMZuQdv0nY9RAHtXvDPWiQO3nwwbq58dikN8JsYpRrI\n" +
+            "d+r4tyRDnMgFR4NatbkLKpqDCbe6CUzQHkcZ2Gmdj0x0146zW37A8rbYLI1YG4+7\n" +
+            "d9HmnNDq9K5MZ8aM6ylW9J//UOCouBb3LeP9wIRqOxXGX1Fl/wWK4tWE2y9yke5X\n" +
+            "jYO7Kq70A2YyjBqTO9g/21Ksjq6SYjFKe5765L2Zyj1fHlt+cKQGYh5ZhL8Aywel\n" +
+            "UZ1YGqYaSCECAwEAAaNQME4wHQYDVR0OBBYEFKSUH4H96EmjJPkJi4kzjcVbDI8m\n" +
+            "MB8GA1UdIwQYMBaAFKSUH4H96EmjJPkJi4kzjcVbDI8mMAwGA1UdEwQFMAMBAf8w\n" +
+            "DQYJKoZIhvcNAQELBQADggEBAAFLHy8NJab+5LZ/+uvaLwxxiVVYph8Nsg9DGgex\n" +
+            "das5tM8LPIgJjMTVJ2xRE368VWrTePncYXZA+hej/Rgci7kGL0o8ux3wVe2I+HM2\n" +
+            "GKHQJAYrI6XiQJcVeY77BxZzrS25vwbqL3Q8+JzalMKI0Nz1fEcMcW5CqtGYEyVx\n" +
+            "GmbkDaO3qgyUkhP7aAWsS2V3t80p9DCdt9iXBDIUzCCi3w08Dxlfikd5SqLD8lD/\n" +
+            "SKBxr7VvdmLnsWpD4875UHxX8L7WzE/BjDM6G4BqPn8g4Hxw4JVrnPS0QjfAW4cb\n" +
+            "YtenYpwKn55X3UVP/uylizBWYGv9lEaY0ARFp5ECRGObDxI=\n" +
+            "-----END CERTIFICATE-----\n";
 }

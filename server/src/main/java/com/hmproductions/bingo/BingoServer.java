@@ -20,15 +20,17 @@ public class BingoServer {
 
     static public void main(String args[]) {
 
-        File serverCertificateFile = new File("server_cert.pem");
-        File serverKeyFile = new File("server_key.pem");
+        File serverCertificateFile = new File("server/server.crt");
+        File serverKeyFile = new File("server/server.key");
+
+        java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
         Server server = ServerBuilder
                 .forPort(Constants.SERVER_PORT)
                 .addService(new BingoActionServiceImpl())
                 .addService(new BingoStreamServiceImpl())
                 .intercept(new ServerHeaderInterceptor())
-                //.useTransportSecurity(serverCertificateFile, serverKeyFile)
+                .useTransportSecurity(serverCertificateFile, serverKeyFile)
                 .build();
 
         try {

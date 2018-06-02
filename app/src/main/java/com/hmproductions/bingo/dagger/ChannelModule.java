@@ -39,13 +39,18 @@ public class ChannelModule {
     public ManagedChannel getManagedChannel(Context context) {
 
 
-        return OkHttpChannelBuilder
-                .forAddress(Constants.SERVER_ADDRESS, Constants.SERVER_PORT)
-                //.sslSocketFactory(getSocketFactory(context))
-                .usePlaintext()
-                .connectionSpec(ConnectionSpec.MODERN_TLS)
-                .hostnameVerifier((hostname, session) -> true)
-                .build();
+        try {
+            return OkHttpChannelBuilder
+                    .forAddress(Constants.SERVER_ADDRESS, Constants.SERVER_PORT)
+                    .sslSocketFactory(getSocketFactory(context))
+                    .connectionSpec(ConnectionSpec.MODERN_TLS)
+                    .hostnameVerifier((hostname, session) -> true)
+                    .build();
+        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyManagementException | GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private SSLSocketFactory getSocketFactory(Context context) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, KeyManagementException, UnrecoverableKeyException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
