@@ -10,10 +10,10 @@ import com.hmproductions.bingo.actions.QuitPlayerRequest;
 import com.hmproductions.bingo.actions.QuitPlayerResponse;
 import com.hmproductions.bingo.models.Player;
 
-import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
-import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
+import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
+import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
 
 public class QuitLoader extends AsyncTaskLoader<QuitPlayerResponse> {
 

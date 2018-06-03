@@ -1,4 +1,4 @@
-package com.hmproductions.bingo.services;
+package com.hmproductions.bingo.sync;
 
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.data.GameEventSubscription;
@@ -16,7 +16,7 @@ import java.util.Random;
 
 import io.grpc.stub.StreamObserver;
 
-import static com.hmproductions.bingo.services.BingoActionServiceImpl.playersList;
+import static com.hmproductions.bingo.sync.BingoActionServiceImpl.playersList;
 import static com.hmproductions.bingo.utils.Miscellaneous.allPlayersReady;
 import static com.hmproductions.bingo.utils.Miscellaneous.getArrayListFromPlayersList;
 
@@ -61,7 +61,6 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
             for (Player player : playersList) {
                 player.setWinCount(0);
             }
-            // TODO : Call onCompleted()
         }
     }
 
@@ -69,8 +68,10 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
     public void getGameEventUpdates(GameSubscription request, StreamObserver<GameEventUpdate> responseObserver) {
 
         if (!gameSubscriptionExists(request.getPlayerId())) {
-            gameEventSubscriptionArrayList.add(new GameEventSubscription(responseObserver, request));
+            gameEventSubscriptionArrayList.add(new GameEventSubscription(request.getPlayerId(), responseObserver, request));
         }
+
+        System.out.println("Sending update");
 
         GameEvent gameEvent;
 

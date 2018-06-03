@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,6 +40,7 @@ import com.hmproductions.bingo.loaders.SetReadyLoader;
 import com.hmproductions.bingo.loaders.UnsubscribeLoader;
 import com.hmproductions.bingo.models.RoomEvent;
 import com.hmproductions.bingo.models.Subscription;
+import com.hmproductions.bingo.sync.RemoveService;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 
@@ -54,6 +54,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.grpc.stub.StreamObserver;
 
+import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
 
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private int currentPlayerId = -1, currentRoomId = -1;
     private ArrayList<Player> playersList = new ArrayList<>();
+    private static boolean mightResume = false;
 
     private Player fakePlayer = new Player("", "", -1, false);
     private PlayersRecyclerAdapter playersRecyclerAdapter;
@@ -250,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
 
         setupSpinner();
+        setupJoinButton();
 
         playersRecyclerAdapter = new PlayersRecyclerAdapter(null, this, this);
 
@@ -269,8 +272,6 @@ public class MainActivity extends AppCompatActivity implements
                 playersList = getIntent().getParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID);
                 playersRecyclerAdapter.swapData(playersList);
 
-                Log.v(":::", playersList.get(0).getName() + " is ready = " + playersList.get(0).isReady());
-
                 currentPlayerId = getIntent().getIntExtra(GameActivity.PLAYER_ID, -1);
                 currentRoomId = getIntent().getIntExtra(GameActivity.ROOM_ID, -1);
                 playerNameEditText.setText(getNameFromId(playersList, currentPlayerId));
@@ -278,24 +279,6 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
-        playerNameEditText.setText(preferences.getString(PLAYER_NAME_KEY, ""));
-        colorSpinner.setSelection(preferences.getInt(PLAYER_COLOR_KEY, 0));
-    }
-
-    @OnClick(R.id.join_button)
-    void onJoinButtonClick() {
-
-        if (playerNameEditText.getText().toString().isEmpty()) {
-            playerNameEditText.setError("A-Z, 0-9");
-            Toast.makeText(this, "Please enter the name", Toast.LENGTH_SHORT).show();
-            return;
-        } else if (currentRoomId != -1) {
-            Toast.makeText(this, "Player already joined", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        getSupportLoaderManager().restartLoader(Constants.ADD_PLAYER_LOADER_ID, null, addPlayerLoader);
     }
 
     @OnClick(R.id.leave_button)
@@ -367,6 +350,21 @@ public class MainActivity extends AppCompatActivity implements
         colorSpinner.setAdapter(colorSpinnerAdapter);
     }
 
+    private void setupJoinButton() {
+        findViewById(R.id.join_button).setOnClickListener(view -> {
+            if (playerNameEditText.getText().toString().isEmpty()) {
+                playerNameEditText.setError("A-Z, 0-9");
+                Toast.makeText(this, "Please enter the name", Toast.LENGTH_SHORT).show();
+                return;
+            } else if (currentRoomId != -1) {
+                Toast.makeText(this, "Player already joined", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            getSupportLoaderManager().restartLoader(Constants.ADD_PLAYER_LOADER_ID, null, addPlayerLoader);
+        });
+    }
+
     boolean getPlayerReady(int playerId) {
         for (Player currentPlayer : playersList) {
             if (currentPlayer.getId() == playerId)
@@ -396,21 +394,38 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        playerNameEditText.setText(preferences.getString(PLAYER_NAME_KEY, ""));
+        colorSpinner.setSelection(preferences.getInt(PLAYER_COLOR_KEY, 0));
+
+//        if (mightResume) {
+//            //getSupportLoaderManager().restartLoader(Constants.ADD_PLAYER_LOADER_ID, null, addPlayerLoader);
+//            mightResume = false;
+//        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(PLAYER_NAME_KEY, playerNameEditText.getText().toString());
         editor.putInt(PLAYER_COLOR_KEY, colorSpinner.getSelectedItemPosition());
         editor.apply();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
         if (currentPlayerId != -1) {
-            getSupportLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader);
-            getSupportLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
+            // TODO (3) : Check why session id is null or empty
+            Intent removePlayerIntent = new Intent(this, RemoveService.class);
+
+            removePlayerIntent.putExtra(RemoveService.PLAYER_ID_KEY, currentPlayerId);
+            removePlayerIntent.putExtra(RemoveService.PLAYER_NAME_KEY, getNameFromId(playersList, currentPlayerId));
+            removePlayerIntent.putExtra(RemoveService.PLAYER_COLOR_KEY, getColorFromId(playersList, currentPlayerId));
+            removePlayerIntent.putExtra(RemoveService.ROOM_ID_KEY, currentRoomId);
+            removePlayerIntent.putExtra(RemoveService.SESSION_ID_KEY, Constants.SESSION_ID);
+
+            mightResume = true;
+            this.startService(removePlayerIntent);
         }
     }
 

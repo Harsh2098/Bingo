@@ -21,7 +21,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,6 +49,7 @@ import com.hmproductions.bingo.loaders.NextRoundLoader;
 import com.hmproductions.bingo.loaders.QuitLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
+import com.hmproductions.bingo.sync.QuitService;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 
@@ -70,11 +70,10 @@ import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VA
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
+import static com.hmproductions.bingo.sync.QuitService.SESSION_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
 import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_LOADER_ID;
-import static com.hmproductions.bingo.utils.Constants.QUIT_PLAYER_LOADER_ID;
 import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromNextPlayerId;
@@ -144,7 +143,7 @@ public class GameActivity extends AppCompatActivity implements
     ArrayList<GridCell> gameGridCellList = new ArrayList<>();
 
     private int playerId = -1, roomId = -1;
-    private boolean gameCompleted = false, myTurn = false;
+    private boolean gameCompleted = false, myTurn = false, quitButtonClicked = false;
     private ArrayList<Player> playersList = new ArrayList<>();
 
     /*
@@ -190,7 +189,6 @@ public class GameActivity extends AppCompatActivity implements
 
         @Override
         public void onLoadFinished(@NonNull Loader<QuitPlayerResponse> loader, QuitPlayerResponse data) {
-
             if (data == null) {
                 onNetworkDownError();
             } else {
@@ -311,7 +309,7 @@ public class GameActivity extends AppCompatActivity implements
                         quitIntent.putExtra(PLAYER_ID, playerId);
                         quitIntent.putExtra(ROOM_ID, roomId);
                         quitIntent.putParcelableArrayListExtra(PLAYERS_LIST_ID, playersList);
-
+                        quitButtonClicked = true;
                         startActivity(quitIntent);
                         finish();
 
@@ -494,7 +492,9 @@ public class GameActivity extends AppCompatActivity implements
                 .setTitle("Confirm Quit")
                 .setMessage("Game will be cancelled. Do you want to forfeit ?")
                 .setPositiveButton(R.string.quit, (dialogInterface, i) ->
-                        getSupportLoaderManager().restartLoader(Constants.QUIT_PLAYER_LOADER_ID, null, quitPlayerLoader))
+                {
+                    getSupportLoaderManager().restartLoader(Constants.QUIT_PLAYER_LOADER_ID, null, quitPlayerLoader);
+                })
                 .setNegativeButton(R.string.no, (dI, i) -> dI.dismiss())
                 .show();
     }
@@ -525,7 +525,6 @@ public class GameActivity extends AppCompatActivity implements
         if (myTurn && !valueClicked(gameGridCellList, value)) {
             Bundle bundle = new Bundle();
             bundle.putInt(CELL_CLICKED_ID, value);
-            Log.v(CLASSIC_TAG, "restarting loader with value:" + value);
             getSupportLoaderManager().restartLoader(Constants.CLICK_CELL_LOADER_ID, bundle, this);
         }
     }
@@ -604,6 +603,14 @@ public class GameActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver);
+
+        if (!quitButtonClicked) {
+            Intent quitServiceIntent = new Intent(this, QuitService.class);
+            quitServiceIntent.putExtra(QuitService.PLAYER_ID_KEY, playerId);
+            quitServiceIntent.putParcelableArrayListExtra(QuitService.PLAYER_LIST_KEY, playersList);
+            quitServiceIntent.putExtra(SESSION_ID_KEY, Constants.SESSION_ID);
+            startService(quitServiceIntent);
+        }
     }
 
     private void setTurnOrderText(int currentPlayerId) {
@@ -624,12 +631,6 @@ public class GameActivity extends AppCompatActivity implements
     public void onNetworkDownError() {
         startActivity(new Intent(this, SplashActivity.class));
         finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        getSupportLoaderManager().restartLoader(QUIT_PLAYER_LOADER_ID, null, quitPlayerLoader);
     }
 
     // ================================== Speech Recognition Methods Implementations ==================================

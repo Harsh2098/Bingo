@@ -7,12 +7,11 @@ import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.AddPlayerRequest;
 import com.hmproductions.bingo.actions.AddPlayerResponse;
 import com.hmproductions.bingo.data.Player;
-import com.hmproductions.bingo.utils.Constants;
 
-import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
-import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
+import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
+import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
 
 public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
 
@@ -32,6 +31,8 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
 
     @Override
     public AddPlayerResponse loadInBackground() {
+
+        // TODO (3) : Check why this loader is called twice when returning from Settings
 
         if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
             com.hmproductions.bingo.models.Player player = com.hmproductions.bingo.models.Player.newBuilder().setId(this.player.getId())

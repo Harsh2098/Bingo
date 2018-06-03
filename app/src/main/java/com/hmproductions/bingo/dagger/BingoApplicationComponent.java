@@ -1,5 +1,7 @@
 package com.hmproductions.bingo.dagger;
 
+import com.hmproductions.bingo.sync.QuitService;
+import com.hmproductions.bingo.sync.RemoveService;
 import com.hmproductions.bingo.ui.GameActivity;
 import com.hmproductions.bingo.ui.MainActivity;
 import com.hmproductions.bingo.ui.SplashActivity;
@@ -13,4 +15,7 @@ public interface BingoApplicationComponent {
     void inject(MainActivity mainActivity);
     void inject(GameActivity gameActivity);
     void inject(SplashActivity splashActivity);
+
+    void inject(QuitService quitService);
+    void inject(RemoveService removeService);
 }

@@ -1,7 +1,7 @@
 package com.hmproductions.bingo;
 
-import com.hmproductions.bingo.services.BingoActionServiceImpl;
-import com.hmproductions.bingo.services.BingoStreamServiceImpl;
+import com.hmproductions.bingo.sync.BingoActionServiceImpl;
+import com.hmproductions.bingo.sync.BingoStreamServiceImpl;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.ServerHeaderInterceptor;
 

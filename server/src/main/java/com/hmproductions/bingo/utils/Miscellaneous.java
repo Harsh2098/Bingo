@@ -5,7 +5,7 @@ import com.hmproductions.bingo.models.Player;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static com.hmproductions.bingo.services.BingoActionServiceImpl.playersList;
+import static com.hmproductions.bingo.sync.BingoActionServiceImpl.playersList;
 
 public class Miscellaneous {
 

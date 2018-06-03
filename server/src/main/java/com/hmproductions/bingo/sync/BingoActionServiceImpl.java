@@ -1,4 +1,4 @@
-package com.hmproductions.bingo.services;
+package com.hmproductions.bingo.sync;
 
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.AddPlayerRequest;
@@ -32,10 +32,11 @@ import java.util.ArrayList;
 
 import io.grpc.stub.StreamObserver;
 
-import static com.hmproductions.bingo.services.BingoStreamServiceImpl.currentPlayerPosition;
-import static com.hmproductions.bingo.services.BingoStreamServiceImpl.gameEventSubscriptionArrayList;
-import static com.hmproductions.bingo.services.BingoStreamServiceImpl.subscriptionArrayList;
-import static com.hmproductions.bingo.services.BingoStreamServiceImpl.totalPlayers;
+import static com.hmproductions.bingo.BingoServer.sessionIdsList;
+import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.currentPlayerPosition;
+import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.gameEventSubscriptionArrayList;
+import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.subscriptionArrayList;
+import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.totalPlayers;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_LENGTH;
 import static com.hmproductions.bingo.utils.Miscellaneous.allPlayersReady;
 import static com.hmproductions.bingo.utils.Miscellaneous.generateSessionId;
@@ -72,6 +73,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         String sessionId = generateSessionId(SESSION_ID_LENGTH);
         System.out.println("New session ID: " + sessionId);
+        sessionIdsList.add(sessionId);
 
         responseObserver.onNext(GetSessionIdResponse.newBuilder().setStatusCode(GetSessionIdResponse.StatusCode.OK)
                 .setStatusMessage("New session ID attached").setSessionId(sessionId).build());
@@ -203,7 +205,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 subscriptionArrayList.remove(currentSubscription);
                 found = true;
 
-                System.out.print("Unsubscribing " + currentSubscription.getSubscription().getPlayerId() + " from this list.");
+                System.out.println("Unsubscribing " + currentSubscription.getSubscription().getPlayerId() + " from this list.");
                 break;
             }
         }
@@ -294,11 +296,13 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         for (GameEventSubscription currentSubscription : gameEventSubscriptionArrayList) {
 
-            GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
-                    .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
-                    .setWinnerId(player.getId()).setCellClicked(-2).build();
+            if (player.getId() != currentSubscription.getPlayerId()) {
+                GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
+                        .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
+                        .setWinnerId(player.getId()).setCellClicked(-2).build();
 
-            streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
+                streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
+            }
         }
 
         gameEventSubscriptionArrayList.clear();
@@ -314,6 +318,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 currentPlayer.setReady(false);
             }
         }
+
+        // Server logs
+        if (removePlayer != null)
+            System.out.println(removePlayer.getName() + " removed from list.");
 
         if (found)
             playersList.remove(removePlayer);

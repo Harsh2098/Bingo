@@ -17,7 +17,8 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
         Metadata.Key<String> metadataKey = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
         String sessionId = headers.get(metadataKey);
 
-        if (call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/GetSessionId")) {
+        if (call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/GetSessionId") ||
+                call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/AddPlayer")) {
             return next.startCall(call, headers);
         }
 
@@ -27,7 +28,8 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             };
         }
 
-        if (call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/RemovePlayer")) {
+        if (call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/RemovePlayer") ||
+                call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/QuitPlayer")) {
             removeSessionIdFromList(sessionId);
         }
 

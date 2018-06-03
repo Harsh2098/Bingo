@@ -7,10 +7,12 @@ import io.grpc.stub.StreamObserver;
 
 public class GameEventSubscription {
 
+    private int playerId;
     private StreamObserver<GameEventUpdate> observer;
     private GameSubscription gameSubscription;
 
-    public GameEventSubscription(StreamObserver<GameEventUpdate> observer, GameSubscription gameSubscription) {
+    public GameEventSubscription(int playerId, StreamObserver<GameEventUpdate> observer, GameSubscription gameSubscription) {
+        this.playerId = playerId;
         this.observer = observer;
         this.gameSubscription = gameSubscription;
     }
@@ -21,5 +23,9 @@ public class GameEventSubscription {
 
     public GameSubscription getGameSubscription() {
         return gameSubscription;
+    }
+
+    public int getPlayerId() {
+        return playerId;
     }
 }
