@@ -40,7 +40,6 @@ import com.hmproductions.bingo.loaders.SetReadyLoader;
 import com.hmproductions.bingo.loaders.UnsubscribeLoader;
 import com.hmproductions.bingo.models.RoomEvent;
 import com.hmproductions.bingo.models.Subscription;
-import com.hmproductions.bingo.sync.RemoveService;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 
@@ -54,7 +53,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.grpc.stub.StreamObserver;
 
-import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
 
@@ -90,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private int currentPlayerId = -1, currentRoomId = -1;
     private ArrayList<Player> playersList = new ArrayList<>();
-    private static boolean mightResume = false;
 
     private Player fakePlayer = new Player("", "", -1, false);
     private PlayersRecyclerAdapter playersRecyclerAdapter;
@@ -316,9 +313,7 @@ public class MainActivity extends AppCompatActivity implements
                                 currentPlayer.getReady()));
                     }
 
-                    runOnUiThread(() -> {
-                        playersRecyclerAdapter.swapData(playersList);
-                    });
+                    runOnUiThread(() -> playersRecyclerAdapter.swapData(playersList));
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 
@@ -400,10 +395,6 @@ public class MainActivity extends AppCompatActivity implements
         playerNameEditText.setText(preferences.getString(PLAYER_NAME_KEY, ""));
         colorSpinner.setSelection(preferences.getInt(PLAYER_COLOR_KEY, 0));
 
-//        if (mightResume) {
-//            //getSupportLoaderManager().restartLoader(Constants.ADD_PLAYER_LOADER_ID, null, addPlayerLoader);
-//            mightResume = false;
-//        }
     }
 
     @Override
@@ -413,20 +404,6 @@ public class MainActivity extends AppCompatActivity implements
         editor.putString(PLAYER_NAME_KEY, playerNameEditText.getText().toString());
         editor.putInt(PLAYER_COLOR_KEY, colorSpinner.getSelectedItemPosition());
         editor.apply();
-
-        if (currentPlayerId != -1) {
-            // TODO (3) : Check why session id is null or empty
-            Intent removePlayerIntent = new Intent(this, RemoveService.class);
-
-            removePlayerIntent.putExtra(RemoveService.PLAYER_ID_KEY, currentPlayerId);
-            removePlayerIntent.putExtra(RemoveService.PLAYER_NAME_KEY, getNameFromId(playersList, currentPlayerId));
-            removePlayerIntent.putExtra(RemoveService.PLAYER_COLOR_KEY, getColorFromId(playersList, currentPlayerId));
-            removePlayerIntent.putExtra(RemoveService.ROOM_ID_KEY, currentRoomId);
-            removePlayerIntent.putExtra(RemoveService.SESSION_ID_KEY, Constants.SESSION_ID);
-
-            mightResume = true;
-            this.startService(removePlayerIntent);
-        }
     }
 
     @Override

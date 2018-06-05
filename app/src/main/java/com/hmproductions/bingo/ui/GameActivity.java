@@ -49,7 +49,6 @@ import com.hmproductions.bingo.loaders.NextRoundLoader;
 import com.hmproductions.bingo.loaders.QuitLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
-import com.hmproductions.bingo.sync.QuitService;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 
@@ -70,7 +69,6 @@ import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VA
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
-import static com.hmproductions.bingo.sync.QuitService.SESSION_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
 import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_LOADER_ID;
@@ -143,7 +141,7 @@ public class GameActivity extends AppCompatActivity implements
     ArrayList<GridCell> gameGridCellList = new ArrayList<>();
 
     private int playerId = -1, roomId = -1;
-    private boolean gameCompleted = false, myTurn = false, quitButtonClicked = false;
+    private boolean gameCompleted = false, myTurn = false;
     private ArrayList<Player> playersList = new ArrayList<>();
 
     /*
@@ -309,7 +307,7 @@ public class GameActivity extends AppCompatActivity implements
                         quitIntent.putExtra(PLAYER_ID, playerId);
                         quitIntent.putExtra(ROOM_ID, roomId);
                         quitIntent.putParcelableArrayListExtra(PLAYERS_LIST_ID, playersList);
-                        quitButtonClicked = true;
+
                         startActivity(quitIntent);
                         finish();
 
@@ -492,9 +490,7 @@ public class GameActivity extends AppCompatActivity implements
                 .setTitle("Confirm Quit")
                 .setMessage("Game will be cancelled. Do you want to forfeit ?")
                 .setPositiveButton(R.string.quit, (dialogInterface, i) ->
-                {
-                    getSupportLoaderManager().restartLoader(Constants.QUIT_PLAYER_LOADER_ID, null, quitPlayerLoader);
-                })
+                        getSupportLoaderManager().restartLoader(Constants.QUIT_PLAYER_LOADER_ID, null, quitPlayerLoader))
                 .setNegativeButton(R.string.no, (dI, i) -> dI.dismiss())
                 .show();
     }
@@ -603,14 +599,6 @@ public class GameActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver);
-
-        if (!quitButtonClicked) {
-            Intent quitServiceIntent = new Intent(this, QuitService.class);
-            quitServiceIntent.putExtra(QuitService.PLAYER_ID_KEY, playerId);
-            quitServiceIntent.putParcelableArrayListExtra(QuitService.PLAYER_LIST_KEY, playersList);
-            quitServiceIntent.putExtra(SESSION_ID_KEY, Constants.SESSION_ID);
-            startService(quitServiceIntent);
-        }
     }
 
     private void setTurnOrderText(int currentPlayerId) {
