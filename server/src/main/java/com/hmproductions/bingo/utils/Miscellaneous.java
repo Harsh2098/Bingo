@@ -18,6 +18,15 @@ public class Miscellaneous {
         return false;
     }
 
+    public static String getNameFromId(ArrayList<com.hmproductions.bingo.data.Player> playerArrayList, int id) {
+        for (com.hmproductions.bingo.data.Player player : playerArrayList) {
+            if (player.getId() == id)
+                return player.getName();
+        }
+
+        return null;
+    }
+
     public static ArrayList<Player> getArrayListFromPlayersList(ArrayList<com.hmproductions.bingo.data.Player> playerArrayList) {
 
         ArrayList<Player> convertedList = new ArrayList<>();

@@ -23,6 +23,8 @@ import io.grpc.ServerBuilder;
 import io.grpc.ServerTransportFilter;
 import io.grpc.stub.StreamObserver;
 
+import static com.hmproductions.bingo.sync.BingoActionServiceImpl.playersList;
+import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getPlayerIdFromRemoteAddress;
 
 public class BingoServer {
@@ -49,7 +51,7 @@ public class BingoServer {
                     String remoteAddress = transportAttrs.get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString();
                     int playerId = getPlayerIdFromRemoteAddress(connectionDataList, remoteAddress);
 
-                    Player player = Player.newBuilder().setId(playerId).build();
+                    Player player = Player.newBuilder().setId(playerId).setName(getNameFromId(playersList, playerId)).build();
 
                     bingoActionService.unsubscribe(Unsubscribe.UnsubscribeRequest.newBuilder().setPlayerId(playerId).build(), new StreamObserver<Unsubscribe.UnsubscribeResponse>() {
                         @Override

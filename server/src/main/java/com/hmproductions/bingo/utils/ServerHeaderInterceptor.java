@@ -18,30 +18,37 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
 
+        String methodName = call.getMethodDescriptor().getFullMethodName();
+
         Metadata.Key<String> metadataSessionIdKey = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
-        Metadata.Key<String> metadataPlayerIdKey = Metadata.Key.of(PLAYER_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
-
         String sessionId = headers.get(metadataSessionIdKey);
-        String playerIdString = headers.get(metadataPlayerIdKey);
 
-        if (call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/GetSessionId")) {
+        System.out.println("Call with session id : " + sessionId);
+
+        if (methodName.equals("com.hmproductions.bingo.BingoActionService/GetSessionId")) {
             return next.startCall(call, headers);
         }
 
-        if (sessionId == null || !sessionIdExists(sessionId)) {
+        if (sessionId == null || (!sessionIdExists(sessionId) && !methodName.equals("com.hmproductions.bingo.BingoActionService/AddPlayer"))) {
             call.close(Status.UNAUTHENTICATED.withDescription("Session id is empty or invalid"), headers);
             return new ServerCall.Listener<ReqT>() {
             };
         }
 
-        if (call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/AddPlayer") &&
-                call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR) != null && playerIdString != null) {
-            int playerId = Integer.parseInt(playerIdString);
-            connectionDataList.add(new ConnectionData(sessionId, call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString(), playerId));
+        if (methodName.equals("com.hmproductions.bingo.BingoActionService/AddPlayer") &&
+                call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR) != null) {
+
+            Metadata.Key<String> metadataPlayerIdKey = Metadata.Key.of(PLAYER_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
+            String playerIdString = headers.get(metadataPlayerIdKey);
+
+            if (playerIdString != null) {
+                int playerId = Integer.parseInt(playerIdString);
+                connectionDataList.add(new ConnectionData(sessionId, call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString(), playerId));
+            }
         }
 
-        if (call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/RemovePlayer") ||
-                call.getMethodDescriptor().getFullMethodName().equals("com.hmproductions.bingo.BingoActionService/QuitPlayer")) {
+        if (methodName.equals("com.hmproductions.bingo.BingoActionService/RemovePlayer") ||
+                methodName.equals("com.hmproductions.bingo.BingoActionService/QuitPlayer")) {
             removeSessionIdFromList(sessionId);
         }
 

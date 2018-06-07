@@ -2,6 +2,7 @@ package com.hmproductions.bingo.loaders;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.AddPlayerRequest;
@@ -14,6 +15,7 @@ import io.grpc.stub.MetadataUtils;
 
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
 import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
@@ -46,8 +48,13 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
                     .setName(this.player.getName()).setReady(this.player.isReady()).setColor(this.player.getColor()).build();
 
             Metadata metadata = new Metadata();
+
             Metadata.Key<String> metadataKey = Metadata.Key.of(PLAYER_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
             metadata.put(metadataKey, String.valueOf(player.getId()));
+
+            metadataKey = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
+            metadata.put(metadataKey, Constants.SESSION_ID);
+
             actionServiceBlockingStub = MetadataUtils.attachHeaders(actionServiceBlockingStub, metadata);
 
             return actionServiceBlockingStub.addPlayer(AddPlayerRequest.newBuilder().setPlayer(player).build());
