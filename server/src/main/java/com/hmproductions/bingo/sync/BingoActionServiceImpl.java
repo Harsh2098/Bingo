@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 import io.grpc.stub.StreamObserver;
 
-import static com.hmproductions.bingo.BingoServer.sessionIdsList;
+import static com.hmproductions.bingo.BingoServer.connectionDataList;
 import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.currentPlayerPosition;
 import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.gameEventSubscriptionArrayList;
 import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.subscriptionArrayList;
@@ -73,7 +73,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         String sessionId = generateSessionId(SESSION_ID_LENGTH);
         System.out.println("New session ID: " + sessionId);
-        sessionIdsList.add(sessionId);
+        connectionDataList.add(sessionId);
 
         responseObserver.onNext(GetSessionIdResponse.newBuilder().setStatusCode(GetSessionIdResponse.StatusCode.OK)
                 .setStatusMessage("New session ID attached").setSessionId(sessionId).build());

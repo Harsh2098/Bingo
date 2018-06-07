@@ -1,5 +1,6 @@
 package com.hmproductions.bingo;
 
+import com.hmproductions.bingo.data.ConnectionData;
 import com.hmproductions.bingo.sync.BingoActionServiceImpl;
 import com.hmproductions.bingo.sync.BingoStreamServiceImpl;
 import com.hmproductions.bingo.utils.Constants;
@@ -16,7 +17,7 @@ import io.grpc.ServerBuilder;
 
 public class BingoServer {
 
-    public static List<String> sessionIdsList = new ArrayList<>();
+    public static List<ConnectionData> connectionDataList = new ArrayList<>();
 
     static public void main(String args[]) {
 

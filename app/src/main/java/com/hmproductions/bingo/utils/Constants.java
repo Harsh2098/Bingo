@@ -26,6 +26,7 @@ public class Constants {
 
     public static String SESSION_ID = null;
     public static final String SESSION_ID_KEY = "sessionid";
+    public static final String PLAYER_ID_KEY = "playerid";
 
     public static final String SERVER_CERT = "" +
             "-----BEGIN CERTIFICATE-----\n" +
