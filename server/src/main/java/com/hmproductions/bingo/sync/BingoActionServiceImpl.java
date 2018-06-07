@@ -40,6 +40,7 @@ import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.totalPlayers;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_LENGTH;
 import static com.hmproductions.bingo.utils.Miscellaneous.allPlayersReady;
 import static com.hmproductions.bingo.utils.Miscellaneous.generateSessionId;
+import static com.hmproductions.bingo.utils.Miscellaneous.removeConnectionData;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
 
@@ -73,7 +74,6 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         String sessionId = generateSessionId(SESSION_ID_LENGTH);
         System.out.println("New session ID: " + sessionId);
-        connectionDataList.add(sessionId);
 
         responseObserver.onNext(GetSessionIdResponse.newBuilder().setStatusCode(GetSessionIdResponse.StatusCode.OK)
                 .setStatusMessage("New session ID attached").setSessionId(sessionId).build());
@@ -122,6 +122,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             addPlayerResponse =
                     AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.SERVER_ERROR)
                             .setStatusMessage("Internal server error").setRoom(Room.newBuilder().setId(-1).build()).build();
+        }
+
+        if (addPlayerResponse.getStatusCode() != AddPlayerResponse.StatusCode.OK) {
+            removeConnectionData(connectionDataList, request.getPlayer().getId());
         }
 
         responseObserver.onNext(addPlayerResponse);
@@ -200,9 +204,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     public void unsubscribe(UnsubscribeRequest request, StreamObserver<UnsubscribeResponse> responseObserver) {
 
         boolean found = false;
+        RoomEventSubscription removalSubscription = null;
         for (RoomEventSubscription currentSubscription : subscriptionArrayList) {
             if (request.getPlayerId() == currentSubscription.getSubscription().getPlayerId()) {
-                subscriptionArrayList.remove(currentSubscription);
+                removalSubscription = currentSubscription;
                 found = true;
 
                 System.out.println("Unsubscribing " + currentSubscription.getSubscription().getPlayerId() + " from this list.");
@@ -212,6 +217,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         UnsubscribeResponse unsubscribeResponse;
         if (found) {
+            subscriptionArrayList.remove(removalSubscription);
             unsubscribeResponse = UnsubscribeResponse.newBuilder().setStatusCode(UnsubscribeResponse.StatusCode.OK)
                     .setStatusMessage("Player unsubscribed").build();
         } else {

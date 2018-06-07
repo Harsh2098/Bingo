@@ -1,5 +1,6 @@
 package com.hmproductions.bingo.utils;
 
+import com.hmproductions.bingo.data.ConnectionData;
 import com.hmproductions.bingo.models.Player;
 
 import java.util.ArrayList;
@@ -43,5 +44,30 @@ public class Miscellaneous {
         }
 
         return stringBuilder.toString();
+    }
+
+    public static void removeConnectionData(ArrayList<ConnectionData> data, int playerId) {
+
+        ConnectionData removalData = null;
+
+        for (ConnectionData currentData : data) {
+            if (currentData.getPlayerId() == playerId) {
+                removalData = currentData;
+            }
+        }
+
+        if (removalData != null) {
+            data.remove(removalData);
+        }
+    }
+
+    public static int getPlayerIdFromRemoteAddress(ArrayList<ConnectionData> data, String remoteAddress) {
+
+        for (ConnectionData currentData : data) {
+            if (currentData.getRemoteAddress().equals(remoteAddress))
+                return currentData.getPlayerId();
+        }
+
+        return -1;
     }
 }
