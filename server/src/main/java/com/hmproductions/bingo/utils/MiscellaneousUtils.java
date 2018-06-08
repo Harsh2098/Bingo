@@ -8,7 +8,7 @@ import java.util.Random;
 
 import static com.hmproductions.bingo.sync.BingoActionServiceImpl.playersList;
 
-public class Miscellaneous {
+public class MiscellaneousUtils {
 
     private static final String randomStringGenerationString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=";
 
@@ -46,7 +46,7 @@ public class Miscellaneous {
         return true;
     }
 
-    public static String generateSessionId(int length) {
+    public static String generateSessionOrRoomId(int length) {
         StringBuilder stringBuilder = new StringBuilder("");
         for (int i = 0; i < length; i++) {
             stringBuilder.append(randomStringGenerationString.charAt(new Random().nextInt(randomStringGenerationString.length())));

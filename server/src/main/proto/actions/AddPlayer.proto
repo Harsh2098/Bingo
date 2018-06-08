@@ -4,10 +4,10 @@ package com.hmproductions.bingo.actions;
 option java_multiple_files = true;
 
 import "models/Player.proto";
-import "models/Room.proto";
 
 message AddPlayerRequest {
     models.Player player = 1;
+    uint32 room_id = 2;
 }
 
 message AddPlayerResponse {
@@ -16,10 +16,11 @@ message AddPlayerResponse {
          OK = 0;
          ROOM_FULL = 1;
          ALREADY_IN_GAME = 2;
-         SERVER_ERROR = 3;
+         ROOM_NOT_EXIST = 3;
+         SERVER_ERROR = 4;
     }
 
     StatusCode status_code = 1;
     string status_message = 2;
-    models.Room room = 3;
+    uint32 room_id = 3;
 }

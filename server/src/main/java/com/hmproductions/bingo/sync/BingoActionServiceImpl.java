@@ -23,6 +23,7 @@ import com.hmproductions.bingo.actions.Unsubscribe.UnsubscribeRequest;
 import com.hmproductions.bingo.actions.Unsubscribe.UnsubscribeResponse;
 import com.hmproductions.bingo.data.GameEventSubscription;
 import com.hmproductions.bingo.data.Player;
+import com.hmproductions.bingo.data.Room;
 import com.hmproductions.bingo.data.RoomEventSubscription;
 import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.models.Room;
@@ -37,22 +38,16 @@ import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.currentPlayerP
 import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.gameEventSubscriptionArrayList;
 import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.subscriptionArrayList;
 import static com.hmproductions.bingo.sync.BingoStreamServiceImpl.totalPlayers;
+import static com.hmproductions.bingo.sync.RoomUtils.getRoomFromId;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_LENGTH;
-import static com.hmproductions.bingo.utils.Miscellaneous.allPlayersReady;
-import static com.hmproductions.bingo.utils.Miscellaneous.generateSessionId;
-import static com.hmproductions.bingo.utils.Miscellaneous.removeConnectionData;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.allPlayersReady;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateSessionOrRoomId;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.removeConnectionData;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
 
-    private static final int ROOM_ID = 17;
-
-    public static ArrayList<Player> playersList = new ArrayList<>();
     private BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
-    private Room room;
-
-    public BingoActionServiceImpl() {
-        room = Room.newBuilder().setId(ROOM_ID).setCount(0).setStatusCode(Room.StatusCode.WAITING).build();
-    }
+    static ArrayList<Room> roomsList = new ArrayList<>();
 
     @Override
     public void getGridSize(GetGridSizeRequest request, StreamObserver<GetGridSizeResponse> responseObserver) {
@@ -72,7 +67,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     @Override
     public void getSessionId(GetSessionIdRequest request, StreamObserver<GetSessionIdResponse> responseObserver) {
 
-        String sessionId = generateSessionId(SESSION_ID_LENGTH);
+        String sessionId = generateSessionOrRoomId(SESSION_ID_LENGTH);
         System.out.println("New session ID: " + sessionId);
 
         responseObserver.onNext(GetSessionIdResponse.newBuilder().setStatusCode(GetSessionIdResponse.StatusCode.OK)
@@ -85,47 +80,54 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     public void addPlayer(AddPlayerRequest request, StreamObserver<AddPlayerResponse> responseObserver) {
 
         AddPlayerResponse addPlayerResponse;
+        Room currentRoom = getRoomFromId(request.getRoomId());
 
-        // Room is not full
-        if (room.getCount() > Constants.MAX_PLAYERS) {
-            addPlayerResponse =
-                    AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.ROOM_FULL)
-                            .setStatusMessage("Room is full").setRoom(Room.newBuilder().setId(-1).build()).build();
+        if (currentRoom != null) {
+            // Room is not full
+            if (currentRoom.getCount() > Constants.MAX_PLAYERS) {
+                addPlayerResponse =
+                        AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.ROOM_FULL)
+                                .setStatusMessage("Room is full").setRoomId(request.getRoomId()).build();
 
-        } else if (room.getCount() < 4) {
+            } else if (currentRoom.getCount() < 4) {
 
-            // player id -1 denotes player already in game (currently -1 is not sent from app)
-            if (request.getPlayer().getId() != -1) {
+                // player id -1 denotes player already in game (currently -1 is not sent from app)
+                if (request.getPlayer().getId() != -1) {
 
-                com.hmproductions.bingo.models.Player currentPlayer = request.getPlayer();
+                    com.hmproductions.bingo.models.Player currentPlayer = request.getPlayer();
 
-                playersList.add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
-                        currentPlayer.getReady()));
+                    currentRoom.getPlayersList().add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
+                            currentPlayer.getReady()));
 
-                room = room.toBuilder().setCount(room.getCount() + 1).build();
+                    currentRoom.setCount(currentRoom.getCount() + 1);
 
-                addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK).setRoom(room)
-                        .setStatusMessage("New player added").build();
+                    addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK).setRoomId(request.getRoomId())
+                            .setStatusMessage("New player added").build();
 
-                sendRoomEventUpdate();
+                    sendRoomEventUpdate();
 
-                // Server logs
-                System.out.println(request.getPlayer().getName() + " added to the game.");
+                    // Server logs
+                    System.out.println(request.getPlayer().getName() + " added to the game.");
+
+                } else {
+                    addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.ALREADY_IN_GAME)
+                            .setStatusMessage("Player already in game").setRoomId(request.getRoomId()).build();
+                }
+
 
             } else {
-                addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.ALREADY_IN_GAME)
-                        .setStatusMessage("Player already in game").setRoom(room).build();
+                addPlayerResponse =
+                        AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.SERVER_ERROR)
+                                .setStatusMessage("Internal server error").setRoomId(-1).build();
             }
 
-
+            if (addPlayerResponse.getStatusCode() != AddPlayerResponse.StatusCode.OK) {
+                removeConnectionData(connectionDataList, request.getPlayer().getId());
+            }
         } else {
             addPlayerResponse =
-                    AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.SERVER_ERROR)
-                            .setStatusMessage("Internal server error").setRoom(Room.newBuilder().setId(-1).build()).build();
-        }
-
-        if (addPlayerResponse.getStatusCode() != AddPlayerResponse.StatusCode.OK) {
-            removeConnectionData(connectionDataList, request.getPlayer().getId());
+                    AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.ROOM_NOT_EXIST)
+                            .setStatusMessage("Internal server error").setRoomId(-1).build();
         }
 
         responseObserver.onNext(addPlayerResponse);
@@ -135,30 +137,38 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     @Override
     public void removePlayer(RemovePlayerRequest request, StreamObserver<RemovePlayerResponse> responseObserver) {
 
-        boolean found = false;
-        Player removePlayer = null;
+        Room currentRoom = getRoomFromId(request.getRoomId());
 
-        for (Player player : playersList) {
-            if (request.getPlayer().getId() == player.getId()) {
-                removePlayer = player;
-                found = true;
-                break;
+        if (currentRoom != null) {
+
+            boolean found = false;
+            Player removePlayer = null;
+
+            for (Player player : currentRoom.getPlayersList()) {
+                if (request.getPlayer().getId() == player.getId()) {
+                    removePlayer = player;
+                    found = true;
+                    break;
+                }
             }
-        }
 
-        if (found) {
-            playersList.remove(removePlayer);
+            if (found) {
+                currentRoom.getPlayersList().remove(removePlayer);
 
-            responseObserver.onNext(RemovePlayerResponse.newBuilder().setStatusMessage("Player removed")
-                    .setStatusCode(RemovePlayerResponse.StatusCode.OK).build());
+                responseObserver.onNext(RemovePlayerResponse.newBuilder().setStatusMessage("Player removed")
+                        .setStatusCode(RemovePlayerResponse.StatusCode.OK).build());
 
-            room = room.toBuilder().setCount(room.getCount() - 1).build();
+                currentRoom.setCount(currentRoom.getCount() - 1);
 
-            sendRoomEventUpdate();
+                sendRoomEventUpdate();
 
-            //Server logs
-            System.out.println(request.getPlayer().getName() + " removed from the game.");
+                //Server logs
+                System.out.println(request.getPlayer().getName() + " removed from the game.");
 
+            } else {
+                responseObserver.onNext(RemovePlayerResponse.newBuilder().setStatusCode(RemovePlayerResponse.StatusCode.NOT_JOINED)
+                        .setStatusMessage("Player not joined").build());
+            }
         } else {
             responseObserver.onNext(RemovePlayerResponse.newBuilder().setStatusCode(RemovePlayerResponse.StatusCode.NOT_JOINED)
                     .setStatusMessage("Player not joined").build());

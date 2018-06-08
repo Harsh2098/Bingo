@@ -12,6 +12,7 @@ message SetPlayerReadyResponse {
 
     enum StatusCode {
         OK = 0;
+        ROOM_NOT_EXI
         SERVER_ERROR = 2;
     }
 

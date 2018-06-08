@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements
                 switch (data.getStatusCodeValue()) {
 
                     case AddPlayerResponse.StatusCode.OK_VALUE:
-                        currentRoomId = data.getRoom().getId();
+                        currentRoomId = data.getRoomId();
                         subscribeToRoomEventsUpdate(currentRoomId);
                         break;
 

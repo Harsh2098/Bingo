@@ -17,8 +17,8 @@ import java.util.Random;
 import io.grpc.stub.StreamObserver;
 
 import static com.hmproductions.bingo.sync.BingoActionServiceImpl.playersList;
-import static com.hmproductions.bingo.utils.Miscellaneous.allPlayersReady;
-import static com.hmproductions.bingo.utils.Miscellaneous.getArrayListFromPlayersList;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.allPlayersReady;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.getArrayListFromPlayersList;
 
 public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamServiceImplBase {
 

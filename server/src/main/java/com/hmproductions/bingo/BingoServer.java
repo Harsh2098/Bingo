@@ -23,8 +23,8 @@ import io.grpc.ServerTransportFilter;
 import io.grpc.stub.StreamObserver;
 
 import static com.hmproductions.bingo.sync.BingoActionServiceImpl.playersList;
-import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
-import static com.hmproductions.bingo.utils.Miscellaneous.getPlayerIdFromRemoteAddress;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.getNameFromId;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.getPlayerIdFromRemoteAddress;
 
 public class BingoServer {
 
