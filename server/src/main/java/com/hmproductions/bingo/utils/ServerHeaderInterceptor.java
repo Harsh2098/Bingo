@@ -11,6 +11,7 @@ import io.grpc.Status;
 
 import static com.hmproductions.bingo.BingoServer.connectionDataList;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
+import static com.hmproductions.bingo.utils.Constants.ROOM_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_KEY;
 
 public class ServerHeaderInterceptor implements ServerInterceptor {
@@ -41,9 +42,13 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             Metadata.Key<String> metadataPlayerIdKey = Metadata.Key.of(PLAYER_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
             String playerIdString = headers.get(metadataPlayerIdKey);
 
-            if (playerIdString != null) {
+            Metadata.Key<String> metadataRoomIdKey = Metadata.Key.of(ROOM_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
+            String roomIdString = headers.get(metadataRoomIdKey);
+
+            if (playerIdString != null && roomIdString != null) {
                 int playerId = Integer.parseInt(playerIdString);
-                connectionDataList.add(new ConnectionData(sessionId, call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString(), playerId));
+                int roomId = Integer.parseInt(roomIdString);
+                connectionDataList.add(new ConnectionData(sessionId, call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString(), playerId, roomId));
             }
         }
 

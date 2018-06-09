@@ -1,31 +1,15 @@
 package com.hmproductions.bingo.utils;
 
 import com.hmproductions.bingo.data.ConnectionData;
+import com.hmproductions.bingo.data.Room;
 import com.hmproductions.bingo.models.Player;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import static com.hmproductions.bingo.sync.BingoActionServiceImpl.playersList;
-
 public class MiscellaneousUtils {
 
     private static final String randomStringGenerationString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=";
-
-    public static boolean playerExists(int playerId) {
-        for (com.hmproductions.bingo.data.Player currentPlayer : playersList)
-            if (currentPlayer.getId() == playerId) return true;
-        return false;
-    }
-
-    public static String getNameFromId(ArrayList<com.hmproductions.bingo.data.Player> playerArrayList, int id) {
-        for (com.hmproductions.bingo.data.Player player : playerArrayList) {
-            if (player.getId() == id)
-                return player.getName();
-        }
-
-        return null;
-    }
 
     public static ArrayList<Player> getArrayListFromPlayersList(ArrayList<com.hmproductions.bingo.data.Player> playerArrayList) {
 
@@ -76,7 +60,29 @@ public class MiscellaneousUtils {
             if (currentData.getRemoteAddress().equals(remoteAddress))
                 return currentData.getPlayerId();
         }
-
         return -1;
+    }
+
+    public static int getRoomIdFromRemoteAddress(ArrayList<ConnectionData> data, String remoteAddress) {
+
+        for (ConnectionData currentData : data) {
+            if (currentData.getRemoteAddress().equals(remoteAddress))
+                return currentData.getRoomId();
+        }
+        return -1;
+    }
+
+    public static String getNameFromRoomId(ArrayList<Room> roomsList, int roomId, int playerId) {
+        for (Room room : roomsList) {
+            if (room.getRoomId() == roomId) {
+                for (com.hmproductions.bingo.data.Player player : room.getPlayersList()) {
+                    if (player.getId() == playerId) {
+                        return player.getName();
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

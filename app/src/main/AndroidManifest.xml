@@ -40,11 +40,11 @@
             android:parentActivityName=".ui.MainActivity" />
 
         <service
-            android:name=".sync.QuitService"
+            android:name=".services.QuitService"
             android:exported="false"/>
 
         <service
-            android:name=".sync.RemoveService"
+            android:name=".services.RemoveService"
             android:exported="false"/>
 
     </application>

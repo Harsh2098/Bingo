@@ -6,6 +6,7 @@ option java_multiple_files = true;
 message SetPlayerReadyRequest {
     uint32 player_id = 1;
     bool isReady = 2;
+    uint32 room_id = 3;
 }
 
 message SetPlayerReadyResponse {

@@ -5,8 +5,8 @@ import com.hmproductions.bingo.actions.RemovePlayerResponse;
 import com.hmproductions.bingo.actions.Unsubscribe;
 import com.hmproductions.bingo.data.ConnectionData;
 import com.hmproductions.bingo.models.Player;
-import com.hmproductions.bingo.sync.BingoActionServiceImpl;
-import com.hmproductions.bingo.sync.BingoStreamServiceImpl;
+import com.hmproductions.bingo.services.BingoActionServiceImpl;
+import com.hmproductions.bingo.services.BingoStreamServiceImpl;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.ServerHeaderInterceptor;
 
@@ -22,9 +22,10 @@ import io.grpc.ServerBuilder;
 import io.grpc.ServerTransportFilter;
 import io.grpc.stub.StreamObserver;
 
-import static com.hmproductions.bingo.sync.BingoActionServiceImpl.playersList;
-import static com.hmproductions.bingo.utils.MiscellaneousUtils.getNameFromId;
+import static com.hmproductions.bingo.services.BingoActionServiceImpl.roomsList;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.getNameFromRoomId;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.getPlayerIdFromRemoteAddress;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.getRoomIdFromRemoteAddress;
 
 public class BingoServer {
 
@@ -49,10 +50,12 @@ public class BingoServer {
 
                     String remoteAddress = transportAttrs.get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString();
                     int playerId = getPlayerIdFromRemoteAddress(connectionDataList, remoteAddress);
+                    int roomId = getRoomIdFromRemoteAddress(connectionDataList, remoteAddress);
 
-                    Player player = Player.newBuilder().setId(playerId).setName(getNameFromId(playersList, playerId)).build();
+                    Player player = Player.newBuilder().setId(playerId).setName(getNameFromRoomId(roomsList, roomId, playerId)).build();
 
-                    bingoActionService.unsubscribe(Unsubscribe.UnsubscribeRequest.newBuilder().setPlayerId(playerId).build(), new StreamObserver<Unsubscribe.UnsubscribeResponse>() {
+                    bingoActionService.unsubscribe(Unsubscribe.UnsubscribeRequest.newBuilder().setPlayerId(playerId).build(),
+                            new StreamObserver<Unsubscribe.UnsubscribeResponse>() {
                         @Override
                         public void onNext(Unsubscribe.UnsubscribeResponse value) {
 
@@ -68,7 +71,9 @@ public class BingoServer {
 
                         }
                     });
-                    bingoActionService.removePlayer(RemovePlayerRequest.newBuilder().setPlayer(player).build(), new StreamObserver<RemovePlayerResponse>() {
+
+                    bingoActionService.removePlayer(RemovePlayerRequest.newBuilder().setPlayer(player).build(),
+                            new StreamObserver<RemovePlayerResponse>() {
                         @Override
                         public void onNext(RemovePlayerResponse value) {
 

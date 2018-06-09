@@ -1,15 +1,15 @@
-package com.hmproductions.bingo.sync;
+package com.hmproductions.bingo.utils;
 
 import com.hmproductions.bingo.data.Room;
 
 import javax.annotation.Nullable;
 
-import static com.hmproductions.bingo.sync.BingoActionServiceImpl.roomsList;
+import static com.hmproductions.bingo.services.BingoActionServiceImpl.roomsList;
 
 public class RoomUtils {
 
     @Nullable
-    static Room getRoomFromId(int roomId) {
+    public static Room getRoomFromId(int roomId) {
         for (Room currentRoom : roomsList) {
             if (currentRoom.getRoomId() == roomId)
                 return currentRoom;

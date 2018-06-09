@@ -41,6 +41,7 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
     public AddPlayerResponse loadInBackground() {
 
         // TODO (3) : Check why this loader is called twice when returning from Settings
+        // TODO (5) : Add room id in metadata
 
         if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
 

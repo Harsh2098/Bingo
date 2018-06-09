@@ -6,6 +6,7 @@ public class Constants {
 
     static final String SESSION_ID_KEY = "sessionid";
     static final String PLAYER_ID_KEY = "playerid";
+    static final String ROOM_ID_KEY = "roomid";
 
     public static final int SESSION_ID_LENGTH = 15;
 
