@@ -30,13 +30,18 @@ public class MiscellaneousUtils {
         return true;
     }
 
-    public static String generateSessionOrRoomId(int length) {
+    public static String generateSessionId(int length) {
         StringBuilder stringBuilder = new StringBuilder("");
         for (int i = 0; i < length; i++) {
             stringBuilder.append(randomStringGenerationString.charAt(new Random().nextInt(randomStringGenerationString.length())));
         }
 
         return stringBuilder.toString();
+    }
+
+    public static int generateRoomId(String name) {
+        return ((int)name.charAt(0) * (int)name.charAt(name.length()/2) * (int)name.charAt(name.length() - 1) *
+                (int)(System.currentTimeMillis() % 100)) % 101;
     }
 
     public static void removeConnectionData(ArrayList<ConnectionData> data, int playerId) {

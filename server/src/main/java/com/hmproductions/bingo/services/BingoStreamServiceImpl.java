@@ -10,7 +10,7 @@ import com.hmproductions.bingo.datastreams.RoomEventUpdate;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.models.RoomEvent;
-import com.hmproductions.bingo.models.Subscription;
+import com.hmproductions.bingo.models.RoomSubscription;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -24,7 +24,7 @@ import static com.hmproductions.bingo.utils.RoomUtils.getRoomFromId;
 public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamServiceImplBase {
 
     @Override
-    public void getRoomEventUpdates(Subscription request, StreamObserver<RoomEventUpdate> responseObserver) {
+    public void getRoomEventUpdates(RoomSubscription request, StreamObserver<RoomEventUpdate> responseObserver) {
 
         Room currentRoom = getRoomFromId(request.getRoomId());
 

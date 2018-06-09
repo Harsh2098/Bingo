@@ -8,7 +8,6 @@ public class Constants {
     static final String PLAYER_ID_KEY = "playerid";
     static final String ROOM_ID_KEY = "roomid";
 
-    public static final int SESSION_ID_LENGTH = 15;
-
-    public static final int MAX_PLAYERS = 3;
+    public static final int SESSION_ID_LENGTH = 23;
+    public static final int ROOM_ID_LENGTH = 17;
 }

@@ -8,20 +8,23 @@ public class Room {
         WAITING, INGAME
     }
 
-    private int roomId, count, currentPlayerPosition;
+    private int roomId, count, currentPlayerPosition, maxSize;
     private Status status;
+    private String name;
 
     private ArrayList<Player> playersList;
     private ArrayList<RoomEventSubscription> roomEventSubscriptionArrayList = new ArrayList<>();
     private ArrayList<GameEventSubscription> gameEventSubscriptionArrayList = new ArrayList<>();
 
     /* Constructor */
-    public Room(int roomId, ArrayList<Player> playersList, int count, int currentPlayerPosition, Status status) {
+    public Room(int roomId, ArrayList<Player> playersList, int count, int currentPlayerPosition, int maxSize, Status status, String name) {
         this.roomId = roomId;
         this.playersList = playersList;
         this.count = count;
         this.currentPlayerPosition = currentPlayerPosition;
+        this.maxSize = maxSize;
         this.status = status;
+        this.name = name;
     }
 
     public int getCurrentPlayerId() {
@@ -92,5 +95,13 @@ public class Room {
 
     public void setCurrentPlayerPosition(int currentPlayerPosition) {
         this.currentPlayerPosition = currentPlayerPosition;
+    }
+
+    public int getMaxSize() {
+        return maxSize;
+    }
+
+    public String getName() {
+        return name;
     }
 }

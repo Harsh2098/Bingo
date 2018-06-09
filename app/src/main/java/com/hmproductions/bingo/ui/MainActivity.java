@@ -39,7 +39,7 @@ import com.hmproductions.bingo.loaders.RemovePlayerLoader;
 import com.hmproductions.bingo.loaders.SetReadyLoader;
 import com.hmproductions.bingo.loaders.UnsubscribeLoader;
 import com.hmproductions.bingo.models.RoomEvent;
-import com.hmproductions.bingo.models.Subscription;
+import com.hmproductions.bingo.models.RoomSubscription;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 
@@ -297,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void subscribeToRoomEventsUpdate(int roomId) {
 
-        streamServiceStub.getRoomEventUpdates(Subscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).build(), new StreamObserver<RoomEventUpdate>() {
+        streamServiceStub.getRoomEventUpdates(RoomSubscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).build(), new StreamObserver<RoomEventUpdate>() {
             @Override
             public void onNext(RoomEventUpdate value) {
 

@@ -9,8 +9,12 @@ import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellRequest;
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeRequest;
 import com.hmproductions.bingo.actions.GetGridSize.GetGridSizeResponse;
+import com.hmproductions.bingo.actions.GetRoomsRequest;
+import com.hmproductions.bingo.actions.GetRoomsResponse;
 import com.hmproductions.bingo.actions.GetSessionIdRequest;
 import com.hmproductions.bingo.actions.GetSessionIdResponse;
+import com.hmproductions.bingo.actions.HostRoomRequest;
+import com.hmproductions.bingo.actions.HostRoomResponse;
 import com.hmproductions.bingo.actions.QuitPlayerRequest;
 import com.hmproductions.bingo.actions.QuitPlayerResponse;
 import com.hmproductions.bingo.actions.RemovePlayerRequest;
@@ -26,7 +30,6 @@ import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.data.Room;
 import com.hmproductions.bingo.data.RoomEventSubscription;
 import com.hmproductions.bingo.models.GameSubscription;
-import com.hmproductions.bingo.utils.Constants;
 
 import java.util.ArrayList;
 
@@ -35,7 +38,8 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.BingoServer.connectionDataList;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_LENGTH;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.allPlayersReady;
-import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateSessionOrRoomId;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateRoomId;
+import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateSessionId;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.removeConnectionData;
 import static com.hmproductions.bingo.utils.RoomUtils.getRoomFromId;
 
@@ -62,11 +66,53 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     @Override
     public void getSessionId(GetSessionIdRequest request, StreamObserver<GetSessionIdResponse> responseObserver) {
 
-        String sessionId = generateSessionOrRoomId(SESSION_ID_LENGTH);
+        String sessionId = generateSessionId(SESSION_ID_LENGTH);
         System.out.println("New session ID: " + sessionId);
 
         responseObserver.onNext(GetSessionIdResponse.newBuilder().setStatusCode(GetSessionIdResponse.StatusCode.OK)
                 .setStatusMessage("New session ID attached").setSessionId(sessionId).build());
+
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void hostRoom(HostRoomRequest request, StreamObserver<HostRoomResponse> responseObserver) {
+
+        ArrayList<Player> playersArrayList = new ArrayList<>();
+        playersArrayList.add(new Player(request.getPlayerName(), request.getPlayerColor(), request.getPlayerId(), false));
+
+        int newRoomId = generateRoomId(request.getRoomName());
+        Room newRoom = new Room(newRoomId, playersArrayList, 1, -1,
+                request.getMaxSize(), Room.Status.WAITING, request.getRoomName());
+
+        boolean newRoomCreatedSuccessfully = roomsList.add(newRoom);
+
+        if (newRoomCreatedSuccessfully)
+            responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusCode(HostRoomResponse.StatusCode.OK)
+                    .setStatusMessage("New room created").build());
+        else
+            responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusMessage("Could not create new room")
+                    .setStatusCode(HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR).build());
+
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getRooms(GetRoomsRequest request, StreamObserver<GetRoomsResponse> responseObserver) {
+
+        ArrayList<com.hmproductions.bingo.models.Room> protoRoomsList = new ArrayList<>();
+        for (Room currentRoom : roomsList) {
+            protoRoomsList.add(com.hmproductions.bingo.models.Room.newBuilder().setRoomName(currentRoom.getName())
+                    .setRoomId(currentRoom.getRoomId()).setCount(currentRoom.getCount()).setMaxSize(currentRoom.getMaxSize()).build());
+        }
+
+        if (protoRoomsList.size() == 0) {
+            responseObserver.onNext(GetRoomsResponse.newBuilder().setStatusCode(GetRoomsResponse.StatusCode.NO_ROOMS)
+                    .setStatusMessage("No rooms available").addAllRooms(protoRoomsList).build());
+        } else {
+            responseObserver.onNext(GetRoomsResponse.newBuilder().setStatusCode(GetRoomsResponse.StatusCode.OK)
+                    .setStatusMessage("Available rooms provided").addAllRooms(protoRoomsList).build());
+        }
 
         responseObserver.onCompleted();
     }
@@ -79,12 +125,12 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         if (currentRoom != null) {
             // Room is not full
-            if (currentRoom.getCount() > Constants.MAX_PLAYERS) {
+            if (currentRoom.getCount() >= currentRoom.getMaxSize()) {
                 addPlayerResponse =
                         AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.ROOM_FULL)
                                 .setStatusMessage("Room is full").setRoomId(request.getRoomId()).build();
 
-            } else if (currentRoom.getCount() < 4) {
+            } else if (currentRoom.getCount() < currentRoom.getMaxSize()) {
 
                 // player id -1 denotes player already in game (currently -1 is not sent from app)
                 if (request.getPlayer().getId() != -1) {
