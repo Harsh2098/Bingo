@@ -6,23 +6,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.hmproductions.bingo.BingoActionServiceGrpc;
-import com.hmproductions.bingo.actions.StartNextRoundRequest;
-import com.hmproductions.bingo.actions.StartNextRoundResponse;
+import com.hmproductions.bingo.actions.GetRoomsRequest;
+import com.hmproductions.bingo.actions.GetRoomsResponse;
 
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
 import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
 import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
 
-public class NextRoundLoader extends AsyncTaskLoader<StartNextRoundResponse> {
+public class GetRoomsLoader extends AsyncTaskLoader<GetRoomsResponse> {
 
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
-    private int playerId, roomId;
 
-    public NextRoundLoader(@NonNull Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, int playerId, int roomId) {
+    public GetRoomsLoader(@NonNull Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub) {
         super(context);
-        this.playerId = playerId;
-        this.roomId = roomId;
         this.actionServiceBlockingStub = stub;
     }
 
@@ -33,11 +30,11 @@ public class NextRoundLoader extends AsyncTaskLoader<StartNextRoundResponse> {
 
     @Nullable
     @Override
-    public StartNextRoundResponse loadInBackground() {
-        if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT))
-            return actionServiceBlockingStub.startNextRound(StartNextRoundRequest.newBuilder().setPlayerId(playerId).setRoomId(roomId).build());
-        else
-            return null;
-    }
+    public GetRoomsResponse loadInBackground() {
+        if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
+            return actionServiceBlockingStub.getRooms(GetRoomsRequest.newBuilder().build());
+        }
 
+        return null;
+    }
 }

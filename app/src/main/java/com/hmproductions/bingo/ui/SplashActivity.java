@@ -22,6 +22,7 @@ import com.hmproductions.bingo.actions.GetSessionIdResponse;
 import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
 import com.hmproductions.bingo.loaders.SessionIdLoader;
+import com.hmproductions.bingo.ui.main.MainActivity;
 import com.hmproductions.bingo.utils.Constants;
 
 import javax.inject.Inject;

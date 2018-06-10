@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginEnd="12dp"
-    android:layout_marginStart="12dp"
-    android:orientation="vertical"
-    android:padding="4dp">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:hint="@string/player_name"
+        android:hint="@string/room_name"
+        android:gravity="center"
         android:textColorHint="@android:color/darker_gray">
 
         <EditText
-            android:id="@+id/playerName_editText"
+            android:id="@+id/roomName_editText"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
             android:inputType="text"
@@ -28,16 +27,9 @@
     </android.support.design.widget.TextInputLayout>
 
     <NumberPicker
-        android:id="@+id/color_picker"
-        android:layout_width="240dp"
+        android:id="@+id/count_picker"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="-8dp" />
-
-    <View
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="-12dp" />
+        android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>

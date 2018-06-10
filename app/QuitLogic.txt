@@ -1,0 +1,13 @@
+if (getIntent().getAction() != null && getIntent().getAction().equals(Constants.QUIT_GAME_ACTION)) {
+
+            if (getIntent().getBooleanExtra(PLAYER_LEFT_ID, true)) {
+                playersRecyclerAdapter.swapData(null);
+            } else {
+                playersList = getIntent().getParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID);
+                playersRecyclerAdapter.swapData(playersList);
+
+                currentPlayerId = getIntent().getIntExtra(GameActivity.PLAYER_ID, -1);
+                currentRoomId = getIntent().getIntExtra(GameActivity.ROOM_ID, -1);
+                playerNameEditText.setText(getNameFromId(playersList, currentPlayerId));
+            }
+        }

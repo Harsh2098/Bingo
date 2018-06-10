@@ -2,7 +2,6 @@ package com.hmproductions.bingo.loaders;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.actions.AddPlayerRequest;
@@ -15,8 +14,8 @@ import io.grpc.stub.MetadataUtils;
 
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
+import static com.hmproductions.bingo.utils.Constants.ROOM_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
 import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_KEY;
@@ -25,11 +24,13 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
 
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
     private Player player;
+    private int roomId;
 
-    public AddPlayerLoader(Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, Player player) {
+    public AddPlayerLoader(Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, int roomId, Player player) {
         super(context);
         this.actionServiceBlockingStub = stub;
         this.player = player;
+        this.roomId = roomId;
     }
 
     @Override
@@ -41,7 +42,6 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
     public AddPlayerResponse loadInBackground() {
 
         // TODO (3) : Check why this loader is called twice when returning from Settings
-        // TODO (5) : Add room id in metadata
 
         if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
 
@@ -56,9 +56,12 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
             metadataKey = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
             metadata.put(metadataKey, Constants.SESSION_ID);
 
+            metadataKey = Metadata.Key.of(ROOM_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
+            metadata.put(metadataKey, String.valueOf(roomId));
+
             actionServiceBlockingStub = MetadataUtils.attachHeaders(actionServiceBlockingStub, metadata);
 
-            return actionServiceBlockingStub.addPlayer(AddPlayerRequest.newBuilder().setPlayer(player).build());
+            return actionServiceBlockingStub.addPlayer(AddPlayerRequest.newBuilder().setPlayer(player).setRoomId(roomId).build());
         } else {
             return null;
         }

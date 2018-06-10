@@ -137,6 +137,8 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
                     com.hmproductions.bingo.models.Player currentPlayer = request.getPlayer();
 
+                    // TODO : Check if the color is already taken
+
                     currentRoom.getPlayersList().add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
                             currentPlayer.getReady()));
 

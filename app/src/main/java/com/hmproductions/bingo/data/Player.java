@@ -24,6 +24,10 @@ public class Player implements Parcelable {
         return color;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }

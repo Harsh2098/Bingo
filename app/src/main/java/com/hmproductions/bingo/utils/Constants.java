@@ -9,7 +9,7 @@ public class Constants {
     public static final int LEADERBOARD_COL_SPAN = 2;
 
     public static final int SERVER_PORT = 8080;
-    public static final String SERVER_ADDRESS = "192.168.0.160";
+    public static final String SERVER_ADDRESS = "192.168.0.182";
 
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;
@@ -20,6 +20,8 @@ public class Constants {
     public static final int QUIT_PLAYER_LOADER_ID = 701;
     public static final int NEXT_ROUND_LOADER_ID = 801;
     public static final int INTERNET_CONNECTION_LOADER_ID = 901;
+    public static final int GET_ROOMS_LOADER_ID = 1001;
+    public static final int HOST_ROOM_LOADER_ID = 2001;
 
     public static final String GRID_CELL_CLICK_ACTION = "grid-cell-click-action";
     public static final String QUIT_GAME_ACTION = "quit-game-action";
@@ -27,6 +29,7 @@ public class Constants {
     public static String SESSION_ID = null;
     public static final String SESSION_ID_KEY = "sessionid";
     public static final String PLAYER_ID_KEY = "playerid";
+    public static final String ROOM_ID_KEY = "roomid";
 
     public static final String SERVER_CERT = "" +
             "-----BEGIN CERTIFICATE-----\n" +

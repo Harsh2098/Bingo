@@ -126,4 +126,10 @@
     <string name="tts_preference_key">Speech to Text</string>
     <string name="talk_to_speak_button">Talk to Speak Button</string>
 
+    <string name="refresh_description">Refresh rooms list</string>
+    <string name="slash"> / </string>
+    <string name="no_rooms_found">No rooms found</string>
+    <string name="host">host</string>
+    <string name="room_name">Room Name</string>
+
 </resources>

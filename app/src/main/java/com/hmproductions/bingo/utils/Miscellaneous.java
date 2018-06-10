@@ -20,6 +20,11 @@ import java.util.Random;
 
 public class Miscellaneous {
 
+    public interface OnFragmentChangeRequest {
+        void changeFragment();
+        void finishCurrentActivity();
+    }
+
     // Returns an int[size][size] containing numbers 1 to 25 randomly placed
     public static int[] CreateRandomGameArray(int size) {
 
