@@ -10,6 +10,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -31,6 +32,7 @@ import io.grpc.ManagedChannel;
 
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isGooglePlayServicesAvailable;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.INTERNET_CONNECTION_LOADER_ID;
 import static com.hmproductions.bingo.utils.Miscellaneous.convertDpToPixel;
 

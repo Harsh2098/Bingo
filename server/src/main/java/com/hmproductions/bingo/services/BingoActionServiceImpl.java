@@ -90,9 +90,12 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         if (newRoomCreatedSuccessfully)
             responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusCode(HostRoomResponse.StatusCode.OK)
                     .setStatusMessage("New room created").build());
-        else
+        else {
             responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusMessage("Could not create new room")
                     .setStatusCode(HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR).build());
+
+            removeConnectionData(connectionDataList, request.getPlayerId());
+        }
 
         responseObserver.onCompleted();
     }

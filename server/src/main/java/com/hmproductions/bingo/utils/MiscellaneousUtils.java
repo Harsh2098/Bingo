@@ -7,6 +7,8 @@ import com.hmproductions.bingo.models.Player;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 public class MiscellaneousUtils {
 
     private static final String randomStringGenerationString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=";
@@ -77,6 +79,7 @@ public class MiscellaneousUtils {
         return -1;
     }
 
+    @Nullable
     public static String getNameFromRoomId(ArrayList<Room> roomsList, int roomId, int playerId) {
         for (Room room : roomsList) {
             if (room.getRoomId() == roomId) {

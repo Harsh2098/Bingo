@@ -42,6 +42,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.grpc.stub.StreamObserver;
 
@@ -186,6 +187,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         View customView = inflater.inflate(R.layout.fragment_room, container, false);
 
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
+        ButterKnife.bind(this, customView);
 
         if (getContext() != null) {
             View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.loading_dialog, null);

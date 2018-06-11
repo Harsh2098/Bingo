@@ -1,7 +1,6 @@
 package com.hmproductions.bingo.ui.main;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +10,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,11 +39,13 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.utils.Constants.ADD_PLAYER_LOADER_ID;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.GET_ROOMS_LOADER_ID;
 import static com.hmproductions.bingo.utils.Constants.HOST_ROOM_LOADER_ID;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
@@ -88,6 +90,7 @@ public class HomeFragment extends Fragment implements
             Player player = userDetails.getUserDetails();
 
             if (player != null && args != null && getContext() != null) {
+
                 currentPlayerId = nameToIdHash(player.getName());
                 player.setId(currentPlayerId);
 
@@ -189,6 +192,8 @@ public class HomeFragment extends Fragment implements
         View customView = inflater.inflate(R.layout.fragment_home, container, false);
 
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
+        ButterKnife.bind(this, customView);
+
         roomsRecyclerView = customView.findViewById(R.id.rooms_recyclerView);
         noRoomsTextView = customView.findViewById(R.id.noRoomsFound_textView);
 
@@ -240,7 +245,7 @@ public class HomeFragment extends Fragment implements
     @NonNull
     @Override
     public Loader<GetRoomsResponse> onCreateLoader(int id, @Nullable Bundle args) {
-        loadingDialog.show();
+        //loadingDialog.show();
 
         if (getContext() != null)
             return new GetRoomsLoader(getContext(), actionServiceBlockingStub);

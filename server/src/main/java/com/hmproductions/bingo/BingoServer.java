@@ -52,43 +52,45 @@ public class BingoServer {
                     int playerId = getPlayerIdFromRemoteAddress(connectionDataList, remoteAddress);
                     int roomId = getRoomIdFromRemoteAddress(connectionDataList, remoteAddress);
 
-                    Player player = Player.newBuilder().setId(playerId).setName(getNameFromRoomId(roomsList, roomId, playerId)).build();
+                    if (playerId != -1 && roomId != -1) {
+                        Player player = Player.newBuilder().setId(playerId).setName(getNameFromRoomId(roomsList, roomId, playerId)).build();
 
-                    bingoActionService.unsubscribe(Unsubscribe.UnsubscribeRequest.newBuilder().setPlayerId(playerId).build(),
-                            new StreamObserver<Unsubscribe.UnsubscribeResponse>() {
-                        @Override
-                        public void onNext(Unsubscribe.UnsubscribeResponse value) {
+                        bingoActionService.unsubscribe(Unsubscribe.UnsubscribeRequest.newBuilder().setPlayerId(playerId).build(),
+                                new StreamObserver<Unsubscribe.UnsubscribeResponse>() {
+                                    @Override
+                                    public void onNext(Unsubscribe.UnsubscribeResponse value) {
 
-                        }
+                                    }
 
-                        @Override
-                        public void onError(Throwable t) {
+                                    @Override
+                                    public void onError(Throwable t) {
 
-                        }
+                                    }
 
-                        @Override
-                        public void onCompleted() {
+                                    @Override
+                                    public void onCompleted() {
 
-                        }
-                    });
+                                    }
+                                });
 
-                    bingoActionService.removePlayer(RemovePlayerRequest.newBuilder().setPlayer(player).build(),
-                            new StreamObserver<RemovePlayerResponse>() {
-                        @Override
-                        public void onNext(RemovePlayerResponse value) {
+                        bingoActionService.removePlayer(RemovePlayerRequest.newBuilder().setPlayer(player).build(),
+                                new StreamObserver<RemovePlayerResponse>() {
+                                    @Override
+                                    public void onNext(RemovePlayerResponse value) {
 
-                        }
+                                    }
 
-                        @Override
-                        public void onError(Throwable t) {
+                                    @Override
+                                    public void onError(Throwable t) {
 
-                        }
+                                    }
 
-                        @Override
-                        public void onCompleted() {
+                                    @Override
+                                    public void onCompleted() {
 
-                        }
-                    });
+                                    }
+                                });
+                    }
                 }
             }
         };
