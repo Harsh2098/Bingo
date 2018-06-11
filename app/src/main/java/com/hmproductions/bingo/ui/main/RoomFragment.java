@@ -93,12 +93,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
             for (Player player : playersList) {
                 if (player.getId() == currentPlayerId) {
-                    return new RemovePlayerLoader(getContext(), actionServiceBlockingStub, player);
+                    return new RemovePlayerLoader(getContext(), actionServiceBlockingStub, player, currentRoomId);
                 }
             }
 
             // If not found
-            return new RemovePlayerLoader(getContext(), actionServiceBlockingStub, fakePlayer);
+            return new RemovePlayerLoader(getContext(), actionServiceBlockingStub, fakePlayer, currentRoomId);
         }
 
         @Override
@@ -133,7 +133,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
             loadingDialog.show();
 
-            return new SetReadyLoader(getContext(), actionServiceBlockingStub, currentPlayerId, !getPlayerReady(currentPlayerId));
+            return new SetReadyLoader(getContext(), actionServiceBlockingStub, currentPlayerId, !getPlayerReady(currentPlayerId), currentRoomId);
         }
 
         @Override
@@ -188,6 +188,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
         ButterKnife.bind(this, customView);
+
+        playersRecyclerView = customView.findViewById(R.id.players_recyclerView);
 
         if (getContext() != null) {
             View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.loading_dialog, null);

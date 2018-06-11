@@ -17,11 +17,13 @@ public class RemovePlayerLoader extends AsyncTaskLoader<RemovePlayerResponse> {
 
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
     private Player player;
+    private int roomId;
 
-    public RemovePlayerLoader(Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, Player player) {
+    public RemovePlayerLoader(Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, Player player, int roomId) {
         super(context);
         this.actionServiceBlockingStub = stub;
         this.player = player;
+        this.roomId = roomId;
     }
 
     @Override
@@ -36,7 +38,7 @@ public class RemovePlayerLoader extends AsyncTaskLoader<RemovePlayerResponse> {
             com.hmproductions.bingo.models.Player player = com.hmproductions.bingo.models.Player.newBuilder().setId(this.player.getId())
                 .setName(this.player.getName()).setReady(this.player.isReady()).setColor(this.player.getColor()).build();
 
-        return actionServiceBlockingStub.removePlayer(RemovePlayerRequest.newBuilder().setPlayer(player).build());
+        return actionServiceBlockingStub.removePlayer(RemovePlayerRequest.newBuilder().setPlayer(player).setRoomId(roomId).build());
         } else {
             return null;
         }

@@ -17,12 +17,14 @@ public class SetReadyLoader extends AsyncTaskLoader<SetPlayerReadyResponse> {
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
     private int playerId;
     private boolean ready;
+    private int roomId;
 
-    public SetReadyLoader(Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, int playerId, boolean ready) {
+    public SetReadyLoader(Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, int playerId, boolean ready, int roomId) {
         super(context);
         this.actionServiceBlockingStub = stub;
         this.playerId = playerId;
         this.ready = ready;
+        this.roomId = roomId;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class SetReadyLoader extends AsyncTaskLoader<SetPlayerReadyResponse> {
         if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
 
             return actionServiceBlockingStub.setPlayerReady(SetPlayerReadyRequest.newBuilder()
-                .setPlayerId(playerId).setIsReady(ready).build());
+                .setPlayerId(playerId).setIsReady(ready).setRoomId(roomId).build());
         } else {
             return null;
         }

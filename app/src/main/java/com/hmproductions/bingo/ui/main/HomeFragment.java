@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.ui.main;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,7 +11,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +45,6 @@ import butterknife.OnClick;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.utils.Constants.ADD_PLAYER_LOADER_ID;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.GET_ROOMS_LOADER_ID;
 import static com.hmproductions.bingo.utils.Constants.HOST_ROOM_LOADER_ID;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
@@ -60,6 +59,9 @@ public class HomeFragment extends Fragment implements
 
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
+
+    @Inject
+    SharedPreferences preferences;
 
     RecyclerView roomsRecyclerView;
     TextView noRoomsTextView;
@@ -104,9 +106,11 @@ public class HomeFragment extends Fragment implements
 
         @Override
         public void onLoadFinished(@NonNull Loader<HostRoomResponse> loader, HostRoomResponse data) {
+
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
+
                 if (data.getStatusCode() == HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR) {
                     currentPlayerId = -1;
                 } else {
@@ -217,6 +221,12 @@ public class HomeFragment extends Fragment implements
     @OnClick(R.id.host_button)
     void onHostButtonClick() {
         View hostRoomView = LayoutInflater.from(getContext()).inflate(R.layout.host_room_view, null);
+        EditText roomNameEditText = hostRoomView.findViewById(R.id.roomName_editText);
+
+        if (userDetails.getUserDetails() != null) {
+            String sampleName = userDetails.getUserDetails().getName() + "'s room";
+            roomNameEditText.setText(preferences.getString(ROOM_NAME_KEY, sampleName));
+        }
 
         NumberPicker countPicker = hostRoomView.findViewById(R.id.count_picker);
         countPicker.setMinValue(2);
@@ -228,8 +238,10 @@ public class HomeFragment extends Fragment implements
                 .setCancelable(true)
                 .setPositiveButton("Host", ((dialogInterface, i) -> {
                     Bundle bundle = new Bundle();
-                    bundle.putString(ROOM_NAME_KEY, ((EditText)hostRoomView.findViewById(R.id.roomName_editText)).getText().toString());
+                    bundle.putString(ROOM_NAME_KEY, roomNameEditText.getText().toString());
                     bundle.putInt(ROOM_SIZE_KEY, countPicker.getValue());
+
+                    preferences.edit().putString(ROOM_NAME_KEY, roomNameEditText.getText().toString()).apply();
 
                     getLoaderManager().restartLoader(HOST_ROOM_LOADER_ID, bundle, hostRoomLoader);
                 }));

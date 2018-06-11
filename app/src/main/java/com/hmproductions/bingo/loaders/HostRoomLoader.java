@@ -36,6 +36,11 @@ public class HostRoomLoader extends AsyncTaskLoader<HostRoomResponse> {
         this.player = player;
     }
 
+    @Override
+    protected void onStartLoading() {
+        forceLoad();
+    }
+
     @Nullable
     @Override
     public HostRoomResponse loadInBackground() {
