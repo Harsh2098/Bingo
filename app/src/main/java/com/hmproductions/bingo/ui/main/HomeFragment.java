@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -110,6 +111,7 @@ public class HomeFragment extends Fragment implements
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
+                showSnackbarWithMessage(data.getStatusMessage());
 
                 if (data.getStatusCode() == HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR) {
                     currentPlayerId = -1;
@@ -155,6 +157,7 @@ public class HomeFragment extends Fragment implements
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
+                showSnackbarWithMessage(data.getStatusMessage());
 
                 switch (data.getStatusCodeValue()) {
 
@@ -263,10 +266,7 @@ public class HomeFragment extends Fragment implements
     public Loader<GetRoomsResponse> onCreateLoader(int id, @Nullable Bundle args) {
         //loadingDialog.show();
 
-        if (getContext() != null)
-            return new GetRoomsLoader(getContext(), actionServiceBlockingStub);
-        else
-            return null;
+        return getContext() != null ? new GetRoomsLoader(getContext(), actionServiceBlockingStub) : null;
     }
 
     @Override
@@ -292,6 +292,10 @@ public class HomeFragment extends Fragment implements
                 case NO_ROOMS:
                     noRoomsTextView.setVisibility(View.VISIBLE);
                     roomsRecyclerView.setVisibility(View.GONE);
+
+                    if (getActivity() != null && getView() != null)
+                        Snackbar.make(getActivity().findViewById(android.R.id.content), data.getStatusMessage(), Snackbar.LENGTH_LONG)
+                                .setAction(R.string.host, (v) -> getView().findViewById(R.id.host_button).callOnClick()).show();
                     break;
 
                 default:
@@ -313,5 +317,10 @@ public class HomeFragment extends Fragment implements
         bundle.putInt(ROOM_ID_KEY, roomsArrayList.get(position).getRoomId());
 
         getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
+    }
+
+    private void showSnackbarWithMessage(String text) {
+        if (getActivity() != null)
+            Snackbar.make(getActivity().findViewById(android.R.id.content), text, Snackbar.LENGTH_SHORT).show();
     }
 }

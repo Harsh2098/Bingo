@@ -111,7 +111,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         if (protoRoomsList.size() == 0) {
             responseObserver.onNext(GetRoomsResponse.newBuilder().setStatusCode(GetRoomsResponse.StatusCode.NO_ROOMS)
-                    .setStatusMessage("No rooms available").addAllRooms(protoRoomsList).build());
+                    .setStatusMessage("Host a Room").addAllRooms(protoRoomsList).build());
         } else {
             responseObserver.onNext(GetRoomsResponse.newBuilder().setStatusCode(GetRoomsResponse.StatusCode.OK)
                     .setStatusMessage("Available rooms provided").addAllRooms(protoRoomsList).build());
