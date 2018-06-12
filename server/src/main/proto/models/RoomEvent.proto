@@ -18,4 +18,5 @@ message RoomEvent {
 
     EventCode event_code = 1;
     repeated models.Player players = 2;
+    uint32 max_count = 3;
 }

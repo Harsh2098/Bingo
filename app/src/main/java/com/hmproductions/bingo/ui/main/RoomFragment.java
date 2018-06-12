@@ -58,7 +58,10 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     @Inject
     BingoStreamServiceGrpc.BingoStreamServiceStub streamServiceStub;
 
+    private int maxCount = 2;
+
     RecyclerView playersRecyclerView;
+    TextView countTextView;
 
     AlertDialog loadingDialog;
     ConnectionUtils.OnNetworkDownHandler networkDownHandler;
@@ -190,6 +193,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         ButterKnife.bind(this, customView);
 
         playersRecyclerView = customView.findViewById(R.id.players_recyclerView);
+        countTextView = customView.findViewById(R.id.count_textView);
 
         if (getContext() != null) {
             View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.loading_dialog, null);
@@ -244,6 +248,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                         value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_STATE_CHANGED ||
                         value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
                     List<com.hmproductions.bingo.models.Player> responseList = value.getRoomEvent().getPlayersList();
+                    maxCount = value.getRoomEvent().getMaxCount();
 
                     playersList.clear();
                     for (com.hmproductions.bingo.models.Player currentPlayer : responseList) {
@@ -252,7 +257,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                     }
 
                     if (getActivity() != null)
-                        getActivity().runOnUiThread(() -> playersRecyclerAdapter.swapData(playersList));
+                        getActivity().runOnUiThread(() ->  {
+                            playersRecyclerAdapter.swapData(playersList);
+
+                            String text = playersList.size() + " / " + maxCount;
+                            countTextView.setText(text);
+                        });
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 

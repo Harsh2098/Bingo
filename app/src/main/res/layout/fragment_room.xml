@@ -9,15 +9,34 @@
         android:id="@+id/players_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/leave_button" />
+        android:layout_above="@+id/bottom_linearLayout" />
 
-    <Button
-        android:id="@+id/leave_button"
+    <LinearLayout
+        android:id="@+id/bottom_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="@string/leave"
-        android:textAllCaps="true"
-        android:textSize="18sp" />
+        android:weightSum="5">
+
+        <Button
+            android:id="@+id/leave_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/leave"
+            android:textAllCaps="true"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/count_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="4"
+            android:gravity="end"
+            android:textColor="@android:color/background_dark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 </RelativeLayout>

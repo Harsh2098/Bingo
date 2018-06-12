@@ -223,7 +223,11 @@ public class HomeFragment extends Fragment implements
         View hostRoomView = LayoutInflater.from(getContext()).inflate(R.layout.host_room_view, null);
         EditText roomNameEditText = hostRoomView.findViewById(R.id.roomName_editText);
 
-        if (userDetails.getUserDetails() != null) {
+        Player hostPlayer = userDetails.getUserDetails();
+
+        if (hostPlayer == null)
+            return;
+        else {
             String sampleName = userDetails.getUserDetails().getName() + "'s room";
             roomNameEditText.setText(preferences.getString(ROOM_NAME_KEY, sampleName));
         }

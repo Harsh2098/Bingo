@@ -43,7 +43,7 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
             }
 
             RoomEvent roomEvent = RoomEvent.newBuilder().addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList()))
-                    .setEventCode(RoomEvent.EventCode.PLAYER_STATE_CHANGED).build();
+                    .setEventCode(RoomEvent.EventCode.PLAYER_STATE_CHANGED).setMaxCount(currentRoom.getMaxSize()).build();
 
             responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
 
@@ -51,7 +51,7 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
 
                 setupCurrentPlayerAndStartGame(currentRoom);
 
-                roomEvent = RoomEvent.newBuilder().setEventCode(RoomEvent.EventCode.GAME_START)
+                roomEvent = RoomEvent.newBuilder().setEventCode(RoomEvent.EventCode.GAME_START).setMaxCount(currentRoom.getMaxSize())
                         .addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList())).build();
 
                 responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
