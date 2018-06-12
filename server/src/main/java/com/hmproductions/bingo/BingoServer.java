@@ -1,5 +1,7 @@
 package com.hmproductions.bingo;
 
+import com.hmproductions.bingo.actions.QuitPlayerRequest;
+import com.hmproductions.bingo.actions.QuitPlayerResponse;
 import com.hmproductions.bingo.actions.RemovePlayerRequest;
 import com.hmproductions.bingo.actions.RemovePlayerResponse;
 import com.hmproductions.bingo.actions.Unsubscribe;
@@ -90,6 +92,27 @@ public class BingoServer {
 
                                     }
                                 });
+
+                        bingoActionService.quitPlayer(QuitPlayerRequest.newBuilder().setRoomId(roomId)
+                                .setPlayer(Player.newBuilder().setId(playerId).setReady(true).build()).build(),
+                                new StreamObserver<QuitPlayerResponse>() {
+                            @Override
+                            public void onNext(QuitPlayerResponse value) {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+
+                            }
+
+                            @Override
+                            public void onCompleted() {
+
+                            }
+                        });
+
+                        System.out.println("Transport for player id " + playerId + " terminated");
                     }
                 }
             }
