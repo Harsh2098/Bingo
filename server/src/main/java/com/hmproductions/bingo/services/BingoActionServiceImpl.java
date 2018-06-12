@@ -209,8 +209,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 if (currentRoom.getCount() == 0) {
                     System.out.print("Room with id " + currentRoom.getRoomId() + " destroyed.");
                     roomsList.remove(currentRoom);
-                }
-                else
+                } else
                     sendRoomEventUpdate(request.getRoomId());
 
                 //Server logs
@@ -394,13 +393,11 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
             for (GameEventSubscription currentSubscription : currentRoom.getGameEventSubscriptionArrayList()) {
 
-                if (player.getId() != currentSubscription.getPlayerId()) {
-                    GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
-                            .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
-                            .setWinnerId(player.getId()).setCellClicked(-2).build();
+                GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
+                        .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
+                        .setWinnerId(player.getId()).setCellClicked(-2).build();
 
-                    streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
-                }
+                streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
             }
 
             currentRoom.getGameEventSubscriptionArrayList().clear();
@@ -421,8 +418,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             if (removePlayer != null)
                 System.out.println(removePlayer.getName() + " removed from list.");
 
-            if (found)
+            if (found) {
                 currentRoom.getPlayersList().remove(removePlayer);
+                currentRoom.setCount(currentRoom.getCount() - 1);
+            }
 
             found = false;
             RoomEventSubscription removeSubscription = null;
@@ -440,8 +439,8 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             responseObserver.onNext(QuitPlayerResponse.newBuilder().setStatusCode(QuitPlayerResponse.StatusCode.OK)
                     .setStatusMessage("Player quit the game").build());
         } else {
-            responseObserver.onNext(QuitPlayerResponse.newBuilder().setStatusCode(QuitPlayerResponse.StatusCode.OK)
-                    .setStatusMessage("Player quit the game").build());
+            responseObserver.onNext(QuitPlayerResponse.newBuilder().setStatusCode(QuitPlayerResponse.StatusCode.ROOM_NOT_EXIST)
+                    .setStatusMessage("Room does not exist").build());
         }
 
         responseObserver.onCompleted();

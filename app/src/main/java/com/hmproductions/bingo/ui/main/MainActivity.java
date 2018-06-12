@@ -23,9 +23,11 @@ import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
 import com.hmproductions.bingo.data.Player;
+import com.hmproductions.bingo.ui.GameActivity;
 import com.hmproductions.bingo.ui.SettingsActivity;
 import com.hmproductions.bingo.ui.SplashActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
+import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.Miscellaneous;
 
 import java.util.ArrayList;
@@ -79,9 +81,19 @@ public class MainActivity extends AppCompatActivity implements
         ((TextView) dialogView.findViewById(R.id.progressDialog_textView)).setText(R.string.processing_request);
         loadingDialog = new AlertDialog.Builder(this).setView(dialogView).setCancelable(false).create();
 
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new HomeFragment()).commit();
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        if (getIntent().getAction() != null && getIntent().getAction().equals(Constants.QUIT_GAME_ACTION)) {
+            if (!getIntent().getBooleanExtra(PLAYER_LEFT_ID, true)) {
+                currentPlayerId = getIntent().getIntExtra(GameActivity.PLAYER_ID, currentPlayerId);
+                currentRoomId = getIntent().getIntExtra(GameActivity.ROOM_ID, currentRoomId);
+
+                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new RoomFragment()).commit();
+                return;
+            }
+        }
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new HomeFragment()).commit();
+        currentPlayerId = currentRoomId = -1;
     }
 
     private void setupColorPicker() {

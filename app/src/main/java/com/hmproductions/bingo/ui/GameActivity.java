@@ -287,27 +287,18 @@ public class GameActivity extends AppCompatActivity implements
 
                     case PLAYER_QUIT_VALUE:
                         Intent quitIntent = new Intent(GameActivity.this, MainActivity.class);
+                        quitIntent.setAction(Constants.QUIT_GAME_ACTION);
+
                         quitIntent.putExtra(MainActivity.PLAYER_LEFT_ID, playerId == winnerId);
 
-                        boolean flag = false;
-                        Player removePlayer = null;
-
-                        for (Player player : playersList) {
-                            if (player.getId() == winnerId) {
-                                flag = true;
-                                removePlayer = player;
-                            } else {
-                                player.setReady(false);
-                            }
+                        if (currentPlayerId == winnerId) {
+                            startActivity(quitIntent);
+                            finish();
+                            return;
                         }
 
-                        if (flag)
-                            playersList.remove(removePlayer);
-
-                        quitIntent.setAction(Constants.QUIT_GAME_ACTION);
                         quitIntent.putExtra(PLAYER_ID, playerId);
                         quitIntent.putExtra(ROOM_ID, roomId);
-                        quitIntent.putParcelableArrayListExtra(PLAYERS_LIST_ID, playersList);
 
                         startActivity(quitIntent);
                         finish();

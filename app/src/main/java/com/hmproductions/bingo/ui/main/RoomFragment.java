@@ -257,7 +257,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                     }
 
                     if (getActivity() != null)
-                        getActivity().runOnUiThread(() ->  {
+                        getActivity().runOnUiThread(() -> {
                             playersRecyclerAdapter.swapData(playersList);
 
                             String text = playersList.size() + " / " + maxCount;
@@ -266,13 +266,18 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 
-                    Intent gameIntent = new Intent(getContext(), GameActivity.class);
-                    gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
-                    gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);
-                    gameIntent.putParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID, playersList);
-                    startActivity(gameIntent);
+                    if (getActivity() != null)
+                        getActivity().runOnUiThread(() -> {
+                            getLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
 
-                    fragmentChangeRequest.finishCurrentActivity();
+                            Intent gameIntent = new Intent(getContext(), GameActivity.class);
+                            gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
+                            gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);
+                            gameIntent.putParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID, playersList);
+                            startActivity(gameIntent);
+
+                            fragmentChangeRequest.finishCurrentActivity();
+                        });
                 }
             }
 

@@ -282,6 +282,7 @@ public class HomeFragment extends Fragment implements
                     noRoomsTextView.setVisibility(View.GONE);
                     roomsRecyclerView.setVisibility(View.VISIBLE);
 
+                    roomsArrayList.clear();
                     for (com.hmproductions.bingo.models.Room currentRoom : data.getRoomsList()) {
                         roomsArrayList.add(new Room(currentRoom.getRoomId(), currentRoom.getCount(), currentRoom.getMaxSize(), currentRoom.getRoomName()));
                     }
