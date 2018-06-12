@@ -3,14 +3,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="2dp">
+    android:paddingStart="2dp"
+    android:paddingEnd="2dp">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rooms_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="50dp"
         android:visibility="visible" />
 
     <ImageButton
