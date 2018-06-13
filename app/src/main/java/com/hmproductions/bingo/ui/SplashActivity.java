@@ -10,7 +10,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -32,11 +31,12 @@ import io.grpc.ManagedChannel;
 
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isGooglePlayServicesAvailable;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.INTERNET_CONNECTION_LOADER_ID;
 import static com.hmproductions.bingo.utils.Miscellaneous.convertDpToPixel;
 
 public class SplashActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<GetSessionIdResponse> {
+
+    public static final String SHOW_SNACKBAR_KEY = "show-snackbar-key";
 
     @Inject
     ManagedChannel channel;
@@ -111,8 +111,12 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
 
         if (data != null) {
             Constants.SESSION_ID = data.getSessionId();
-            startActivity(new Intent(this, MainActivity.class));
+
+            Intent mainActivityIntent = new Intent(this, MainActivity.class);
+            mainActivityIntent.putExtra(SHOW_SNACKBAR_KEY, true);
+            startActivity(mainActivityIntent);
             finish();
+
         } else {
             loadingProgressBar.setVisibility(View.GONE);
             loadingTextView.setText(R.string.server_unreachable);

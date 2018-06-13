@@ -33,6 +33,7 @@ import com.hmproductions.bingo.data.Room;
 import com.hmproductions.bingo.loaders.AddPlayerLoader;
 import com.hmproductions.bingo.loaders.GetRoomsLoader;
 import com.hmproductions.bingo.loaders.HostRoomLoader;
+import com.hmproductions.bingo.ui.SplashActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Miscellaneous;
 
@@ -264,7 +265,6 @@ public class HomeFragment extends Fragment implements
     @NonNull
     @Override
     public Loader<GetRoomsResponse> onCreateLoader(int id, @Nullable Bundle args) {
-        //loadingDialog.show();
 
         return getContext() != null ? new GetRoomsLoader(getContext(), actionServiceBlockingStub) : null;
     }
@@ -293,7 +293,7 @@ public class HomeFragment extends Fragment implements
                     noRoomsTextView.setVisibility(View.VISIBLE);
                     roomsRecyclerView.setVisibility(View.GONE);
 
-                    if (getActivity() != null && getView() != null)
+                    if (getActivity() != null && getView() != null && getArguments() != null && getArguments().getBoolean(SplashActivity.SHOW_SNACKBAR_KEY))
                         Snackbar.make(getActivity().findViewById(android.R.id.content), data.getStatusMessage(), Snackbar.LENGTH_LONG)
                                 .setAction(R.string.host, (v) -> getView().findViewById(R.id.host_button).callOnClick()).show();
                     break;

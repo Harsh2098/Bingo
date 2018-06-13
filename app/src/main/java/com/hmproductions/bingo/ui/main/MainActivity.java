@@ -3,10 +3,12 @@ package com.hmproductions.bingo.ui.main;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +19,8 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
@@ -43,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements
         HomeFragment.GetDetails {
 
     public static final String PLAYER_LEFT_ID = "player-left-id";
+    private static final String FIRST_TIME_KEY = "first-time-key";
 
     private static final String PLAYER_NAME_KEY = "player-name-key";
     private static final String PLAYER_COLOR_KEY = "player-color-key";
@@ -62,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.color_picker)
     NumberPicker colorPicker;
 
+    @BindView(R.id.main_toolbar)
+    Toolbar mainToolbar;
+
     static int currentPlayerId = -1, currentRoomId = -1;
     static ArrayList<Player> playersList = new ArrayList<>();
 
@@ -76,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
 
         setupColorPicker();
+        setSupportActionBar(mainToolbar);
 
         View dialogView = LayoutInflater.from(this).inflate(R.layout.loading_dialog, null);
         ((TextView) dialogView.findViewById(R.id.progressDialog_textView)).setText(R.string.processing_request);
@@ -92,8 +101,11 @@ public class MainActivity extends AppCompatActivity implements
                 return;
             }
         }
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new HomeFragment()).commit();
+
         currentPlayerId = currentRoomId = -1;
+
+        startTapTargetView();
+        preferences.edit().putBoolean(FIRST_TIME_KEY, false).apply();
     }
 
     private void setupColorPicker() {
@@ -140,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         if (currentFragment instanceof RoomFragment) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, getHomeFragment(false)).commit();
             playerNameEditText.setEnabled(true);
             colorPicker.setEnabled(true);
         } else {
@@ -176,5 +188,41 @@ public class MainActivity extends AppCompatActivity implements
 
         return new Player(playerNameEditText.getText().toString(),
                 getResources().getStringArray(R.array.colorsName)[colorPicker.getValue()], -1, false);
+    }
+
+    private HomeFragment getHomeFragment(boolean showSnackbar) {
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(SplashActivity.SHOW_SNACKBAR_KEY, showSnackbar && getIntent().getBooleanExtra(SplashActivity.SHOW_SNACKBAR_KEY, false));
+
+        HomeFragment homeFragment = new HomeFragment();
+        homeFragment.setArguments(bundle);
+
+        return homeFragment;
+    }
+
+    private void startTapTargetView() {
+
+        if (preferences.getBoolean(FIRST_TIME_KEY, true)) {
+            new Handler().postDelayed(() ->
+                            TapTargetView.showFor(MainActivity.this, TapTarget
+                                            .forToolbarMenuItem(mainToolbar, R.id.settings_action, "Speech to Text", "Call numbers instead of tapping on them")
+                                            .targetRadius(50)
+                                            .cancelable(true)
+                                            .drawShadow(true),
+                                    new TapTargetView.Listener() {
+                                        @Override
+                                        public void onTargetClick(TapTargetView view) {
+                                            super.onTargetClick(view);
+                                            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+
+                                        }
+                                    })
+                    , 200);
+
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, getHomeFragment(false)).commit();
+        } else
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, getHomeFragment(true)).commit();
+
     }
 }

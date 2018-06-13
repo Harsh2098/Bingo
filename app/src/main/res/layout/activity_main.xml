@@ -3,8 +3,15 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="4dp">
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:background="?colorPrimary"
+        android:orientation="horizontal"
+        android:theme="@style/Base.ThemeOverlay.AppCompat.Dark" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"

@@ -102,6 +102,7 @@ dependencies {
 
     // Celebration
     implementation 'nl.dionsegijn:konfetti:1.1.2'
+    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.11.0'
 
     // Testing-only dependencies
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

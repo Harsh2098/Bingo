@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -112,7 +113,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
-                Toast.makeText(getContext(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+                showSnackbarWithMessage(data.getStatusMessage());
 
                 if (data.getStatusCode() == RemovePlayerResponse.StatusCode.OK) {
                     currentPlayerId = currentRoomId = -1;
@@ -291,5 +292,10 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
             }
         });
+    }
+
+    private void showSnackbarWithMessage(String text) {
+        if (getActivity() != null)
+            Snackbar.make(getActivity().findViewById(android.R.id.content), text, Snackbar.LENGTH_SHORT).show();
     }
 }
