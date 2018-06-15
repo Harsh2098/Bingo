@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +32,7 @@ import com.hmproductions.bingo.ui.SplashActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.Miscellaneous;
+import com.hmproductions.bingo.views.ColorPicker;
 
 import java.util.ArrayList;
 
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String PLAYER_NAME_KEY = "player-name-key";
     private static final String PLAYER_COLOR_KEY = "player-color-key";
 
+    // TODO : tap target for ready, turn off sound option, and mic in game activity
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
 
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements
     EditText playerNameEditText;
 
     @BindView(R.id.color_picker)
-    NumberPicker colorPicker;
+    ColorPicker colorPicker;
 
     @BindView(R.id.main_toolbar)
     Toolbar mainToolbar;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
 
         setupColorPicker();
+
+        mainToolbar.setTitle("");
         setSupportActionBar(mainToolbar);
 
         View dialogView = LayoutInflater.from(this).inflate(R.layout.loading_dialog, null);
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements
         colorPicker.setMinValue(0);
         colorPicker.setMaxValue(getResources().getStringArray(R.array.colorsName).length - 1);
         colorPicker.setDisplayedValues(getResources().getStringArray(R.array.colorsName));
-        colorPicker.setWrapSelectorWheel(false);
+        colorPicker.setWrapSelectorWheel(true);
     }
 
     @Override

@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:fontFamily="@font/default_bingo_font"
         android:maxLength="20"
         android:maxLines="1"
         android:textColor="@android:color/background_dark"
@@ -27,6 +28,7 @@
             android:id="@+id/count_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/default_bingo_font"
             android:textColor="@android:color/background_dark"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -34,6 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/default_bingo_font"
             android:text="@string/slash"
             android:textColor="@android:color/background_dark"
             android:textSize="22sp" />
@@ -42,6 +45,7 @@
             android:id="@+id/maxCount_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/default_bingo_font"
             android:textColor="@android:color/background_dark"
             android:textSize="22sp"
             android:textStyle="bold" />

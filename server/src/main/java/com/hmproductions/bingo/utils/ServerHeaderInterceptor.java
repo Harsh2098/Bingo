@@ -62,6 +62,8 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
         if (methodName.equals("com.hmproductions.bingo.BingoActionService/RemovePlayer") ||
                 methodName.equals("com.hmproductions.bingo.BingoActionService/QuitPlayer")) {
             removeSessionIdFromList(sessionId);
+
+            new Thread(new RoomUtils.RoomDestroyRunnable()).start();
         }
 
         return next.startCall(call, headers);

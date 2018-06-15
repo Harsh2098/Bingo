@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="2dp"
-    android:paddingEnd="2dp">
+    android:paddingEnd="2dp"
+    android:paddingStart="2dp">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/host_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="12dp"
+        android:elevation="12dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/add_icon"
+        app:fabSize="auto" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rooms_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
         android:layout_marginTop="50dp"
         android:visibility="visible" />
 
@@ -27,15 +38,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:fontFamily="@font/default_bingo_font"
         android:text="@string/no_rooms_found"
         android:textSize="18sp"
         android:visibility="gone" />
-
-    <Button
-        android:id="@+id/host_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:text="@string/host" />
 
 </FrameLayout>

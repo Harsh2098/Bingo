@@ -9,30 +9,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/bingo_imageView"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="80dp"
+        android:fontFamily="@font/default_bingo_font"
         android:gravity="center"
         android:text="@string/starting"
         android:textAllCaps="true"
         android:textColor="@android:color/background_dark"
         android:textSize="22sp" />
 
-    <ImageView
+    <TextView
         android:id="@+id/bingo_imageView"
-        android:layout_width="match_parent"
-        android:layout_height="360dp"
-        android:layout_marginTop="20dp"
-        android:contentDescription="@string/bingo_splash_image"
-        android:padding="12dp"
-        android:src="@raw/splash"
-        android:visibility="visible" />
-
-    <ProgressBar
-        android:id="@+id/loading_progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="24dp"
-        android:indeterminate="true" />
+        android:layout_centerInParent="true"
+        android:fontFamily="@font/default_bingo_font"
+        android:letterSpacing="0.04"
+        android:text="@string/splash_app_name"
+        android:textColor="?colorPrimary"
+        android:textSize="40sp"
+        android:textStyle="bold" />
 
 </RelativeLayout>

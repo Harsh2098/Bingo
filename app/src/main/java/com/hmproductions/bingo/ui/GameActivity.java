@@ -22,6 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.GridLayoutAnimationController;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +54,7 @@ import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.ui.main.MainActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
+import com.hmproductions.bingo.views.GridRecyclerView;
 
 import java.util.ArrayList;
 
@@ -108,7 +111,7 @@ public class GameActivity extends AppCompatActivity implements
     LinearLayout bingoLinearLayout;
 
     @BindView(R.id.game_recyclerView)
-    RecyclerView gameRecyclerView;
+    GridRecyclerView gameRecyclerView;
 
     @BindView(R.id.leaderBoard_recyclerView)
     RecyclerView leaderBoardRecyclerView;
@@ -384,7 +387,11 @@ public class GameActivity extends AppCompatActivity implements
 
         gridRecyclerAdapter = new GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this);
 
+        // Setting up animations for grid recycler view
+        GridLayoutAnimationController animationController = (GridLayoutAnimationController) AnimationUtils.loadLayoutAnimation(this, R.anim.game_grid_animation);
+
         gameRecyclerView.setLayoutManager(new GridLayoutManager(this, GRID_SIZE));
+        gameRecyclerView.setLayoutAnimation(animationController);
         gameRecyclerView.setAdapter(gridRecyclerAdapter);
         gameRecyclerView.setHasFixedSize(true);
 

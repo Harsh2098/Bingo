@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +35,7 @@ import com.hmproductions.bingo.loaders.HostRoomLoader;
 import com.hmproductions.bingo.ui.SplashActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Miscellaneous;
+import com.hmproductions.bingo.views.ColorPicker;
 
 import java.util.ArrayList;
 
@@ -49,6 +49,8 @@ import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.utils.Constants.ADD_PLAYER_LOADER_ID;
 import static com.hmproductions.bingo.utils.Constants.GET_ROOMS_LOADER_ID;
 import static com.hmproductions.bingo.utils.Constants.HOST_ROOM_LOADER_ID;
+import static com.hmproductions.bingo.utils.Constants.MAX_PLAYERS;
+import static com.hmproductions.bingo.utils.Constants.MIN_PLAYERS;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
 
 public class HomeFragment extends Fragment implements
@@ -236,9 +238,10 @@ public class HomeFragment extends Fragment implements
             roomNameEditText.setText(preferences.getString(ROOM_NAME_KEY, sampleName));
         }
 
-        NumberPicker countPicker = hostRoomView.findViewById(R.id.count_picker);
-        countPicker.setMinValue(2);
-        countPicker.setMaxValue(4);
+        ColorPicker countPicker = hostRoomView.findViewById(R.id.count_picker);
+        countPicker.setMinValue(MIN_PLAYERS);
+        countPicker.setMaxValue(MAX_PLAYERS);
+        countPicker.setWrapSelectorWheel(false);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
                 .setView(hostRoomView)

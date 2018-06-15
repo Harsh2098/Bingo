@@ -18,14 +18,16 @@
         android:layout_alignParentBottom="true"
         android:weightSum="5">
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/leave_button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/default_bingo_font"
+            android:gravity="center"
             android:text="@string/leave"
-            android:textAllCaps="true"
-            android:textSize="18sp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/count_textView"
@@ -33,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_weight="4"
+            android:fontFamily="@font/default_bingo_font"
             android:gravity="end"
             android:textColor="@android:color/background_dark"
             android:textSize="20sp"

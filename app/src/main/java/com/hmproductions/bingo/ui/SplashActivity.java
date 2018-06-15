@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -41,8 +42,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
     @Inject
     ManagedChannel channel;
 
-    private TextView loadingTextView;
-    private ProgressBar loadingProgressBar;
+    private TextView loadingTextView, bingoAppNameTextView;
 
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
 
@@ -54,7 +54,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
 
         loadingTextView = findViewById(R.id.loading_textView);
-        loadingProgressBar = findViewById(R.id.loading_progressBar);
+        bingoAppNameTextView = findViewById(R.id.bingo_imageView);
 
         /* Setting layoutParams to match the width of the screen */
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -77,16 +77,15 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
 
         actionServiceBlockingStub = BingoActionServiceGrpc.newBlockingStub(channel);
 
-        startMainActivity();
+        bingoAppNameTextView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_animation));
+
+        new Handler().postDelayed(this::startMainActivity, 1000);
     }
 
     private void startMainActivity() {
 
-        loadingProgressBar.setVisibility(View.VISIBLE);
 
         if (!getConnectionInfo(this)) {
-            loadingProgressBar.setVisibility(View.GONE);
-
             loadingTextView.setText(R.string.internet_unavailable);
             new Handler().postDelayed(() -> Snackbar
                     .make(findViewById(android.R.id.content), "Please check internet connection", Snackbar.LENGTH_INDEFINITE)
@@ -101,7 +100,6 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
     @NonNull
     @Override
     public Loader<GetSessionIdResponse> onCreateLoader(int i, Bundle bundle) {
-        loadingProgressBar.setVisibility(View.VISIBLE);
         return new SessionIdLoader(this, actionServiceBlockingStub);
     }
 
@@ -118,7 +116,6 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
             finish();
 
         } else {
-            loadingProgressBar.setVisibility(View.GONE);
             loadingTextView.setText(R.string.server_unreachable);
             handler.postDelayed(() -> Snackbar
                     .make(findViewById(android.R.id.content), "Couldn't connect to server", Snackbar.LENGTH_INDEFINITE)
