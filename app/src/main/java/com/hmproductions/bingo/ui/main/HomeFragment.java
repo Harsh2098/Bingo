@@ -114,11 +114,17 @@ public class HomeFragment extends Fragment implements
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
-                showSnackbarWithMessage(data.getStatusMessage());
-
                 if (data.getStatusCode() == HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR) {
                     currentPlayerId = -1;
+                    showSnackbarWithMessage(data.getStatusMessage());
+
+                } else if (data.getStatusCode() == HostRoomResponse.StatusCode.NAME_TAKEN) {
+                    Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+
+                    if (getView() != null)
+                        getView().findViewById(R.id.host_button).callOnClick();
                 } else {
+                    showSnackbarWithMessage(data.getStatusMessage());
                     currentRoomId = data.getRoomId();
                     fragmentChangeRequest.changeFragment();
                 }
@@ -169,10 +175,13 @@ public class HomeFragment extends Fragment implements
                         fragmentChangeRequest.changeFragment();
                         break;
 
+                    case AddPlayerResponse.StatusCode.COLOR_TAKEN_VALUE:
+                        Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+                        break;
+
                     case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
                     default:
                         currentPlayerId = -1;
-                        Toast.makeText(getContext(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
                         break;
                 }
             }

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -172,7 +173,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onNetworkDownError() {
-        startActivity(new Intent(this, SplashActivity.class));
+        TextView bingoTextView = mainToolbar.findViewById(R.id.toolbarName_textView);
+
+        startActivity(new Intent(this, SplashActivity.class), ActivityOptionsCompat
+                .makeSceneTransitionAnimation(this, bingoTextView, bingoTextView.getTransitionName()).toBundle());
         finish();
     }
 

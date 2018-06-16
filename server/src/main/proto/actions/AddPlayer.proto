@@ -15,9 +15,10 @@ message AddPlayerResponse {
     enum StatusCode {
          OK = 0;
          ROOM_FULL = 1;
-         ALREADY_IN_GAME = 2;
-         ROOM_NOT_EXIST = 3;
-         SERVER_ERROR = 4;
+         COLOR_TAKEN = 2;
+         ALREADY_IN_GAME = 3;
+         ROOM_NOT_EXIST = 4;
+         SERVER_ERROR = 5;
     }
 
     StatusCode status_code = 1;

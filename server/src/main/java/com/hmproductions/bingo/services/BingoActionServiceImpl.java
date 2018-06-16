@@ -41,7 +41,9 @@ import static com.hmproductions.bingo.utils.MiscellaneousUtils.allPlayersReady;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateRoomId;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateSessionId;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.removeConnectionData;
+import static com.hmproductions.bingo.utils.RoomUtils.colorAlreadyTaken;
 import static com.hmproductions.bingo.utils.RoomUtils.getRoomFromId;
+import static com.hmproductions.bingo.utils.RoomUtils.roomNameAlreadyTaken;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
 
@@ -81,20 +83,25 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         ArrayList<Player> playersArrayList = new ArrayList<>();
         playersArrayList.add(new Player(request.getPlayerName(), request.getPlayerColor(), request.getPlayerId(), false));
 
-        int newRoomId = generateRoomId(request.getRoomName());
-        Room newRoom = new Room(newRoomId, playersArrayList, 1, -1,
-                request.getMaxSize(), Room.Status.WAITING, request.getRoomName());
+        if (!roomNameAlreadyTaken(request.getRoomName())) {
+            int newRoomId = generateRoomId(request.getRoomName());
+            Room newRoom = new Room(newRoomId, playersArrayList, 1, -1,
+                    request.getMaxSize(), Room.Status.WAITING, request.getRoomName());
 
-        boolean newRoomCreatedSuccessfully = roomsList.add(newRoom);
+            boolean newRoomCreatedSuccessfully = roomsList.add(newRoom);
 
-        if (newRoomCreatedSuccessfully)
-            responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusCode(HostRoomResponse.StatusCode.OK)
-                    .setStatusMessage("New room created").build());
-        else {
-            responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusMessage("Could not create new room")
-                    .setStatusCode(HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR).build());
+            if (newRoomCreatedSuccessfully)
+                responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusCode(HostRoomResponse.StatusCode.OK)
+                        .setStatusMessage("New room created").build());
+            else {
+                responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(-1).setStatusMessage("Could not create new room")
+                        .setStatusCode(HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR).build());
 
-            removeConnectionData(connectionDataList, request.getPlayerId());
+                removeConnectionData(connectionDataList, request.getPlayerId());
+            }
+        } else {
+            responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(-1).setStatusMessage("Room name already taken")
+                    .setStatusCode(HostRoomResponse.StatusCode.NAME_TAKEN).build());
         }
 
         responseObserver.onCompleted();
@@ -140,20 +147,24 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
                     com.hmproductions.bingo.models.Player currentPlayer = request.getPlayer();
 
-                    // TODO : Check if the color is already taken
+                    if (!colorAlreadyTaken(currentRoom.getRoomId(), currentPlayer.getColor())) {
 
-                    currentRoom.getPlayersList().add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
-                            currentPlayer.getReady()));
+                        currentRoom.getPlayersList().add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
+                                currentPlayer.getReady()));
 
-                    currentRoom.setCount(currentRoom.getCount() + 1);
+                        currentRoom.setCount(currentRoom.getCount() + 1);
 
-                    addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK).setRoomId(request.getRoomId())
-                            .setStatusMessage("New player added").build();
+                        addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK).setRoomId(request.getRoomId())
+                                .setStatusMessage("New player added").build();
 
-                    sendRoomEventUpdate(request.getRoomId());
+                        sendRoomEventUpdate(request.getRoomId());
 
-                    // Server logs
-                    System.out.println(request.getPlayer().getName() + " added to the game.");
+                        // Server logs
+                        System.out.println(request.getPlayer().getName() + " added to the game.");
+                    } else {
+                        addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.COLOR_TAKEN)
+                                .setStatusMessage("Color already taken").setRoomId(request.getRoomId()).build();
+                    }
 
                 } else {
                     addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.ALREADY_IN_GAME)

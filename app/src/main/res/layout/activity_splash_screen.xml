@@ -2,23 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/default_background">
 
     <TextView
-        android:id="@+id/loading_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/bingo_imageView"
-        android:layout_marginTop="80dp"
-        android:fontFamily="@font/default_bingo_font"
-        android:gravity="center"
-        android:text="@string/starting"
-        android:textAllCaps="true"
-        android:textColor="@android:color/background_dark"
-        android:textSize="22sp" />
-
-    <TextView
-        android:id="@+id/bingo_imageView"
+        android:id="@+id/bingo_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -26,7 +14,21 @@
         android:letterSpacing="0.04"
         android:text="@string/splash_app_name"
         android:textColor="?colorPrimary"
-        android:textSize="40sp"
-        android:textStyle="bold" />
+        android:textSize="44sp"
+        android:textStyle="bold"
+        android:transitionName="@string/bingo_app_name_transition" />
+
+    <TextView
+        android:id="@+id/loading_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bingo_textView"
+        android:layout_marginTop="60dp"
+        android:fontFamily="@font/default_bingo_font"
+        android:gravity="center"
+        android:text="@string/starting"
+        android:textAllCaps="true"
+        android:textColor="@android:color/background_dark"
+        android:textSize="22sp" />
 
 </RelativeLayout>

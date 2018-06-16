@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -54,7 +56,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
 
         loadingTextView = findViewById(R.id.loading_textView);
-        bingoAppNameTextView = findViewById(R.id.bingo_imageView);
+        bingoAppNameTextView = findViewById(R.id.bingo_textView);
 
         /* Setting layoutParams to match the width of the screen */
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -63,7 +65,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
         LayoutParams layoutParams = new LayoutParams(displayMetrics.widthPixels, displayMetrics.heightPixels / 2);
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         layoutParams.setMargins(0, (int) convertDpToPixel(this, 20), 0, 0);
-        findViewById(R.id.bingo_imageView).setLayoutParams(layoutParams);
+        findViewById(R.id.bingo_textView).setLayoutParams(layoutParams);
 
         if (!isGooglePlayServicesAvailable(this)) {
             AlertDialog.Builder playServicesBuilder = new AlertDialog.Builder(this);
@@ -112,7 +114,10 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
 
             Intent mainActivityIntent = new Intent(this, MainActivity.class);
             mainActivityIntent.putExtra(SHOW_SNACKBAR_KEY, true);
-            startActivity(mainActivityIntent);
+
+            TextView bingoTextView = findViewById(R.id.bingo_textView);
+            startActivity(mainActivityIntent, ActivityOptionsCompat
+                    .makeSceneTransitionAnimation(this, bingoTextView, bingoTextView.getTransitionName()).toBundle());
             finish();
 
         } else {

@@ -132,5 +132,6 @@
     <string name="host">host</string>
     <string name="room_name">Room Name</string>
     <string name="splash_app_name">BiNGO</string>
+    <string name="bingo_app_name_transition">bingo_name_transition</string>
 
 </resources>

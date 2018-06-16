@@ -14,6 +14,7 @@
         <item name="colorPrimaryDark">#280680</item>
         <item name="colorAccent">#9162e4</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="android:fontFamily">@font/default_bingo_font</item>
     </style>
 
 </resources>
