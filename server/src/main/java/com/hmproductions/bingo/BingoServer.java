@@ -54,6 +54,8 @@ public class BingoServer {
                     int playerId = getPlayerIdFromRemoteAddress(connectionDataList, remoteAddress);
                     int roomId = getRoomIdFromRemoteAddress(connectionDataList, remoteAddress);
 
+                    System.out.println("Transport termination detected. Player ID = " + playerId + " Room ID = " + roomId);
+
                     if (playerId != -1 && roomId != -1) {
                         Player player = Player.newBuilder().setId(playerId).setName(getNameFromRoomId(roomsList, roomId, playerId)).build();
 

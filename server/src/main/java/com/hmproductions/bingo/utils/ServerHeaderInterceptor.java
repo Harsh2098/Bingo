@@ -47,6 +47,7 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             if (playerIdString != null && roomIdString != null && call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR) != null) {
                 int playerId = Integer.parseInt(playerIdString);
                 int roomId = Integer.parseInt(roomIdString);
+                System.out.println("Adding " + playerId + " to connection data list. Room ID = " + roomId);
                 connectionDataList.add(new ConnectionData(sessionId, call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString(), playerId, roomId));
             }
 

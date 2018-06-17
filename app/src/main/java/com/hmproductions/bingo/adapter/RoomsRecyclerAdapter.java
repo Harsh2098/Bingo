@@ -57,7 +57,7 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
             holder.countTextView.setText(String.valueOf(currentRoom.getCount()));
             holder.maxCountTextView.setText(String.valueOf(currentRoom.getMaxSize()));
 
-            holder.roomIconTextView.setText(String.valueOf(currentRoom.getName().charAt(0)));
+            holder.roomIconTextView.setText(String.valueOf(currentRoom.getName().charAt(0)).toUpperCase());
             holder.roomIconTextView.setBackgroundResource(R.drawable.cell_circle_foreground);
             GradientDrawable backgroundDrawable = (GradientDrawable) holder.roomIconTextView.getBackground();
 

@@ -25,6 +25,7 @@ import com.hmproductions.bingo.actions.StartNextRoundRequest;
 import com.hmproductions.bingo.actions.StartNextRoundResponse;
 import com.hmproductions.bingo.actions.Unsubscribe.UnsubscribeRequest;
 import com.hmproductions.bingo.actions.Unsubscribe.UnsubscribeResponse;
+import com.hmproductions.bingo.data.ConnectionData;
 import com.hmproductions.bingo.data.GameEventSubscription;
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.data.Room;
@@ -90,9 +91,11 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
             boolean newRoomCreatedSuccessfully = roomsList.add(newRoom);
 
-            if (newRoomCreatedSuccessfully)
+            if (newRoomCreatedSuccessfully) {
+                updateRoomId(request.getPlayerId(), newRoomId);
                 responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusCode(HostRoomResponse.StatusCode.OK)
                         .setStatusMessage("New room created").build());
+            }
             else {
                 responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(-1).setStatusMessage("Could not create new room")
                         .setStatusCode(HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR).build());
@@ -501,6 +504,13 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             for (RoomEventSubscription currentSubscription : currentRoom.getRoomEventSubscriptionArrayList()) {
                 streamService.getRoomEventUpdates(currentSubscription.getSubscription(), currentSubscription.getObserver());
             }
+        }
+    }
+
+    private void updateRoomId(int playerId, int roomId) {
+        for (ConnectionData data : connectionDataList) {
+            if (data.getPlayerId() == playerId)
+                data.setRoomId(roomId);
         }
     }
 }

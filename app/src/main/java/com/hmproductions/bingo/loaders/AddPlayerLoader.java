@@ -41,8 +41,6 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
     @Override
     public AddPlayerResponse loadInBackground() {
 
-        // TODO (3) : Check why this loader is called twice when returning from Settings
-
         if (getConnectionInfo(getContext()) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
 
             com.hmproductions.bingo.models.Player player = com.hmproductions.bingo.models.Player.newBuilder().setId(this.player.getId())
