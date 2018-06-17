@@ -1,13 +1,15 @@
 <shape android:shape="oval"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <solid android:color="@android:color/background_light" />
+
     <size
         android:width="24dp"
         android:height="24dp" />
 
     <stroke
         android:width="2dp"
-        android:color="#ff5500" />
+        android:color="#000000" />
 
 
 </shape>

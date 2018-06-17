@@ -1,9 +1,10 @@
 package com.hmproductions.bingo.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ import com.hmproductions.bingo.data.Room;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
+import static com.hmproductions.bingo.utils.Miscellaneous.generateColor;
 
 public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdapter.RoomViewHolder> {
 
@@ -55,6 +56,13 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
         if (holder.getItemViewType() == NORMAL_TYPE) {
             holder.countTextView.setText(String.valueOf(currentRoom.getCount()));
             holder.maxCountTextView.setText(String.valueOf(currentRoom.getMaxSize()));
+
+            holder.roomIconTextView.setText(String.valueOf(currentRoom.getName().charAt(0)));
+            holder.roomIconTextView.setBackgroundResource(R.drawable.cell_circle_foreground);
+            GradientDrawable backgroundDrawable = (GradientDrawable) holder.roomIconTextView.getBackground();
+
+            String randomColor = "#" + generateColor();
+            backgroundDrawable.setColor(Color.parseColor(randomColor));
         }
     }
 
@@ -93,15 +101,12 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
             if (roomsFullPosition != -1) {
                 roomArrayList.add(roomsFullPosition, new Room(HEADER_TYPE, 0, 0, "Full Rooms"));
             }
-
-            for (Room room : roomArrayList)
-                Log.v(CLASSIC_TAG, room.getName() + " == " + room.getCount() + "/" + room.getMaxSize());
         }
     }
 
     public class RoomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView roomNameTextView, countTextView, maxCountTextView;
+        TextView roomIconTextView, roomNameTextView, countTextView, maxCountTextView;
 
         RoomViewHolder(View itemView, int viewType) {
             super(itemView);
@@ -109,6 +114,7 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
             roomNameTextView = itemView.findViewById(R.id.roomName_textView);
 
             if (viewType == NORMAL_TYPE) {
+                roomIconTextView = itemView.findViewById(R.id.roomIcon_textView);
                 countTextView = itemView.findViewById(R.id.count_textView);
                 maxCountTextView = itemView.findViewById(R.id.maxCount_textView);
                 itemView.setOnClickListener(this);

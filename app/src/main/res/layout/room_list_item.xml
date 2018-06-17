@@ -3,13 +3,30 @@
 
     android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:padding="20dp">
+    android:paddingEnd="20dp"
+    android:paddingStart="20dp">
+
+    <TextView
+        android:id="@+id/roomIcon_textView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_centerVertical="true"
+        android:background="@drawable/cell_circle_foreground"
+        android:contentDescription="@string/room_image"
+        android:fontFamily="@font/default_bingo_font"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="M"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/roomName_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/roomIcon_textView"
         android:fontFamily="@font/default_bingo_font"
         android:maxLength="20"
         android:maxLines="1"

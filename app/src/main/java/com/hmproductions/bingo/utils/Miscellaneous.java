@@ -2,20 +2,12 @@ package com.hmproductions.bingo.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
 import android.view.View;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.hmproductions.bingo.data.GridCell;
 import com.hmproductions.bingo.data.Player;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -106,5 +98,14 @@ public class Miscellaneous {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         return dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static String generateColor() {
+        StringBuilder stringBuilder = new StringBuilder("");
+        for (int i = 0; i < 6; i++) {
+            String randomStringGenerationString = "0123456789abcdef";
+            stringBuilder.append(randomStringGenerationString.charAt(new Random().nextInt(randomStringGenerationString.length())));
+        }
+        return stringBuilder.toString();
     }
 }
