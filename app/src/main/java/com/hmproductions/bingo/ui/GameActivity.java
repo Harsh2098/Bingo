@@ -352,6 +352,7 @@ public class GameActivity extends AppCompatActivity implements
                         } else {
                             gameRecyclerView.setEnabled(false);
                         }
+                        findViewById(R.id.nextRound_button).setVisibility(View.GONE);
 
                         setTurnOrderText(currentPlayerId);
                         break;

@@ -155,7 +155,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                         currentRoom.setCount(currentRoom.getCount() + 1);
 
                         addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK).setRoomId(request.getRoomId())
-                                .setStatusMessage("New player added").build();
+                                .setStatusMessage("New room joined").build();
 
                         sendRoomEventUpdate(request.getRoomId());
 
@@ -446,6 +446,11 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
             if (found)
                 currentRoom.getRoomEventSubscriptionArrayList().remove(removeSubscription);
+
+            if (currentRoom.getCount() == 0) {
+                System.out.print("Room with id " + currentRoom.getRoomId() + " destroyed.");
+                roomsList.remove(currentRoom);
+            }
 
             responseObserver.onNext(QuitPlayerResponse.newBuilder().setStatusCode(QuitPlayerResponse.StatusCode.OK)
                     .setStatusMessage("Player quit the game").build());

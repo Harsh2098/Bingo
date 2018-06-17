@@ -18,20 +18,25 @@
         android:src="@drawable/add_icon"
         app:fabSize="auto" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rooms_recyclerView"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/darker_gray" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/roomRecyclerView_swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
-        android:visibility="visible" />
+        android:layout_marginTop="18dp">
 
-    <ImageButton
-        android:id="@+id/refreshRooms_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:contentDescription="@string/refresh_description"
-        android:src="@drawable/refresh_icon2" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rooms_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <TextView
         android:id="@+id/noRoomsFound_textView"

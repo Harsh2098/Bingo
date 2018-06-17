@@ -14,7 +14,8 @@
         android:maxLength="20"
         android:maxLines="1"
         android:textColor="@android:color/background_dark"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:transitionName="@string/room_name_transition" />
 
     <LinearLayout
         android:layout_width="wrap_content"

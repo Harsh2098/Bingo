@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -18,10 +19,12 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 public class Miscellaneous {
 
     public interface OnFragmentChangeRequest {
-        void changeFragment();
+        void changeFragment(@Nullable String roonName, @Nullable View view);
         void finishCurrentActivity();
     }
 

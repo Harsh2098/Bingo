@@ -152,15 +152,30 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void changeFragment() {
+    public void changeFragment(String roomName, View view) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         if (currentFragment instanceof RoomFragment) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, getHomeFragment(false)).commit();
             playerNameEditText.setEnabled(true);
             colorPicker.setEnabled(true);
+
         } else {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new RoomFragment()).commit();
+            RoomFragment roomFragment = new RoomFragment();
+
+            if(roomName != null) {
+                Bundle bundle = new Bundle();
+                bundle.putString(RoomFragment.ROOM_NAME_BUNDLE_KEY, roomName);
+                roomFragment.setArguments(bundle);
+            }
+
+            if (view != null) {
+                getSupportFragmentManager().beginTransaction().addSharedElement(view, getString(R.string.room_name_transition))
+                        .replace(R.id.fragment_container, roomFragment).commit();
+            } else {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, roomFragment).commit();
+            }
+
             playerNameEditText.setEnabled(false);
             colorPicker.setEnabled(false);
         }

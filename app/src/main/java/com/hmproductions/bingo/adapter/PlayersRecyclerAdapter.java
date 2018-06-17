@@ -6,7 +6,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +67,7 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
         notifyDataSetChanged();
     }
 
-    class PlayerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView playerNameTextView;
         View colorView;
@@ -88,5 +87,13 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
         public void onClick(View view) {
             listener.onPlayerClick(getAdapterPosition());
         }
+    }
+
+    public int getReadyTapTargetPosition(int playerId) {
+        for (Player player : playersList) {
+            if (player.getId() == playerId)
+                return this.playersList.indexOf(player);
+        }
+        return -1;
     }
 }

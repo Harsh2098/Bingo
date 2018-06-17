@@ -1,8 +1,8 @@
 package com.hmproductions.bingo.ui.main;
 
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,14 +13,15 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Explode;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
@@ -53,8 +54,12 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
+
+    private static final String FIRST_TIME_JOINED = "first-time-joined";
+    public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
 
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
@@ -62,10 +67,14 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     @Inject
     BingoStreamServiceGrpc.BingoStreamServiceStub streamServiceStub;
 
-    private int maxCount = 2;
+    @Inject
+    SharedPreferences preferences;
+
+    private int maxCount = Constants.MIN_PLAYERS;
 
     RecyclerView playersRecyclerView;
     TextView countTextView;
+    LinearLayoutManager linearLayoutManager;
 
     AlertDialog loadingDialog;
     ConnectionUtils.OnNetworkDownHandler networkDownHandler;
@@ -122,7 +131,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                     currentPlayerId = currentRoomId = -1;
                     playersList.clear();
                     playersRecyclerAdapter.swapData(null);
-                    fragmentChangeRequest.changeFragment();
+                    fragmentChangeRequest.changeFragment(null, null);
                 }
             }
         }
@@ -199,6 +208,11 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         playersRecyclerView = customView.findViewById(R.id.players_recyclerView);
         countTextView = customView.findViewById(R.id.count_textView);
 
+        if (getArguments() != null) {
+            Log.v(CLASSIC_TAG, getArguments().getString(ROOM_NAME_BUNDLE_KEY));
+            ((TextView)customView.findViewById(R.id.roomName_textView)).setText(getArguments().getString(ROOM_NAME_BUNDLE_KEY));
+        }
+
         if (getContext() != null) {
             View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.loading_dialog, null);
             ((TextView) dialogView.findViewById(R.id.progressDialog_textView)).setText(R.string.processing_request);
@@ -207,7 +221,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         playersRecyclerAdapter = new PlayersRecyclerAdapter(playersList, getContext(), this);
 
-        playersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        linearLayoutManager = new LinearLayoutManager(getContext());
+
+        playersRecyclerView.setLayoutManager(linearLayoutManager);
         playersRecyclerView.setAdapter(playersRecyclerAdapter);
         playersRecyclerView.setHasFixedSize(false);
 
@@ -264,6 +280,14 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                         getActivity().runOnUiThread(() -> {
                             playersRecyclerAdapter.swapData(playersList);
 
+                            if (preferences.getBoolean(FIRST_TIME_JOINED, true)) {
+                                int position = playersRecyclerAdapter.getReadyTapTargetPosition(currentPlayerId);
+                                Log.v(CLASSIC_TAG, "position = " + position);
+//                                View readyView = (playersRecyclerView.findViewHolderForAdapterPosition(position)).itemView.findViewById(R.id.ready_cardView);
+//                                startTapTargetForView(readyView);
+                                preferences.edit().putBoolean(FIRST_TIME_JOINED, false).apply();
+                            }
+
                             String text = playersList.size() + " / " + maxCount;
                             countTextView.setText(text);
                         });
@@ -300,5 +324,21 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     private void showSnackbarWithMessage(String text) {
         if (getActivity() != null)
             Snackbar.make(getActivity().findViewById(android.R.id.content), text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void startTapTargetForView(View view) {
+
+        if (getActivity() != null) {
+            TapTargetView.showFor(getActivity(), TapTarget.forView(view, "Are you ready ?", "Tap here to mark ready")
+                            .targetRadius(50).cancelable(true).drawShadow(true),
+                    new TapTargetView.Listener() {
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);
+                            getActivity().getSupportLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, null, setPlayerReadyLoader);
+                        }
+                    });
+        }
+
     }
 }

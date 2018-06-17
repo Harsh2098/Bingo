@@ -10,9 +10,7 @@
     <string name="leave">Leave</string>
     <string name="processing_request">Processing request…</string>
     <string name="player_name">Player Name</string>
-    <string name="quit">Quit</string>
     <string name="no">No</string>
-    <string name="next_round">Next Round</string>
     <string name="bingo_splash_image">Bingo splash image</string>
     <string name="internet_unavailable">Internet Unavailable</string>
     <string name="starting">Starting…</string>
@@ -133,5 +131,7 @@
     <string name="room_name">Room Name</string>
     <string name="splash_app_name">BiNGO</string>
     <string name="bingo_app_name_transition">bingo_name_transition</string>
+    <string name="quit">Quit</string>
+    <string name="room_name_transition">room_name_transition</string>
 
 </resources>

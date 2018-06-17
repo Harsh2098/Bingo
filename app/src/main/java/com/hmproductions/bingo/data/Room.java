@@ -28,7 +28,4 @@ public class Room {
         return name;
     }
 
-    public void setCount(int count) {
-        this.count = count;
-    }
 }

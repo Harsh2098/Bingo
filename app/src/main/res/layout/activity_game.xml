@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:orientation="vertical"
     android:background="@color/default_background"
-    android:padding="4dp">
+    android:orientation="vertical">
 
     <com.hmproductions.bingo.views.GridRecyclerView
         android:id="@+id/game_recyclerView"
@@ -38,6 +38,7 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
         android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp"
         android:visibility="visible">
 
         <TextView
@@ -51,7 +52,7 @@
             android:gravity="center"
             android:text="@string/b"
             android:textColor="@android:color/background_dark"
-            android:textSize="36sp"
+            android:textSize="38sp"
             android:textStyle="bold" />
 
         <TextView
@@ -65,7 +66,7 @@
             android:gravity="center"
             android:text="@string/i"
             android:textColor="@android:color/background_dark"
-            android:textSize="36sp"
+            android:textSize="38sp"
             android:textStyle="bold" />
 
         <TextView
@@ -79,7 +80,7 @@
             android:gravity="center"
             android:text="@string/n"
             android:textColor="@android:color/background_dark"
-            android:textSize="36sp"
+            android:textSize="38sp"
             android:textStyle="bold" />
 
         <TextView
@@ -93,7 +94,7 @@
             android:gravity="center"
             android:text="@string/g"
             android:textColor="@android:color/background_dark"
-            android:textSize="36sp"
+            android:textSize="38sp"
             android:textStyle="bold" />
 
         <TextView
@@ -107,7 +108,7 @@
             android:gravity="center"
             android:text="@string/o"
             android:textColor="@android:color/background_dark"
-            android:textSize="36sp"
+            android:textSize="38sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -119,7 +120,7 @@
         android:layout_above="@+id/quitButton"
         android:visibility="gone" />
 
-    <Button
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/nextRound_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -127,14 +128,12 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="6dp"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/green_rounded_button"
-        android:padding="6dp"
-        android:text="@string/next_round"
-        android:textColor="@android:color/background_light"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        android:backgroundTint="@android:color/holo_orange_dark"
+        app:srcCompat="@drawable/next_icon"
+        android:visibility="visible"
+        app:fabSize="auto" />
 
-    <Button
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/quitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -142,11 +141,9 @@
         android:layout_alignParentStart="true"
         android:layout_marginBottom="6dp"
         android:layout_marginStart="8dp"
-        android:background="@drawable/red_rounded_button"
-        android:padding="4dp"
-        android:text="@string/quit"
-        android:textColor="@android:color/background_light"
-        android:textSize="20sp" />
+        android:backgroundTint="@android:color/holo_red_dark"
+        app:srcCompat="@drawable/exit_icon"
+        app:fabSize="auto" />
 
     <ImageButton
         android:id="@+id/talkToSpeak_imageButton"
@@ -164,6 +161,8 @@
     <nl.dionsegijn.konfetti.KonfettiView
         android:id="@+id/konfettiView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
 
 </RelativeLayout>

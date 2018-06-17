@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,7 +56,8 @@ import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
 
 public class HomeFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<GetRoomsResponse>,
-        RoomsRecyclerAdapter.OnRoomItemClickListener {
+        RoomsRecyclerAdapter.OnRoomItemClickListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     private static final String ROOM_ID_KEY = "roomId-key";
     private static final String ROOM_NAME_KEY = "room-name-key";
@@ -67,9 +69,11 @@ public class HomeFragment extends Fragment implements
     @Inject
     SharedPreferences preferences;
 
+    SwipeRefreshLayout roomSwipeRefreshLayout;
     RecyclerView roomsRecyclerView;
     TextView noRoomsTextView;
     AlertDialog loadingDialog;
+    RoomsRecyclerAdapter.RoomViewHolder lastViewHolder = null;
 
     private ArrayList<Room> roomsArrayList = new ArrayList<>();
 
@@ -126,7 +130,7 @@ public class HomeFragment extends Fragment implements
                 } else {
                     showSnackbarWithMessage(data.getStatusMessage());
                     currentRoomId = data.getRoomId();
-                    fragmentChangeRequest.changeFragment();
+                    fragmentChangeRequest.changeFragment(getRoomNameFromId(currentRoomId), null);
                 }
             }
         }
@@ -166,13 +170,12 @@ public class HomeFragment extends Fragment implements
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
-                showSnackbarWithMessage(data.getStatusMessage());
-
                 switch (data.getStatusCodeValue()) {
 
                     case AddPlayerResponse.StatusCode.OK_VALUE:
+                        showSnackbarWithMessage(data.getStatusMessage());
                         currentRoomId = data.getRoomId();
-                        fragmentChangeRequest.changeFragment();
+                        fragmentChangeRequest.changeFragment(getRoomNameFromId(currentRoomId), lastViewHolder.itemView.findViewById(R.id.roomName_textView));
                         break;
 
                     case AddPlayerResponse.StatusCode.COLOR_TAKEN_VALUE:
@@ -181,6 +184,7 @@ public class HomeFragment extends Fragment implements
 
                     case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
                     default:
+                        showSnackbarWithMessage(data.getStatusMessage());
                         currentPlayerId = -1;
                         break;
                 }
@@ -212,6 +216,9 @@ public class HomeFragment extends Fragment implements
 
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
         ButterKnife.bind(this, customView);
+
+        roomSwipeRefreshLayout = customView.findViewById(R.id.roomRecyclerView_swipeRefreshLayout);
+        roomSwipeRefreshLayout.setOnRefreshListener(this);
 
         roomsRecyclerView = customView.findViewById(R.id.rooms_recyclerView);
         noRoomsTextView = customView.findViewById(R.id.noRoomsFound_textView);
@@ -252,26 +259,21 @@ public class HomeFragment extends Fragment implements
         countPicker.setMaxValue(MAX_PLAYERS);
         countPicker.setWrapSelectorWheel(false);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
-                .setView(hostRoomView)
-                .setNegativeButton("Cancel", (dI, i) -> dI.dismiss())
-                .setCancelable(true)
-                .setPositiveButton("Host", ((dialogInterface, i) -> {
-                    Bundle bundle = new Bundle();
-                    bundle.putString(ROOM_NAME_KEY, roomNameEditText.getText().toString());
-                    bundle.putInt(ROOM_SIZE_KEY, countPicker.getValue());
+        if (getContext() != null)
+            new AlertDialog.Builder(getContext())
+                    .setView(hostRoomView)
+                    .setNegativeButton("Cancel", (dI, i) -> dI.dismiss())
+                    .setCancelable(true)
+                    .setPositiveButton("Host", ((dialogInterface, i) -> {
+                        Bundle bundle = new Bundle();
+                        bundle.putString(ROOM_NAME_KEY, roomNameEditText.getText().toString());
+                        bundle.putInt(ROOM_SIZE_KEY, countPicker.getValue());
 
-                    preferences.edit().putString(ROOM_NAME_KEY, roomNameEditText.getText().toString()).apply();
+                        preferences.edit().putString(ROOM_NAME_KEY, roomNameEditText.getText().toString()).apply();
 
-                    getLoaderManager().restartLoader(HOST_ROOM_LOADER_ID, bundle, hostRoomLoader);
-                }));
-
-        builder.show();
-    }
-
-    @OnClick(R.id.refreshRooms_button)
-    void onRefreshButtonClick() {
-        getLoaderManager().restartLoader(GET_ROOMS_LOADER_ID, null, this);
+                        getLoaderManager().restartLoader(HOST_ROOM_LOADER_ID, bundle, hostRoomLoader);
+                    }))
+                    .show();
     }
 
     @NonNull
@@ -285,6 +287,7 @@ public class HomeFragment extends Fragment implements
     public void onLoadFinished(@NonNull Loader<GetRoomsResponse> loader, GetRoomsResponse data) {
 
         loadingDialog.dismiss();
+        roomSwipeRefreshLayout.setRefreshing(false);
 
         if (data == null)
             networkDownHandler.onNetworkDownError();
@@ -323,10 +326,12 @@ public class HomeFragment extends Fragment implements
     }
 
     @Override
-    public void onRoomClick(int position) {
+    public void onRoomClick(RoomsRecyclerAdapter.RoomViewHolder viewHolder, int position) {
 
         Bundle bundle = new Bundle();
         bundle.putInt(ROOM_ID_KEY, roomsArrayList.get(position).getRoomId());
+
+        lastViewHolder = viewHolder;
 
         getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
     }
@@ -334,5 +339,19 @@ public class HomeFragment extends Fragment implements
     private void showSnackbarWithMessage(String text) {
         if (getActivity() != null)
             Snackbar.make(getActivity().findViewById(android.R.id.content), text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Nullable
+    private String getRoomNameFromId(int id) {
+        for (Room room : roomsArrayList) {
+            if (room.getRoomId() == id)
+                return room.getName();
+        }
+        return null;
+    }
+
+    @Override
+    public void onRefresh() {
+        getLoaderManager().restartLoader(GET_ROOMS_LOADER_ID, null, this);
     }
 }
