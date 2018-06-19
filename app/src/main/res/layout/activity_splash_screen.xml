@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     android:background="@color/default_background">
 
-    <TextView
-        android:id="@+id/bingo_textView"
+    <com.hmproductions.bingo.views.BaselineGridTextView
+        android:id="@+id/toolbarName_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -22,7 +22,7 @@
         android:id="@+id/loading_textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/bingo_textView"
+        android:layout_below="@+id/toolbarName_textView"
         android:layout_marginTop="60dp"
         android:fontFamily="@font/default_bingo_font"
         android:gravity="center"

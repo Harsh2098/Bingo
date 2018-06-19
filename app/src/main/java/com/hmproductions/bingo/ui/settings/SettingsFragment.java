@@ -38,7 +38,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(GameActivity.FIRST_TIME_PLAYED_KEY, true);
                 editor.putBoolean(MainActivity.FIRST_TIME_OPENED_KEY, true);
-                editor.putBoolean(RoomFragment.FIRST_TIME_JOINED_KEY, true);// TODO : Set this preference false after displaying this
+                editor.putBoolean(RoomFragment.FIRST_TIME_JOINED_KEY, true);
                 editor.apply();
             }
         }

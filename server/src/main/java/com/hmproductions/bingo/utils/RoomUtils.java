@@ -20,7 +20,7 @@ public class RoomUtils {
         return null;
     }
 
-    static class RoomDestroyRunnable implements Runnable {
+    public static class RoomDestroyRunnable implements Runnable {
 
         @Override
         public void run() {

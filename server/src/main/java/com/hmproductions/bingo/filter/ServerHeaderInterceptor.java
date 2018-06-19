@@ -1,6 +1,7 @@
-package com.hmproductions.bingo.utils;
+package com.hmproductions.bingo.filter;
 
 import com.hmproductions.bingo.data.ConnectionData;
+import com.hmproductions.bingo.utils.RoomUtils;
 
 import io.grpc.Grpc;
 import io.grpc.Metadata;

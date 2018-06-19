@@ -13,7 +13,7 @@
         android:orientation="horizontal"
         android:theme="@style/Base.ThemeOverlay.AppCompat.Dark">
 
-        <TextView
+        <com.hmproductions.bingo.views.BaselineGridTextView
             android:id="@+id/toolbarName_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

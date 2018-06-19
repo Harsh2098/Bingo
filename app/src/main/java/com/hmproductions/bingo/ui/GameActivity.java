@@ -54,7 +54,6 @@ import com.hmproductions.bingo.loaders.QuitLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.ui.main.MainActivity;
-import com.hmproductions.bingo.ui.settings.SettingsActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.views.GridRecyclerView;
@@ -626,8 +625,9 @@ public class GameActivity extends AppCompatActivity implements
         if (preferences.getBoolean(FIRST_TIME_PLAYED_KEY, true)) {
             TapTargetView.showFor(this,
                     TapTarget
-                            .forView(findViewById(R.id.talkToSpeak_imageButton), "Mic info", "Tap this once to call out number if mic does not recognise your number in the first time")
+                            .forView(findViewById(R.id.talkToSpeak_imageButton), "How to use Mic", "Tap this once to call out number if mic does not recognise your number in the first time")
                             .targetRadius(50)
+                            .icon(getDrawable(R.drawable.mic_icon_white))
                             .cancelable(true));
 
             SharedPreferences.Editor editor = preferences.edit();
