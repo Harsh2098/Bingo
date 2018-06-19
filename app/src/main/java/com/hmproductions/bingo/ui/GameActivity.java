@@ -28,6 +28,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.common.util.NumberUtils;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
@@ -52,6 +54,7 @@ import com.hmproductions.bingo.loaders.QuitLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.ui.main.MainActivity;
+import com.hmproductions.bingo.ui.settings.SettingsActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.views.GridRecyclerView;
@@ -97,6 +100,8 @@ public class GameActivity extends AppCompatActivity implements
     public static final String WON_ID = "won-id";
     public static final String CURRENT_PLAYER_ID = "current-player-id";
     public static final String EVENT_CODE_ID = "event-code-id";
+
+    public static final String FIRST_TIME_PLAYED_KEY = "first-time-played-key";
 
     @Inject
     SharedPreferences preferences;
@@ -244,7 +249,9 @@ public class GameActivity extends AppCompatActivity implements
 
                         if (winnerId == playerId) {
                             Toast.makeText(GameActivity.this, "You won the game", Toast.LENGTH_SHORT).show();
-                            celebrationSound.start();
+
+                            if (preferences.getBoolean(getString(R.string.sound_preference_key), true))
+                                celebrationSound.start();
 
                             konfettiView.build()
                                     .addColors(Color.parseColor("#9162e4"), Color.YELLOW, Color.RED)
@@ -309,7 +316,9 @@ public class GameActivity extends AppCompatActivity implements
                         break;
 
                     case CELL_CLICKED_VALUE:
-                        popSound.start();
+
+                        if (preferences.getBoolean(getString(R.string.sound_preference_key), true))
+                            popSound.start();
 
                         for (GridCell gridCell : gameGridCellList) {
                             if (gridCell.getValue() == cellClicked) {
@@ -353,6 +362,8 @@ public class GameActivity extends AppCompatActivity implements
                             gameRecyclerView.setEnabled(false);
                         }
                         findViewById(R.id.nextRound_button).setVisibility(View.GONE);
+
+                        startMicTapTargetView();
 
                         setTurnOrderText(currentPlayerId);
                         break;
@@ -456,8 +467,8 @@ public class GameActivity extends AppCompatActivity implements
         if (mainDiagonalFormed) counter++;
 
         boolean secondaryDiagonalFormed = true;
-        for (int i=0 ; i<GRID_SIZE ; ++i) {
-            if (!gameGridCellList.get(i * GRID_SIZE + (GRID_SIZE-i-1)).getIsClicked()) {
+        for (int i = 0; i < GRID_SIZE; ++i) {
+            if (!gameGridCellList.get(i * GRID_SIZE + (GRID_SIZE - i - 1)).getIsClicked()) {
                 secondaryDiagonalFormed = false;
                 break;
             }
@@ -611,6 +622,21 @@ public class GameActivity extends AppCompatActivity implements
         turnOrderTextView.setText(turnOrder);
     }
 
+    private void startMicTapTargetView() {
+        if (preferences.getBoolean(FIRST_TIME_PLAYED_KEY, true)) {
+            TapTargetView.showFor(this,
+                    TapTarget
+                            .forView(findViewById(R.id.talkToSpeak_imageButton), "Mic info", "Tap this once to call out number if mic does not recognise your number in the first time")
+                            .targetRadius(50)
+                            .cancelable(true));
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(FIRST_TIME_PLAYED_KEY, false);
+            editor.putBoolean(getString(R.string.tutorial_preference_key), false);
+            editor.apply();
+        }
+    }
+
     private void startListening() {
         speechRecognizer.startListening(speechRecognitionIntent);
     }
@@ -659,7 +685,7 @@ public class GameActivity extends AppCompatActivity implements
 
         if (speechResult != null) {
             for (String currentWord : speechResult) {
-                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= GRID_SIZE*GRID_SIZE) {
+                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= GRID_SIZE * GRID_SIZE) {
                     onGridCellClick(Integer.parseInt(currentWord));
                     foundMatch = true;
                 }

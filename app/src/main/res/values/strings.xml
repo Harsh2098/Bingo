@@ -134,5 +134,8 @@
     <string name="quit">Quit</string>
     <string name="room_name_transition">room_name_transition</string>
     <string name="room_image">Room image</string>
+    <string name="sound_preference_key">sound key</string>
+    <string name="tutorial_preference_key">tutorial key</string>
+    <string name="number_of_players">Number of Players</string>
 
 </resources>

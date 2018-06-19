@@ -4,6 +4,22 @@
     <PreferenceCategory android:title="General">
 
         <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/sound_preference_key"
+            android:summary="Celebration and number click sounds."
+            android:title="Sound and Music"/>
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/tutorial_preference_key"
+            android:summary="Start an interactive tutorial when app launches"
+            android:title="Tutorial"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Game">
+
+        <SwitchPreference
             android:defaultValue="false"
             android:key="@string/tts_preference_key"
             android:summary="Read out numbers instead of tapping on them."

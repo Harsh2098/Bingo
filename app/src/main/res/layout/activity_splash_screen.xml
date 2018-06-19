@@ -11,10 +11,10 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:fontFamily="@font/default_bingo_font"
-        android:letterSpacing="0.04"
+        android:letterSpacing="0.05"
         android:text="@string/splash_app_name"
         android:textColor="?colorPrimary"
-        android:textSize="44sp"
+        android:textSize="54sp"
         android:textStyle="bold"
         android:transitionName="@string/bingo_app_name_transition" />
 

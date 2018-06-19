@@ -10,13 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
-import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.hmproductions.bingo.BingoActionServiceGrpc;
@@ -35,7 +29,6 @@ import io.grpc.ManagedChannel;
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.ConnectionUtils.isGooglePlayServicesAvailable;
 import static com.hmproductions.bingo.utils.Constants.INTERNET_CONNECTION_LOADER_ID;
-import static com.hmproductions.bingo.utils.Miscellaneous.convertDpToPixel;
 
 public class SplashActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<GetSessionIdResponse> {
 
@@ -58,19 +51,12 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
         loadingTextView = findViewById(R.id.loading_textView);
         bingoAppNameTextView = findViewById(R.id.bingo_textView);
 
-        /* Setting layoutParams to match the width of the screen */
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-
-        LayoutParams layoutParams = new LayoutParams(displayMetrics.widthPixels, displayMetrics.heightPixels / 2);
-        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        layoutParams.setMargins(0, (int) convertDpToPixel(this, 20), 0, 0);
-        findViewById(R.id.bingo_textView).setLayoutParams(layoutParams);
+        bingoAppNameTextView.setAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_animation));
 
         if (!isGooglePlayServicesAvailable(this)) {
             AlertDialog.Builder playServicesBuilder = new AlertDialog.Builder(this);
             playServicesBuilder
-                    .setMessage("Dalal Street requires latest version of google play services.")
+                    .setMessage("Bingo requires latest version of google play services.")
                     .setPositiveButton("Close", (dialogInterface, i) -> finish())
                     .setTitle("Update PlayServices")
                     .setCancelable(true)
@@ -81,7 +67,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
 
         bingoAppNameTextView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_animation));
 
-        new Handler().postDelayed(this::startMainActivity, 1000);
+        new Handler().postDelayed(this::startMainActivity, 750);
     }
 
     private void startMainActivity() {

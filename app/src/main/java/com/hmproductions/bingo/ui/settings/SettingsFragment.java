@@ -1,4 +1,4 @@
-package com.hmproductions.bingo.ui;
+package com.hmproductions.bingo.ui.settings;
 
 import android.Manifest;
 import android.content.SharedPreferences;
@@ -9,6 +9,9 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.hmproductions.bingo.R;
+import com.hmproductions.bingo.ui.GameActivity;
+import com.hmproductions.bingo.ui.main.MainActivity;
+import com.hmproductions.bingo.ui.main.RoomFragment;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -27,7 +30,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         Preference preference = findPreference(key);
 
         if (preference != null && preference instanceof SwitchPreference && ((SwitchPreference) preference).isChecked()) {
-            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO_RC);
+
+            if (key.equals(getString(R.string.tts_preference_key))) {
+                requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO_RC);
+            }
+            else if (key.equals(getString(R.string.tutorial_preference_key))) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(GameActivity.FIRST_TIME_PLAYED_KEY, true);
+                editor.putBoolean(MainActivity.FIRST_TIME_OPENED_KEY, true);
+                editor.putBoolean(RoomFragment.FIRST_TIME_JOINED_KEY, true);// TODO : Set this preference false after displaying this
+                editor.apply();
+            }
         }
     }
 

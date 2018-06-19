@@ -26,10 +26,21 @@
 
     </android.support.design.widget.TextInputLayout>
 
+    <TextView
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/default_bingo_font"
+        android:text="@string/number_of_players"
+        android:textColor="#666666"
+        android:textSize="16sp" />
+
     <com.hmproductions.bingo.views.ColorPicker
         android:id="@+id/count_picker"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="-4dp" />
 
 </LinearLayout>

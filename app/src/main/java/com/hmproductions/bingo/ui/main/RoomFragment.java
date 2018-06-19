@@ -58,7 +58,7 @@ import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
 
-    private static final String FIRST_TIME_JOINED = "first-time-joined";
+    public static final String FIRST_TIME_JOINED_KEY = "first-time-joined";
     public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
 
     @Inject
@@ -280,12 +280,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                         getActivity().runOnUiThread(() -> {
                             playersRecyclerAdapter.swapData(playersList);
 
-                            if (preferences.getBoolean(FIRST_TIME_JOINED, true)) {
+                            if (preferences.getBoolean(FIRST_TIME_JOINED_KEY, true)) {
                                 int position = playersRecyclerAdapter.getReadyTapTargetPosition(currentPlayerId);
                                 Log.v(CLASSIC_TAG, "position = " + position);
 //                                View readyView = (playersRecyclerView.findViewHolderForAdapterPosition(position)).itemView.findViewById(R.id.ready_cardView);
-//                                startTapTargetForView(readyView);
-                                preferences.edit().putBoolean(FIRST_TIME_JOINED, false).apply();
+//                                startTapTargetForView(readyView); TODO : Fix this tap target view
+                                preferences.edit().putBoolean(FIRST_TIME_JOINED_KEY, false).apply();
                             }
 
                             String text = playersList.size() + " / " + maxCount;

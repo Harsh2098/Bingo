@@ -1,4 +1,4 @@
-package com.hmproductions.bingo.ui;
+package com.hmproductions.bingo.ui.settings;
 
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;

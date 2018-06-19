@@ -28,7 +28,7 @@ import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.ui.GameActivity;
-import com.hmproductions.bingo.ui.SettingsActivity;
+import com.hmproductions.bingo.ui.settings.SettingsActivity;
 import com.hmproductions.bingo.ui.SplashActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements
         HomeFragment.GetDetails {
 
     public static final String PLAYER_LEFT_ID = "player-left-id";
-    private static final String FIRST_TIME_KEY = "first-time-key";
+    public static final String FIRST_TIME_OPENED_KEY = "first-time-key";
 
     private static final String PLAYER_NAME_KEY = "player-name-key";
     private static final String PLAYER_COLOR_KEY = "player-color-key";
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements
         currentPlayerId = currentRoomId = -1;
 
         startTapTargetView();
-        preferences.edit().putBoolean(FIRST_TIME_KEY, false).apply();
+        preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
     }
 
     private void setupColorPicker() {
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void startTapTargetView() {
 
-        if (preferences.getBoolean(FIRST_TIME_KEY, true)) {
+        if (preferences.getBoolean(FIRST_TIME_OPENED_KEY, true)) {
             new Handler().postDelayed(() ->
                             TapTargetView.showFor(MainActivity.this, TapTarget
                                             .forToolbarMenuItem(mainToolbar, R.id.settings_action, "Speech to Text", "Call numbers instead of tapping on them")
