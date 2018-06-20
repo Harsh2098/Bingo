@@ -61,7 +61,7 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
             holder.roomIconTextView.setBackgroundResource(R.drawable.cell_circle_foreground);
             GradientDrawable backgroundDrawable = (GradientDrawable) holder.roomIconTextView.getBackground();
 
-            String randomColor = "#" + generateColor();
+            String randomColor = "#EEEEEE"; // + generateColor();
             backgroundDrawable.setColor(Color.parseColor(randomColor));
         }
     }

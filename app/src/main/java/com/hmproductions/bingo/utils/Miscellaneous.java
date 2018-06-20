@@ -101,9 +101,9 @@ public class Miscellaneous {
     }
 
     public static String generateColor() {
+        String randomStringGenerationString = "0123456789abcdef";
         StringBuilder stringBuilder = new StringBuilder("");
         for (int i = 0; i < 6; i++) {
-            String randomStringGenerationString = "0123456789abcdef";
             stringBuilder.append(randomStringGenerationString.charAt(new Random().nextInt(randomStringGenerationString.length())));
         }
         return stringBuilder.toString();

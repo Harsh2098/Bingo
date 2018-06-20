@@ -150,6 +150,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
                     com.hmproductions.bingo.models.Player currentPlayer = request.getPlayer();
 
+                    // Checks if the color is already taken
                     if (!colorAlreadyTaken(currentRoom.getRoomId(), currentPlayer.getColor())) {
 
                         currentRoom.getPlayersList().add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
@@ -181,6 +182,9 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                                 .setStatusMessage("Internal server error").setRoomId(-1).build();
             }
 
+            /*  If player was not added successfully, remove it from connection data list. This is the only way as of now. Connection data is added when filter detects
+                AddPlayer method was called from action service                                                                                                      */
+
             if (addPlayerResponse.getStatusCode() != AddPlayerResponse.StatusCode.OK) {
                 removeConnectionData(connectionDataList, request.getPlayer().getId());
             }
@@ -199,11 +203,13 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         Room currentRoom = getRoomFromId(request.getRoomId());
 
+        // Check if room exists
         if (currentRoom != null) {
 
             boolean found = false;
             Player removePlayer = null;
 
+            // Check if player exists in the room
             for (Player player : currentRoom.getPlayersList()) {
                 if (request.getPlayer().getId() == player.getId()) {
                     removePlayer = player;
@@ -212,6 +218,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 }
             }
 
+            // If found: 1. Remove player from player list   2. Reduce room count   3. If room count is 0 destroy room
             if (found) {
                 currentRoom.getPlayersList().remove(removePlayer);
 
@@ -246,6 +253,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         Room currentRoom = getRoomFromId(request.getRoomId());
 
+        // Check if room exists
         if (currentRoom != null) {
 
             boolean found = false;
@@ -253,17 +261,17 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 if (player.getId() == request.getPlayerId()) {
                     player.setReady(request.getIsReady());
                     found = true;
-
-                    // Server logs
-                    System.out.println(request.getPlayerId() + " id set to " + player.isReady());
-
-                    sendRoomEventUpdate(request.getRoomId());
-
                     break;
                 }
             }
 
+            // If found send room update
             if (found) {
+                // Server logs
+                System.out.println(request.getPlayerId() + " id set to " + request.getIsReady());
+
+                sendRoomEventUpdate(request.getRoomId());
+
                 responseObserver.onNext(
                         SetPlayerReadyResponse.newBuilder().setStatusCode(SetPlayerReadyResponse.StatusCode.OK).setIsReady(request.getIsReady())
                                 .setStatusMessage("Player set to " + request.getIsReady()).setPlayerId(request.getPlayerId()).build());
@@ -301,6 +309,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 }
             }
 
+            // If found, remove subscription with player ID equal to player id sent in the request
             if (found) {
                 currentRoom.getRoomEventSubscriptionArrayList().remove(removalSubscription);
                 unsubscribeResponse = UnsubscribeResponse.newBuilder().setStatusCode(UnsubscribeResponse.StatusCode.OK)
@@ -323,6 +332,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         Room currentRoom = getRoomFromId(request.getRoomId());
 
+        // Checks if the room exists
         if (currentRoom != null) {
 
             if (request.getCellClicked() == -1) {
@@ -339,8 +349,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
             System.out.print("Cell clicked = " + request.getCellClicked() + "\n");
 
+            // Change current player
             currentRoom.changeCurrentPlayer();  // currentPlayer = (currentPlayer + 1) % count
 
+            // Sets current player ID, winner ID to -1 and cell number clicked
             for (GameEventSubscription currentSubscription : currentRoom.getGameEventSubscriptionArrayList()) {
 
                 GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
@@ -365,6 +377,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         Room currentRoom = getRoomFromId(request.getRoomId());
 
+        // Checks if the room exists
         if (currentRoom != null) {
             com.hmproductions.bingo.models.Player player = request.getPlayer();
 
@@ -378,6 +391,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 currentPlayer.setReady(false);
             }
 
+            // Streams winner ID to all room players
             for (GameEventSubscription currentSubscription : currentRoom.getGameEventSubscriptionArrayList()) {
 
                 GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)

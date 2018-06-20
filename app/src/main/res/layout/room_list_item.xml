@@ -16,8 +16,7 @@
         android:fontFamily="@font/default_bingo_font"
         android:gravity="center"
         android:padding="6dp"
-        android:text="M"
-        android:textColor="@android:color/background_light"
+        android:textColor="@android:color/background_dark"
         android:textSize="24sp" />
 
     <TextView
