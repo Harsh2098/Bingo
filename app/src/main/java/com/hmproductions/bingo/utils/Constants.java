@@ -12,7 +12,7 @@ public class Constants {
     public static final int MAX_PLAYERS = 4;
 
     public static final int SERVER_PORT = 8080;
-    public static final String SERVER_ADDRESS = "192.168.0.160";
+    public static final String SERVER_ADDRESS = "192.168.0.182";
 
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;

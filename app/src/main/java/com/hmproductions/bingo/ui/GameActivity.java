@@ -190,7 +190,7 @@ public class GameActivity extends AppCompatActivity implements
         public Loader<QuitPlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
             return new QuitLoader(GameActivity.this, actionServiceBlockingStub,
                     com.hmproductions.bingo.models.Player.newBuilder().setColor(getColorFromId(playersList, playerId))
-                            .setId(playerId).setReady(true).setName(getNameFromId(playersList, playerId)).build(), roomId);
+                            .setId(playerId).setReady(true).setName(getNameFromId(playersList, playerId)).setWinCount(0).build(), roomId);
         }
 
         @Override
