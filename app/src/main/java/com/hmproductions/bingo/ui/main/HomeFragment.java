@@ -126,7 +126,7 @@ public class HomeFragment extends Fragment implements
                     Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
 
                     if (getView() != null)
-                        getView().findViewById(R.id.host_button).callOnClick();
+                        getView().findViewById(R.id.host_fab).callOnClick();
                 } else {
                     showSnackbarWithMessage(data.getStatusMessage());
                     currentRoomId = data.getRoomId();
@@ -240,7 +240,8 @@ public class HomeFragment extends Fragment implements
         return customView;
     }
 
-    @OnClick(R.id.host_button)
+    // TODO (3) : Fix fab and snackbar overlap
+    @OnClick(R.id.host_fab)
     void onHostButtonClick() {
         View hostRoomView = LayoutInflater.from(getContext()).inflate(R.layout.host_room_view, null);
         EditText roomNameEditText = hostRoomView.findViewById(R.id.roomName_editText);
@@ -310,7 +311,7 @@ public class HomeFragment extends Fragment implements
 
                     if (getActivity() != null && getView() != null && getArguments() != null && getArguments().getBoolean(SplashActivity.SHOW_SNACKBAR_KEY))
                         Snackbar.make(getActivity().findViewById(android.R.id.content), data.getStatusMessage(), Snackbar.LENGTH_LONG)
-                                .setAction(R.string.host, (v) -> getView().findViewById(R.id.host_button).callOnClick()).show();
+                                .setAction(R.string.host, (v) -> getView().findViewById(R.id.host_fab).callOnClick()).show();
                     break;
 
                 default:

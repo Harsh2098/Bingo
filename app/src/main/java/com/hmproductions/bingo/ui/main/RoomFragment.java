@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -283,9 +284,11 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                             if (preferences.getBoolean(FIRST_TIME_JOINED_KEY, true)) {
                                 int position = playersRecyclerAdapter.getReadyTapTargetPosition(currentPlayerId);
                                 Log.v(CLASSIC_TAG, "position = " + position);
-//                                View readyView = (playersRecyclerView.findViewHolderForAdapterPosition(position)).itemView.findViewById(R.id.ready_cardView);
-//                                startTapTargetForView(readyView); TODO : Fix this tap target view
-                                preferences.edit().putBoolean(FIRST_TIME_JOINED_KEY, false).apply();
+                                new Handler().postDelayed(() -> {
+                                    View readyView = (playersRecyclerView.findViewHolderForLayoutPosition(position)).itemView.findViewById(R.id.ready_cardView);
+                                    startTapTargetForView(readyView);
+                                    preferences.edit().putBoolean(FIRST_TIME_JOINED_KEY, false).apply();
+                                }, 750);
                             }
 
                             String text = playersList.size() + " / " + maxCount;
@@ -330,7 +333,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         if (getActivity() != null) {
             TapTargetView.showFor(getActivity(), TapTarget.forView(view, "Are you ready ?", "Tap here to mark ready")
-                            .targetRadius(50).cancelable(true).drawShadow(true),
+                            .targetRadius(100).cancelable(true).icon(getActivity().getDrawable(R.drawable.ready_icon)).drawShadow(true),
                     new TapTargetView.Listener() {
                         @Override
                         public void onTargetClick(TapTargetView view) {
