@@ -10,7 +10,6 @@
         android:id="@+id/roomName_textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/default_bingo_font"
         android:paddingEnd="20dp"
         android:paddingStart="20dp"
         android:textAllCaps="true"
@@ -48,7 +47,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:fontFamily="@font/default_bingo_font"
             android:gravity="center"
             android:text="@string/leave"
             android:textSize="20sp" />
@@ -59,7 +57,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_weight="4"
-            android:fontFamily="@font/default_bingo_font"
             android:gravity="end"
             android:textColor="@android:color/background_dark"
             android:textSize="20sp"

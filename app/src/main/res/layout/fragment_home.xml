@@ -43,7 +43,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:fontFamily="@font/default_bingo_font"
         android:text="@string/no_rooms_found"
         android:textSize="18sp"
         android:visibility="gone" />

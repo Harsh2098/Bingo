@@ -17,7 +17,6 @@
             android:id="@+id/roomName_editText"
             android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/default_bingo_font"
             android:inputType="text"
             android:maxLength="16"
             android:maxLines="1"
@@ -31,7 +30,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/default_bingo_font"
         android:text="@string/number_of_players"
         android:textColor="#666666"
         android:textSize="16sp" />

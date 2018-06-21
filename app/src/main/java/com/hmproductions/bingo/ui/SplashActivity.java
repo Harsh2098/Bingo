@@ -39,7 +39,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
     @Inject
     ManagedChannel channel;
 
-    private TextView loadingTextView, bingoAppNameTextView;
+    private TextView loadingTextView;
 
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
 
@@ -51,7 +51,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
 
         loadingTextView = findViewById(R.id.loading_textView);
-        bingoAppNameTextView = findViewById(R.id.toolbarName_textView);
+        TextView bingoAppNameTextView = findViewById(R.id.toolbarName_textView);
 
         bingoAppNameTextView.setAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_animation));
 

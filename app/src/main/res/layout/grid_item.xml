@@ -10,7 +10,6 @@
         android:layout_height="match_parent"
         android:layout_margin="4dp"
         android:background="@drawable/cell_circle_foreground"
-        android:fontFamily="@font/default_bingo_font"
         android:gravity="center"
         android:padding="6dp"
         android:text="24"
