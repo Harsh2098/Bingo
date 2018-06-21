@@ -75,8 +75,8 @@ public class TerminationFilter extends ServerTransportFilter {
                             }
                         });
 
-                /* This is a very hacky way to check if user has abruply left the game. Since we call QuitPlayer from transport
-                terminated method we need to check if this method is called from filter. This is done by settings winCount to -101*/
+                /*  This is a very hacky way to check if user has abruply left the game. Since we call QuitPlayer here we need to tell
+                    that the player has abruptly left and don't stream update to this player. This is done by setting winCount to -101  */
                 bingoActionService.quitPlayer(QuitPlayerRequest.newBuilder().setRoomId(roomId)
                                 .setPlayer(Player.newBuilder().setWinCount(-101).setId(playerId).setReady(true).build()).build(),
                         new StreamObserver<QuitPlayerResponse>() {

@@ -3,8 +3,10 @@ package com.hmproductions.bingo.ui.main;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -69,6 +71,7 @@ public class HomeFragment extends Fragment implements
     @Inject
     SharedPreferences preferences;
 
+    FloatingActionButton hostFab;
     SwipeRefreshLayout roomSwipeRefreshLayout;
     RecyclerView roomsRecyclerView;
     TextView noRoomsTextView;
@@ -125,8 +128,7 @@ public class HomeFragment extends Fragment implements
                 } else if (data.getStatusCode() == HostRoomResponse.StatusCode.NAME_TAKEN) {
                     Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
 
-                    if (getView() != null)
-                        getView().findViewById(R.id.host_fab).callOnClick();
+                    hostFab.callOnClick();
                 } else {
                     showSnackbarWithMessage(data.getStatusMessage());
                     currentRoomId = data.getRoomId();
@@ -217,6 +219,7 @@ public class HomeFragment extends Fragment implements
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
         ButterKnife.bind(this, customView);
 
+        hostFab = customView.findViewById(R.id.host_fab);
         roomSwipeRefreshLayout = customView.findViewById(R.id.roomRecyclerView_swipeRefreshLayout);
         roomSwipeRefreshLayout.setOnRefreshListener(this);
 
@@ -240,7 +243,6 @@ public class HomeFragment extends Fragment implements
         return customView;
     }
 
-    // TODO (3) : Fix fab and snackbar overlap
     @OnClick(R.id.host_fab)
     void onHostButtonClick() {
         View hostRoomView = LayoutInflater.from(getContext()).inflate(R.layout.host_room_view, null);
@@ -309,9 +311,11 @@ public class HomeFragment extends Fragment implements
                     noRoomsTextView.setVisibility(View.VISIBLE);
                     roomsRecyclerView.setVisibility(View.GONE);
 
-                    if (getActivity() != null && getView() != null && getArguments() != null && getArguments().getBoolean(SplashActivity.SHOW_SNACKBAR_KEY))
+                    if (getActivity() != null && getView() != null && getArguments() != null && getArguments().getBoolean(SplashActivity.SHOW_SNACKBAR_KEY)) {
                         Snackbar.make(getActivity().findViewById(android.R.id.content), data.getStatusMessage(), Snackbar.LENGTH_LONG)
-                                .setAction(R.string.host, (v) -> getView().findViewById(R.id.host_fab).callOnClick()).show();
+                                .setAction(R.string.host, (v) -> hostFab.callOnClick()).show();
+                        hideSnackbarForSometime(Snackbar.LENGTH_LONG);
+                    }
                     break;
 
                 default:
@@ -340,6 +344,12 @@ public class HomeFragment extends Fragment implements
     private void showSnackbarWithMessage(String text) {
         if (getActivity() != null)
             Snackbar.make(getActivity().findViewById(android.R.id.content), text, Snackbar.LENGTH_SHORT).show();
+        hideSnackbarForSometime(Snackbar.LENGTH_SHORT);
+    }
+
+    private void hideSnackbarForSometime(int length) {
+        hostFab.setVisibility(View.GONE);
+        new Handler().postDelayed(() -> hostFab.setVisibility(View.VISIBLE), length == Snackbar.LENGTH_LONG ? 3500 : 2000);
     }
 
     @Nullable

@@ -7,14 +7,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +53,6 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
 
@@ -126,7 +123,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
-                showSnackbarWithMessage(data.getStatusMessage());
 
                 if (data.getStatusCode() == RemovePlayerResponse.StatusCode.OK) {
                     currentPlayerId = currentRoomId = -1;
@@ -210,7 +206,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         countTextView = customView.findViewById(R.id.count_textView);
 
         if (getArguments() != null) {
-            Log.v(CLASSIC_TAG, getArguments().getString(ROOM_NAME_BUNDLE_KEY));
             ((TextView)customView.findViewById(R.id.roomName_textView)).setText(getArguments().getString(ROOM_NAME_BUNDLE_KEY));
         }
 
@@ -283,7 +278,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
                             if (preferences.getBoolean(FIRST_TIME_JOINED_KEY, true)) {
                                 int position = playersRecyclerAdapter.getReadyTapTargetPosition(currentPlayerId);
-                                Log.v(CLASSIC_TAG, "position = " + position);
                                 new Handler().postDelayed(() -> {
                                     View readyView = (playersRecyclerView.findViewHolderForLayoutPosition(position)).itemView.findViewById(R.id.ready_cardView);
                                     startTapTargetForView(readyView);
@@ -322,11 +316,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
             }
         });
-    }
-
-    private void showSnackbarWithMessage(String text) {
-        if (getActivity() != null)
-            Snackbar.make(getActivity().findViewById(android.R.id.content), text, Snackbar.LENGTH_SHORT).show();
     }
 
     private void startTapTargetForView(View view) {

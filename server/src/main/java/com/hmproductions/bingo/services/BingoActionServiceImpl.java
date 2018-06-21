@@ -426,7 +426,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                         .setWinnerId(player.getId()).setCellClicked(-2).build();
 
                 /* This is a very hacky way to check if user has abruply left the game. Since we call QuitPlayer from transport
-                terminated method we need to check if this method is called from filter. This is done by settings winCount to -101*/
+                terminated method we need to check if this method is called from filter. This is done by setting winCount to -101*/
 
                 if (!(player.getId() == currentSubscription.getGameSubscription().getPlayerId() && player.getWinCount() == -101))
                     streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
