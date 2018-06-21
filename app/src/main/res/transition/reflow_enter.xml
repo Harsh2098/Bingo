@@ -3,9 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:transitionOrdering="together">
     <transitionSet android:interpolator="@android:interpolator/fast_out_slow_in">
-        <targets>
-            <target android:targetId="@+id/toolbarName_textView" />
-        </targets>
         <transition
             class="com.hmproductions.bingo.views.ReflowText"
             app:maxDuration="3000"

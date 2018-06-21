@@ -3,16 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:transitionOrdering="together">
     <transitionSet android:interpolator="@android:interpolator/fast_out_slow_in">
-        <targets>
-            <target android:targetId="@+id/toolbarName_textView" />
-        </targets>
         <transition
             class="com.hmproductions.bingo.views.ReflowText"
-            app:velocity="1000dp"
-            app:minDuration="230"
+            app:freezeFrame="true"
             app:maxDuration="230"
+            app:minDuration="230"
             app:staggerDelay="10"
-            app:freezeFrame="true">
+            app:velocity="1000dp">
             <arcMotion
                 android:maximumAngle="90"
                 android:minimumHorizontalAngle="90"

@@ -449,7 +449,7 @@ public class ReflowText extends Transition {
         paint.setLetterSpacing(data.letterSpacing);
         if (data.fontResId != 0) {
             try {
-                Typeface font = ResourcesCompat.getFont(context, data.fontResId);
+                Typeface font = ResourcesCompat.getFont(context, R.font.default_bingo_font);
                 if (font != null) {
                     paint.setTypeface(font);
                 }
@@ -873,7 +873,7 @@ public class ReflowText extends Transition {
 
         @Override
         public int getFontResId() {
-            return textView.getFontResId();
+            return R.font.default_bingo_font;
         }
 
         @Override

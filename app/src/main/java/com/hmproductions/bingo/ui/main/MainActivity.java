@@ -121,12 +121,12 @@ public class MainActivity extends AppCompatActivity implements
         setEnterSharedElementCallback(new SharedElementCallback() {
             @Override
             public void onSharedElementStart(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
-                ReflowText.setupReflow(getIntent(), mainToolbar.findViewById(R.id.toolbarName_textView));
+                ReflowText.setupReflow(getIntent(), findViewById(R.id.toolbarName_textView));
             }
 
             @Override
             public void onSharedElementEnd(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
-                ReflowText.setupReflow(new ReflowText.ReflowableTextView(mainToolbar.findViewById(R.id.toolbarName_textView)));
+                ReflowText.setupReflow(new ReflowText.ReflowableTextView(findViewById(R.id.toolbarName_textView)));
             }
         });
     }
