@@ -260,6 +260,7 @@ public class HomeFragment extends Fragment implements
         ColorPicker countPicker = hostRoomView.findViewById(R.id.count_picker);
         countPicker.setMinValue(MIN_PLAYERS);
         countPicker.setMaxValue(MAX_PLAYERS);
+        countPicker.setValue(preferences.getInt(ROOM_SIZE_KEY, MIN_PLAYERS + 1));
         countPicker.setWrapSelectorWheel(false);
 
         if (getContext() != null)
@@ -273,6 +274,7 @@ public class HomeFragment extends Fragment implements
                         bundle.putInt(ROOM_SIZE_KEY, countPicker.getValue());
 
                         preferences.edit().putString(ROOM_NAME_KEY, roomNameEditText.getText().toString()).apply();
+                        preferences.edit().putInt(ROOM_SIZE_KEY, countPicker.getValue()).apply();
 
                         getLoaderManager().restartLoader(HOST_ROOM_LOADER_ID, bundle, hostRoomLoader);
                     }))

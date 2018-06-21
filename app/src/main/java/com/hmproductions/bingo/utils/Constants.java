@@ -8,11 +8,12 @@ public class Constants {
     public static final double SCALING_FACTOR = 0.95;
     public static final int LEADERBOARD_COL_SPAN = 2;
 
+    // TODO (Release) : Change min players
     public static final int MIN_PLAYERS = 1;
     public static final int MAX_PLAYERS = 4;
 
     public static final int SERVER_PORT = 8080;
-    public static final String SERVER_ADDRESS = "192.168.0.160";
+    public static final String SERVER_ADDRESS = "116.88.119.133"; // Last known public IP - 116.88.119.133
 
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;
