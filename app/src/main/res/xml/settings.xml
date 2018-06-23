@@ -10,7 +10,7 @@
             android:title="Sound and Music"/>
 
         <SwitchPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="@string/tutorial_preference_key"
             android:summary="Start an interactive tutorial when app launches"
             android:title="Tutorial"/>

@@ -185,6 +185,9 @@ public class HomeFragment extends Fragment implements
                         Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
                         break;
 
+                    case AddPlayerResponse.StatusCode.SERVER_ERROR_VALUE:
+                        break;
+
                     case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
                     default:
                         showSnackbarWithMessage(data.getStatusMessage());

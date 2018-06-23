@@ -16,8 +16,6 @@ import com.hmproductions.bingo.data.Room;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.hmproductions.bingo.utils.Miscellaneous.generateColor;
-
 public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdapter.RoomViewHolder> {
 
     private static final int HEADER_TYPE = -435;

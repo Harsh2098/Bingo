@@ -5,6 +5,8 @@
     <color name="bingo_primary">#FFFFFF</color>
     <color name="default_background">#FFE7FF</color>
 
+    <color name="grid_cell_background">#FFFFFF</color>
+
     <color name="player_ready">#99CC00</color>
     <color name="player_not_ready">#CC0000</color>
 

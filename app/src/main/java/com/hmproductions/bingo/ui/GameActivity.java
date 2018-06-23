@@ -76,6 +76,7 @@ import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_PLAYED_KEY;
+import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_WON_KEY;
 import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
 import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_LOADER_ID;
@@ -245,6 +246,11 @@ public class GameActivity extends AppCompatActivity implements
 
                     case GAME_WON_VALUE:
 
+                        /*  1. Celebrations begin if player has won
+                            2. Sets up leader board recycler view nad hides BINGO linear layout
+                            3. Sets turn order text to winner names
+                         */
+
                         if (winnerId == playerId) {
                             Toast.makeText(GameActivity.this, "You won the game", Toast.LENGTH_SHORT).show();
 
@@ -271,6 +277,7 @@ public class GameActivity extends AppCompatActivity implements
                         bingoLinearLayout.setVisibility(View.GONE);
                         leaderBoardRecyclerView.setVisibility(View.VISIBLE);
                         findViewById(R.id.nextRound_button).setVisibility(View.VISIBLE);
+                        startNextRoundButtonTapTargetView();
 
                         leaderBoardRecyclerView.setLayoutManager(new GridLayoutManager(GameActivity.this, LEADERBOARD_COL_SPAN));
                         leaderBoardRecyclerView.setAdapter(new LeaderboardRecyclerAdapter(
@@ -632,6 +639,28 @@ public class GameActivity extends AppCompatActivity implements
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean(FIRST_TIME_PLAYED_KEY, false);
             editor.putBoolean(getString(R.string.tutorial_preference_key), false);
+            editor.apply();
+        }
+    }
+
+    private void startNextRoundButtonTapTargetView() {
+        if (preferences.getBoolean(FIRST_TIME_WON_KEY, true)) {
+            TapTargetView.showFor(this,
+                    TapTarget
+                            .forView(findViewById(R.id.nextRound_button), "Next Round", "Tap to mark yourself ready and start next round")
+                            .targetRadius(40)
+                            .icon(getDrawable(R.drawable.next_icon))
+                            .cancelable(true),
+                    new TapTargetView.Listener() {
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);
+                            onNextRoundButtonClick();
+                        }
+                    });
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(FIRST_TIME_WON_KEY, false);
             editor.apply();
         }
     }

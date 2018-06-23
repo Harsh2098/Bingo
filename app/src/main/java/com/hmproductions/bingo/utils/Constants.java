@@ -12,6 +12,7 @@ public class Constants {
     public static final String FIRST_TIME_OPENED_KEY = "first-time-key";
     public static final String FIRST_TIME_PLAYED_KEY = "first-time-played-key";
     public static final String FIRST_TIME_JOINED_KEY = "first-time-joined";
+    public static final String FIRST_TIME_WON_KEY = "first-time-won-key";
 
     // TODO (Release) : Change min players
     public static final int MIN_PLAYERS = 1;

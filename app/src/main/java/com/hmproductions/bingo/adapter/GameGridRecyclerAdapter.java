@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -85,6 +86,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
 
             backgroundDrawable.setStroke(8,
                     Color.parseColor(context.getResources().getStringArray(R.array.colorsHex)[colorPosition]));
+            backgroundDrawable.setColor(ContextCompat.getColor(context, R.color.grid_cell_background));
 
         } else {
 
