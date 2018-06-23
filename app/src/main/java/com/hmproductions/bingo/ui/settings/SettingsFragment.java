@@ -9,9 +9,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.hmproductions.bingo.R;
-import com.hmproductions.bingo.ui.GameActivity;
-import com.hmproductions.bingo.ui.main.MainActivity;
-import com.hmproductions.bingo.ui.main.RoomFragment;
+import com.hmproductions.bingo.utils.Constants;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -36,9 +34,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
             else if (key.equals(getString(R.string.tutorial_preference_key))) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(GameActivity.FIRST_TIME_PLAYED_KEY, true);
-                editor.putBoolean(MainActivity.FIRST_TIME_OPENED_KEY, true);
-                editor.putBoolean(RoomFragment.FIRST_TIME_JOINED_KEY, true);
+                editor.putBoolean(Constants.FIRST_TIME_PLAYED_KEY, true);
+                editor.putBoolean(Constants.FIRST_TIME_OPENED_KEY, true);
+                editor.putBoolean(Constants.FIRST_TIME_JOINED_KEY, true);
                 editor.apply();
             }
         }

@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/help_action"
+        android:icon="@drawable/help_icon"
+        app:showAsAction="ifRoom"
+        android:title="@string/help"/>
+
+    <item
         android:id="@+id/settings_action"
         android:icon="@drawable/settings_icon_black"
         app:showAsAction="ifRoom"

@@ -161,7 +161,8 @@ public class HomeFragment extends Fragment implements
                         new Player(rawPlayer.getName(), rawPlayer.getColor(), currentPlayerId, false));
             }
 
-            return null;
+            return new AddPlayerLoader(getContext(), actionServiceBlockingStub, -1,
+                    new Player("", "", -1, false));
         }
 
         @Override
@@ -299,7 +300,7 @@ public class HomeFragment extends Fragment implements
         else {
             switch (data.getStatusCode()) {
                 case OK:
-                    noRoomsTextView.setVisibility(View.GONE);
+                    noRoomsTextView.setVisibility(View.INVISIBLE);
                     roomsRecyclerView.setVisibility(View.VISIBLE);
 
                     roomsArrayList.clear();
@@ -311,7 +312,7 @@ public class HomeFragment extends Fragment implements
 
                 case NO_ROOMS:
                     noRoomsTextView.setVisibility(View.VISIBLE);
-                    roomsRecyclerView.setVisibility(View.GONE);
+                    roomsRecyclerView.setVisibility(View.INVISIBLE);
 
                     if (getActivity() != null && getView() != null && getArguments() != null && getArguments().getBoolean(SplashActivity.SHOW_SNACKBAR_KEY)) {
                         Snackbar.make(getActivity().findViewById(android.R.id.content), data.getStatusMessage(), Snackbar.LENGTH_LONG)

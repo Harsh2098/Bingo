@@ -53,10 +53,10 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
+import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
 
-    public static final String FIRST_TIME_JOINED_KEY = "first-time-joined";
     public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
 
     @Inject

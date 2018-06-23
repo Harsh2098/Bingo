@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="96dp"
+    android:viewportHeight="72"
+    android:viewportWidth="24">
+
+    <group
+        android:name="groupPlayPause"
+        android:pivotX="48"
+        android:pivotY="48">
+
+        <path
+            android:name="play"
+            android:pathData="
+            M2,2 L12,22 L22,2
+            M2,22 L12,42 L22,22
+            M2,42 L12,64 L22,42"
+            android:strokeWidth="4"
+            android:strokeLineCap="round"
+            android:strokeColor="@android:color/background_light"/>
+
+    </group>
+
+</vector>

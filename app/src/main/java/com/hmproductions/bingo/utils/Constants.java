@@ -8,6 +8,11 @@ public class Constants {
     public static final double SCALING_FACTOR = 0.95;
     public static final int LEADERBOARD_COL_SPAN = 2;
 
+    // First time keys
+    public static final String FIRST_TIME_OPENED_KEY = "first-time-key";
+    public static final String FIRST_TIME_PLAYED_KEY = "first-time-played-key";
+    public static final String FIRST_TIME_JOINED_KEY = "first-time-joined";
+
     // TODO (Release) : Change min players
     public static final int MIN_PLAYERS = 1;
     public static final int MAX_PLAYERS = 4;

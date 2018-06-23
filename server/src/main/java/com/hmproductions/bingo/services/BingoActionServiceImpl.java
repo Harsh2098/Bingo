@@ -136,6 +136,13 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         AddPlayerResponse addPlayerResponse;
         Room currentRoom = getRoomFromId(request.getRoomId());
 
+        if (request.getPlayer().getId() == -1 && request.getRoomId() == -1) {
+            responseObserver.onNext(AddPlayerResponse.newBuilder().setStatusMessage("Please enter the name")
+                    .setStatusCode(AddPlayerResponse.StatusCode.SERVER_ERROR).setRoomId(-1).build());
+            responseObserver.onCompleted();
+            return;
+        }
+
         if (currentRoom != null) {
             // Room is not full
             if (currentRoom.getCount() >= currentRoom.getMaxSize()) {

@@ -45,6 +45,6 @@
         android:layout_gravity="center"
         android:text="@string/no_rooms_found"
         android:textSize="18sp"
-        android:visibility="gone" />
+        android:visibility="invisible" />
 
 </FrameLayout>

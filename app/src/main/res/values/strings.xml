@@ -137,5 +137,7 @@
     <string name="sound_preference_key">sound key</string>
     <string name="tutorial_preference_key">tutorial key</string>
     <string name="number_of_players">Number of Players</string>
+    <string name="help">Help</string>
+    <string name="help_content">Objective:-\nComplete 5 straight lines. A line can either be any row, column or diagonal.</string>
 
 </resources>

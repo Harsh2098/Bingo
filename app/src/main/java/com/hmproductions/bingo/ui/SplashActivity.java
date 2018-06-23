@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.ui;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -40,6 +41,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
     ManagedChannel channel;
 
     private TextView loadingTextView;
+    private MediaPlayer flybySound;
 
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
 
@@ -53,7 +55,11 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
         loadingTextView = findViewById(R.id.loading_textView);
         TextView bingoAppNameTextView = findViewById(R.id.toolbarName_textView);
 
+        flybySound = MediaPlayer.create(this, R.raw.flyby);
+        flybySound.setVolume(0.8f, 0.8f);
+
         bingoAppNameTextView.setAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_animation));
+        flybySound.start();
 
         if (!isGooglePlayServicesAvailable(this)) {
             AlertDialog.Builder playServicesBuilder = new AlertDialog.Builder(this);
@@ -122,5 +128,11 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoaderReset(@NonNull Loader<GetSessionIdResponse> loader) {
         // Do nothing
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        flybySound.stop();
     }
 }

@@ -75,6 +75,7 @@ import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_STARTED_VA
 import static com.hmproductions.bingo.models.GameEvent.EventCode.GAME_WON_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.NEXT_ROUND_VALUE;
 import static com.hmproductions.bingo.models.GameEvent.EventCode.PLAYER_QUIT_VALUE;
+import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_PLAYED_KEY;
 import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
 import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_LOADER_ID;
@@ -99,8 +100,6 @@ public class GameActivity extends AppCompatActivity implements
     public static final String WON_ID = "won-id";
     public static final String CURRENT_PLAYER_ID = "current-player-id";
     public static final String EVENT_CODE_ID = "event-code-id";
-
-    public static final String FIRST_TIME_PLAYED_KEY = "first-time-played-key";
 
     @Inject
     SharedPreferences preferences;
