@@ -6,8 +6,16 @@ option java_multiple_files = true;
 import "models/Player.proto";
 
 message Room {
+
+    enum TimeLimit {
+        SECONDS_3 = 0;
+        SECONDS_10 = 1;
+        INFINITE = 2;
+    }
+
     uint32 room_id = 1;
     string room_name = 2;
     uint32 count = 3;
     uint32 max_size = 4;
+    TimeLimit time_limit = 5;
 }

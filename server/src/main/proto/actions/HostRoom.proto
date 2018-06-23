@@ -4,12 +4,20 @@ package com.hmproductions.bingo.actions;
 option java_multiple_files = true;
 
 message HostRoomRequest {
+
+    enum TimeLimit {
+        SECONDS_3 = 0;
+        SECONDS_10 = 1;
+        INFINITE = 2;
+    }
+
     string room_name = 1;
     uint32 max_size = 2;
+    TimeLimit time_limit = 3;
 
-    uint32 player_id = 3;
-    string player_name = 4;
-    string player_color = 5;
+    uint32 player_id = 4;
+    string player_name = 5;
+    string player_color = 6;
 }
 
 message HostRoomResponse {

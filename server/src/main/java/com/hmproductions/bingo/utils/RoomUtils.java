@@ -2,6 +2,7 @@ package com.hmproductions.bingo.utils;
 
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.data.Room;
+import com.hmproductions.bingo.data.Room.TIME_LIMIT;
 
 import java.util.ArrayList;
 
@@ -47,5 +48,21 @@ public class RoomUtils {
                 return true;
 
         return false;
+    }
+
+    public static int getValueFromEnum(TIME_LIMIT timeLimit) {
+        switch (timeLimit) {
+            case SECONDS_3: return 0;
+            case SECONDS_10: return 1;
+            default: return 2;
+        }
+    }
+
+    public static TIME_LIMIT getEnumFromValue(int value) {
+        switch (value) {
+            case 0 : return TIME_LIMIT.SECONDS_3;
+            case 1 : return TIME_LIMIT.SECONDS_10;
+            default: return TIME_LIMIT.INFINITE;
+        }
     }
 }

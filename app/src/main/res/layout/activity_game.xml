@@ -25,9 +25,37 @@
         android:layout_below="@+id/game_recyclerView"
         android:layout_marginEnd="6dp"
         android:layout_marginStart="6dp"
+        android:layout_marginTop="16dp"
+        android:text="DEVELOPER'S TURN"
         android:textAllCaps="true"
         android:textColor="@android:color/background_dark"
         android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/currentTime_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/timeLimit_progressBar"
+        android:layout_alignEnd="@+id/timeLimit_progressBar"
+        android:layout_alignStart="@+id/timeLimit_progressBar"
+        android:layout_alignTop="@+id/timeLimit_progressBar"
+        android:layout_below="@+id/game_recyclerView"
+        android:gravity="center"
+        android:textColor="@android:color/background_dark"
+        android:textSize="18sp" />
+
+    <ProgressBar
+        android:id="@+id/timeLimit_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/game_recyclerView"
+        android:layout_marginEnd="6dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/progress_track"
+        android:indeterminate="false"
+        android:progressDrawable="@drawable/progress_circle" />
 
     <LinearLayout
         android:id="@+id/bingo_linearLayout"

@@ -13,6 +13,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,10 +55,13 @@ import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
+import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
+import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
 
     public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
+    public static final String TIME_LIMIT_BUNDLE_KEY = "time-limit-bundle-key";
 
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
@@ -128,7 +132,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                     currentPlayerId = currentRoomId = -1;
                     playersList.clear();
                     playersRecyclerAdapter.swapData(null);
-                    fragmentChangeRequest.changeFragment(null, null);
+                    fragmentChangeRequest.changeFragment(null, -1, null);
                 }
             }
         }
@@ -207,6 +211,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         if (getArguments() != null) {
             ((TextView)customView.findViewById(R.id.roomName_textView)).setText(getArguments().getString(ROOM_NAME_BUNDLE_KEY));
+            ((TextView)customView.findViewById(R.id.timeLimit_textView)).setText(getTimeLimitString(getEnumFromValue(getArguments().getInt(TIME_LIMIT_BUNDLE_KEY))));
+            Log.v(":::", "here 2: " + getArguments().getInt(TIME_LIMIT_BUNDLE_KEY));
         }
 
         if (getContext() != null) {
@@ -298,6 +304,10 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                             Intent gameIntent = new Intent(getContext(), GameActivity.class);
                             gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
                             gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);
+
+                            if (getArguments() != null)
+                                gameIntent.putExtra(GameActivity.TIME_LIMIT_ID, getArguments().getInt(TIME_LIMIT_BUNDLE_KEY));
+
                             gameIntent.putParcelableArrayListExtra(GameActivity.PLAYERS_LIST_ID, playersList);
                             startActivity(gameIntent);
 

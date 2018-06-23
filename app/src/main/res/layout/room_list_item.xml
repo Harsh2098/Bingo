@@ -31,7 +31,27 @@
         android:textSize="20sp"
         android:transitionName="@string/room_name_transition" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="4dp"
+        android:layout_toStartOf="@id/timeLimit_textView"
+        android:src="@drawable/stopwatch_icon"
+        android:contentDescription="@string/stopwatch_image" />
+
+    <TextView
+        android:id="@+id/timeLimit_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="20dp"
+        android:layout_toStartOf="@id/count_linearLayout"
+        android:textColor="@android:color/background_dark"
+        android:textSize="18sp" />
+
     <LinearLayout
+        android:id="@+id/count_linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

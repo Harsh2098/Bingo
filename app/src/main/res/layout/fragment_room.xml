@@ -8,14 +8,38 @@
 
     <TextView
         android:id="@+id/roomName_textView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="4dp"
         android:paddingEnd="20dp"
         android:paddingStart="20dp"
         android:textAllCaps="true"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:transitionName="@string/room_name_transition" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="4dp"
+        android:layout_toStartOf="@id/timeLimit_textView"
+        android:contentDescription="@string/stopwatch_image"
+        android:src="@drawable/stopwatch_icon" />
+
+    <TextView
+        android:id="@+id/timeLimit_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="3dp"
+        android:layout_toStartOf="@id/count_linearLayout"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
+        android:textSize="16sp" />
 
     <View
         android:id="@+id/divider"
@@ -24,6 +48,7 @@
         android:layout_below="@+id/roomName_textView"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:background="@android:color/darker_gray" />
 
     <android.support.v7.widget.RecyclerView

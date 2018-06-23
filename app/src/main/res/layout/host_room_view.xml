@@ -25,20 +25,62 @@
 
     </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:layout_width="240dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:text="@string/number_of_players"
-        android:textColor="#666666"
-        android:textSize="16sp" />
+        android:orientation="horizontal"
+        android:weightSum="2">
 
-    <com.hmproductions.bingo.views.ColorPicker
-        android:id="@+id/count_picker"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="-4dp" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/number_of_players"
+                android:textColor="#666666"
+                android:textSize="16sp" />
+
+            <com.hmproductions.bingo.views.CustomPicker
+                android:id="@+id/count_picker"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="-4dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/time_limit_per_turn"
+                android:textColor="#666666"
+                android:textSize="16sp" />
+
+            <com.hmproductions.bingo.views.CustomPicker
+                android:id="@+id/timeLimit_picker"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="-4dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

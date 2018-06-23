@@ -37,13 +37,19 @@ import java.util.ArrayList;
 import io.grpc.stub.StreamObserver;
 
 import static com.hmproductions.bingo.BingoServer.connectionDataList;
+import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_CODE;
+import static com.hmproductions.bingo.utils.Constants.NO_WINNER_ID_CODE;
+import static com.hmproductions.bingo.utils.Constants.PLAYER_QUIT_CODE;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_LENGTH;
+import static com.hmproductions.bingo.utils.Constants.SKIPPED_TURN_CODE;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.allPlayersReady;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateRoomId;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateSessionId;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.removeConnectionData;
 import static com.hmproductions.bingo.utils.RoomUtils.colorAlreadyTaken;
+import static com.hmproductions.bingo.utils.RoomUtils.getEnumFromValue;
 import static com.hmproductions.bingo.utils.RoomUtils.getRoomFromId;
+import static com.hmproductions.bingo.utils.RoomUtils.getValueFromEnum;
 import static com.hmproductions.bingo.utils.RoomUtils.roomNameAlreadyTaken;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
@@ -87,7 +93,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         if (!roomNameAlreadyTaken(request.getRoomName())) {
             int newRoomId = generateRoomId(request.getRoomName());
             Room newRoom = new Room(newRoomId, playersArrayList, 1, -1,
-                    request.getMaxSize(), Room.Status.WAITING, request.getRoomName());
+                    request.getMaxSize(), Room.Status.WAITING, request.getRoomName(), getEnumFromValue(request.getTimeLimitValue()));
 
             boolean newRoomCreatedSuccessfully = roomsList.add(newRoom);
 
@@ -116,7 +122,8 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         ArrayList<com.hmproductions.bingo.models.Room> protoRoomsList = new ArrayList<>();
         for (Room currentRoom : roomsList) {
             protoRoomsList.add(com.hmproductions.bingo.models.Room.newBuilder().setRoomName(currentRoom.getName())
-                    .setRoomId(currentRoom.getRoomId()).setCount(currentRoom.getCount()).setMaxSize(currentRoom.getMaxSize()).build());
+                    .setRoomId(currentRoom.getRoomId()).setCount(currentRoom.getCount()).setMaxSize(currentRoom.getMaxSize())
+                    .setTimeLimitValue(getValueFromEnum(currentRoom.getTimeLimit())).build());
         }
 
         if (protoRoomsList.size() == 0) {
@@ -354,6 +361,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 return;
             }
 
+            if (request.getCellClicked() == SKIPPED_TURN_CODE) {
+                System.out.println("Player with ID " + request.getPlayerId() + " skipped turn.\n");
+            }
+
             System.out.print("Cell clicked = " + request.getCellClicked() + "\n");
 
             // Change current player
@@ -364,7 +375,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
                 GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
                         .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
-                        .setWinnerId(-1).setCellClicked(request.getCellClicked()).build();
+                        .setWinnerId(NO_WINNER_ID_CODE).setCellClicked(request.getCellClicked()).build();
 
                 streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
             }
@@ -430,7 +441,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
                 GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
                         .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
-                        .setWinnerId(player.getId()).setCellClicked(-2).build();
+                        .setWinnerId(player.getId()).setCellClicked(PLAYER_QUIT_CODE).build();
 
                 /* This is a very hacky way to check if user has abruply left the game. Since we call QuitPlayer from transport
                 terminated method we need to check if this method is called from filter. This is done by setting winCount to -101*/
@@ -505,7 +516,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
                     GameSubscription gameSubscription = GameSubscription.newBuilder().setFirstSubscription(false)
                             .setRoomId(request.getRoomId()).setPlayerId(currentSubscription.getGameSubscription().getPlayerId())
-                            .setWinnerId(-1).setCellClicked(-3).build();
+                            .setWinnerId(NO_WINNER_ID_CODE).setCellClicked(NEXT_ROUND_CODE).build();
 
                     streamService.getGameEventUpdates(gameSubscription, currentSubscription.getObserver());
                 }

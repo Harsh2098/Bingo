@@ -12,9 +12,13 @@ import android.widget.TextView;
 
 import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.data.Room;
+import com.hmproductions.bingo.utils.TimeLimitUtils;
 
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
 
 public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdapter.RoomViewHolder> {
 
@@ -61,6 +65,8 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
 
             String randomColor = "#EEEEEE"; // + generateColor();
             backgroundDrawable.setColor(Color.parseColor(randomColor));
+
+            holder.timeLimitTextView.setText(getTimeLimitString(currentRoom.getTimeLimit()));
         }
     }
 
@@ -87,7 +93,7 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
                     roomB.getMaxSize() - roomB.getCount(), roomA.getMaxSize() - roomA.getCount()));
 
             if (roomArrayList.get(0).getMaxSize() != roomArrayList.get(0).getCount())
-                roomArrayList.add(0, new Room(HEADER_TYPE, 0, 0, "Available Rooms"));
+                roomArrayList.add(0, new Room(HEADER_TYPE, 0, 0, "Available Rooms", TimeLimitUtils.TIME_LIMIT.INFINITE));
 
             int roomsFullPosition = -1;
             for (Room room : roomArrayList)
@@ -97,14 +103,14 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
                 }
 
             if (roomsFullPosition != -1) {
-                roomArrayList.add(roomsFullPosition, new Room(HEADER_TYPE, 0, 0, "Full Rooms"));
+                roomArrayList.add(roomsFullPosition, new Room(HEADER_TYPE, 0, 0, "Full Rooms", TimeLimitUtils.TIME_LIMIT.INFINITE));
             }
         }
     }
 
     public class RoomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView roomIconTextView, roomNameTextView, countTextView, maxCountTextView;
+        TextView roomIconTextView, roomNameTextView, countTextView, maxCountTextView, timeLimitTextView;
 
         RoomViewHolder(View itemView, int viewType) {
             super(itemView);
@@ -115,6 +121,7 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
                 roomIconTextView = itemView.findViewById(R.id.roomIcon_textView);
                 countTextView = itemView.findViewById(R.id.count_textView);
                 maxCountTextView = itemView.findViewById(R.id.maxCount_textView);
+                timeLimitTextView = itemView.findViewById(R.id.timeLimit_textView);
                 itemView.setOnClickListener(this);
             }
         }
@@ -124,20 +131,4 @@ public class RoomsRecyclerAdapter extends RecyclerView.Adapter<RoomsRecyclerAdap
             listener.onRoomClick(this, getAdapterPosition());
         }
     }
-
-    /* private void test() {
-     *   //Mock rooms list for testing
-     *   ArrayList<Room> mockList = new ArrayList<>();
-     *   mockList.add(new Room(1, 3, 3, "hello1"));
-     *   mockList.add(new Room(1, 2, 3, "hello2"));
-     *   mockList.add(new Room(1, 0, 3, "hello4"));
-     *   mockList.add(new Room(1, 4, 4, "hello5"));
-     *   mockList.add(new Room(1, 1, 1, "hello7"));
-     *   mockList.add(new Room(1, 4, 6, "hello8"));
-     *   mockList.add(new Room(1, 8, 8, "hello9"));
-     *   mockList = createHeadersAndRefactorRooms(mockList);
-     *   for (Room room : mockList)
-     *       Log.v(CLASSIC_TAG, room.getName() + " == " + room.getCount() + "/" + room.getMaxSize());
-     }
-        */
 }

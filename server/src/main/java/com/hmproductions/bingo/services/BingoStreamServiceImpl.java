@@ -17,6 +17,9 @@ import java.util.Random;
 
 import io.grpc.stub.StreamObserver;
 
+import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_CODE;
+import static com.hmproductions.bingo.utils.Constants.NO_WINNER_ID_CODE;
+import static com.hmproductions.bingo.utils.Constants.PLAYER_QUIT_CODE;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.allPlayersReady;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.getArrayListFromPlayersList;
 import static com.hmproductions.bingo.utils.RoomUtils.getRoomFromId;
@@ -82,20 +85,20 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
                 gameEvent = GameEvent.newBuilder().setEventCode(GameEvent.EventCode.GAME_STARTED)
                         .setWinner(-1).setCellClicked(-1).setCurrentPlayerId(currentRoom.getCurrentPlayerId()).build();
 
-            } else if (request.getCellClicked() == -2) {
+            } else if (request.getCellClicked() == PLAYER_QUIT_CODE) {
 
                 gameEvent = GameEvent.newBuilder().setCurrentPlayerId(currentRoom.getCurrentPlayerId())
                         .setEventCode(GameEvent.EventCode.PLAYER_QUIT)
                         .setCellClicked(request.getCellClicked()).setWinner(request.getWinnerId()).build();
 
-            } else if (request.getCellClicked() == -3) {
+            } else if (request.getCellClicked() == NEXT_ROUND_CODE) {
 
                 gameEvent = GameEvent.newBuilder().setCurrentPlayerId(currentRoom.getCurrentPlayerId())
                         .setEventCode(GameEvent.EventCode.NEXT_ROUND)
                         .setCellClicked(request.getCellClicked()).setWinner(request.getWinnerId()).build();
             } else {
 
-                if (request.getWinnerId() == -1) {
+                if (request.getWinnerId() == NO_WINNER_ID_CODE) {
 
                     gameEvent = GameEvent.newBuilder().setCurrentPlayerId(currentRoom.getCurrentPlayerId())
                             .setEventCode(GameEvent.EventCode.CELL_CLICKED).setCellClicked(request.getCellClicked())

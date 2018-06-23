@@ -4,20 +4,21 @@ import java.util.ArrayList;
 
 public class Room {
 
-    public enum Status {
-        WAITING, INGAME
-    }
+    public enum Status { WAITING, INGAME }
+
+    public enum TIME_LIMIT { SECONDS_3, SECONDS_10, INFINITE }
 
     private int roomId, count, currentPlayerPosition, maxSize;
     private Status status;
     private String name;
+    private TIME_LIMIT timeLimit;
 
     private ArrayList<Player> playersList;
     private ArrayList<RoomEventSubscription> roomEventSubscriptionArrayList = new ArrayList<>();
     private ArrayList<GameEventSubscription> gameEventSubscriptionArrayList = new ArrayList<>();
 
     /* Constructor */
-    public Room(int roomId, ArrayList<Player> playersList, int count, int currentPlayerPosition, int maxSize, Status status, String name) {
+    public Room(int roomId, ArrayList<Player> playersList, int count, int currentPlayerPosition, int maxSize, Status status, String name, TIME_LIMIT timeLimit) {
         this.roomId = roomId;
         this.playersList = playersList;
         this.count = count;
@@ -25,6 +26,7 @@ public class Room {
         this.maxSize = maxSize;
         this.status = status;
         this.name = name;
+        this.timeLimit = timeLimit;
     }
 
     public int getCurrentPlayerId() {
@@ -103,5 +105,9 @@ public class Room {
 
     public String getName() {
         return name;
+    }
+
+    public TIME_LIMIT getTimeLimit() {
+        return timeLimit;
     }
 }

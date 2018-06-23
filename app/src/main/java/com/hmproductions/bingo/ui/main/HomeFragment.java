@@ -38,7 +38,7 @@ import com.hmproductions.bingo.loaders.HostRoomLoader;
 import com.hmproductions.bingo.ui.SplashActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Miscellaneous;
-import com.hmproductions.bingo.views.ColorPicker;
+import com.hmproductions.bingo.views.CustomPicker;
 
 import java.util.ArrayList;
 
@@ -55,6 +55,8 @@ import static com.hmproductions.bingo.utils.Constants.HOST_ROOM_LOADER_ID;
 import static com.hmproductions.bingo.utils.Constants.MAX_PLAYERS;
 import static com.hmproductions.bingo.utils.Constants.MIN_PLAYERS;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
+import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
+import static com.hmproductions.bingo.utils.TimeLimitUtils.getValueFromEnum;
 
 public class HomeFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<GetRoomsResponse>,
@@ -64,6 +66,7 @@ public class HomeFragment extends Fragment implements
     private static final String ROOM_ID_KEY = "roomId-key";
     private static final String ROOM_NAME_KEY = "room-name-key";
     private static final String ROOM_SIZE_KEY = "room-size-key";
+    private static final String ROOM_TIME_LIMIT_KEY = "room-time-limit-key";
 
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
@@ -107,7 +110,8 @@ public class HomeFragment extends Fragment implements
                 currentPlayerId = nameToIdHash(player.getName());
                 player.setId(currentPlayerId);
 
-                Room room = new Room(-1, -1, args.getInt(ROOM_SIZE_KEY), args.getString(ROOM_NAME_KEY));
+                Room room = new Room(-1, -1, args.getInt(ROOM_SIZE_KEY), args.getString(ROOM_NAME_KEY),
+                        getEnumFromValue(args.getInt(ROOM_TIME_LIMIT_KEY)));
 
                 return new HostRoomLoader(getContext(), actionServiceBlockingStub, room, player);
             }
@@ -132,7 +136,9 @@ public class HomeFragment extends Fragment implements
                 } else {
                     showSnackbarWithMessage(data.getStatusMessage());
                     currentRoomId = data.getRoomId();
-                    fragmentChangeRequest.changeFragment(getRoomNameFromId(currentRoomId), null);
+
+                    fragmentChangeRequest.changeFragment(preferences.getString(ROOM_NAME_KEY, "New Room"),
+                            preferences.getInt(ROOM_TIME_LIMIT_KEY, 1), null);
                 }
             }
         }
@@ -178,7 +184,9 @@ public class HomeFragment extends Fragment implements
                     case AddPlayerResponse.StatusCode.OK_VALUE:
                         showSnackbarWithMessage(data.getStatusMessage());
                         currentRoomId = data.getRoomId();
-                        fragmentChangeRequest.changeFragment(getRoomNameFromId(currentRoomId), lastViewHolder.itemView.findViewById(R.id.roomName_textView));
+                        fragmentChangeRequest.changeFragment(getRoomNameFromRoomId(currentRoomId),
+                                getRoomTimeLimitValueFromRoomId(currentRoomId),
+                                lastViewHolder.itemView.findViewById(R.id.roomName_textView));
                         break;
 
                     case AddPlayerResponse.StatusCode.COLOR_TAKEN_VALUE:
@@ -261,11 +269,18 @@ public class HomeFragment extends Fragment implements
             roomNameEditText.setText(preferences.getString(ROOM_NAME_KEY, sampleName));
         }
 
-        ColorPicker countPicker = hostRoomView.findViewById(R.id.count_picker);
+        CustomPicker countPicker = hostRoomView.findViewById(R.id.count_picker);
         countPicker.setMinValue(MIN_PLAYERS);
         countPicker.setMaxValue(MAX_PLAYERS);
         countPicker.setValue(preferences.getInt(ROOM_SIZE_KEY, MIN_PLAYERS + 1));
         countPicker.setWrapSelectorWheel(false);
+        
+        CustomPicker timeLimitPicker = hostRoomView.findViewById(R.id.timeLimit_picker);
+        timeLimitPicker.setMinValue(0);
+        timeLimitPicker.setMaxValue(getResources().getStringArray(R.array.timeLimitOptions).length - 1);
+        timeLimitPicker.setValue(preferences.getInt(ROOM_TIME_LIMIT_KEY, 1));
+        timeLimitPicker.setDisplayedValues(getResources().getStringArray(R.array.timeLimitOptions));
+        timeLimitPicker.setWrapSelectorWheel(false);
 
         if (getContext() != null)
             new AlertDialog.Builder(getContext())
@@ -276,9 +291,11 @@ public class HomeFragment extends Fragment implements
                         Bundle bundle = new Bundle();
                         bundle.putString(ROOM_NAME_KEY, roomNameEditText.getText().toString());
                         bundle.putInt(ROOM_SIZE_KEY, countPicker.getValue());
+                        bundle.putInt(ROOM_TIME_LIMIT_KEY, timeLimitPicker.getValue());
 
                         preferences.edit().putString(ROOM_NAME_KEY, roomNameEditText.getText().toString()).apply();
                         preferences.edit().putInt(ROOM_SIZE_KEY, countPicker.getValue()).apply();
+                        preferences.edit().putInt(ROOM_TIME_LIMIT_KEY, timeLimitPicker.getValue()).apply();
 
                         getLoaderManager().restartLoader(HOST_ROOM_LOADER_ID, bundle, hostRoomLoader);
                     }))
@@ -308,7 +325,8 @@ public class HomeFragment extends Fragment implements
 
                     roomsArrayList.clear();
                     for (com.hmproductions.bingo.models.Room currentRoom : data.getRoomsList()) {
-                        roomsArrayList.add(new Room(currentRoom.getRoomId(), currentRoom.getCount(), currentRoom.getMaxSize(), currentRoom.getRoomName()));
+                        roomsArrayList.add(new Room(currentRoom.getRoomId(), currentRoom.getCount(), currentRoom.getMaxSize(),
+                                currentRoom.getRoomName(), getEnumFromValue(currentRoom.getTimeLimitValue())));
                     }
                     roomsRecyclerAdapter.swapData(roomsArrayList);
                     break;
@@ -359,12 +377,20 @@ public class HomeFragment extends Fragment implements
     }
 
     @Nullable
-    private String getRoomNameFromId(int id) {
+    private String getRoomNameFromRoomId(int id) {
         for (Room room : roomsArrayList) {
             if (room.getRoomId() == id)
                 return room.getName();
         }
         return null;
+    }
+
+    private int getRoomTimeLimitValueFromRoomId(int id) {
+        for (Room room : roomsArrayList) {
+            if (room.getRoomId() == id)
+                return getValueFromEnum(room.getTimeLimit());
+        }
+        return -1;
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.GridLayoutAnimationController;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,8 +58,10 @@ import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.ui.main.MainActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
+import com.hmproductions.bingo.utils.TimeLimitUtils;
 import com.hmproductions.bingo.views.GridRecyclerView;
 
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -80,11 +84,14 @@ import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_WON_KEY;
 import static com.hmproductions.bingo.utils.Constants.GRID_SIZE;
 import static com.hmproductions.bingo.utils.Constants.LEADERBOARD_COL_SPAN;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_LOADER_ID;
+import static com.hmproductions.bingo.utils.Constants.TURN_SKIPPED_CODE;
 import static com.hmproductions.bingo.utils.Miscellaneous.CreateRandomGameArray;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromNextPlayerId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.valueClicked;
+import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
+import static com.hmproductions.bingo.utils.TimeLimitUtils.getExactValueFromEnum;
 
 public class GameActivity extends AppCompatActivity implements
         GameGridRecyclerAdapter.GridCellClickListener,
@@ -94,6 +101,8 @@ public class GameActivity extends AppCompatActivity implements
 
     public static final String PLAYER_ID = "player-id";
     public static final String ROOM_ID = "room-id";
+    public static final String TIME_LIMIT_ID = "time-limit-id";
+
     public static final String PLAYERS_LIST_ID = "players-list-id";
     private static final String LEADERBOARD_LIST_KEY = "leaderboard-list-key";
 
@@ -138,6 +147,12 @@ public class GameActivity extends AppCompatActivity implements
     @BindView(R.id.turnOrder_textView)
     TextView turnOrderTextView;
 
+    @BindView(R.id.timeLimit_progressBar)
+    ProgressBar timeLimitProgressBar;
+
+    @BindView(R.id.currentTime_textView)
+    TextView currentTimeTextView;
+
     @BindView(R.id.konfettiView)
     KonfettiView konfettiView;
 
@@ -145,10 +160,13 @@ public class GameActivity extends AppCompatActivity implements
     private MediaPlayer celebrationSound, popSound;
     private GameGridRecyclerAdapter gridRecyclerAdapter;
     private Intent speechRecognitionIntent;
+    private CountDownTimer gameTimer;
 
     ArrayList<GridCell> gameGridCellList = new ArrayList<>();
 
     private int playerId = -1, roomId = -1;
+    TimeLimitUtils.TIME_LIMIT currentTimeLimit = TimeLimitUtils.TIME_LIMIT.INFINITE;
+
     private boolean gameCompleted = false, myTurn = false;
     private ArrayList<Player> playersList = new ArrayList<>();
 
@@ -298,6 +316,8 @@ public class GameActivity extends AppCompatActivity implements
                             gameCompleted = true;
                         }
 
+                        gameTimer.cancel();
+
                         break;
 
                     case PLAYER_QUIT_VALUE:
@@ -315,6 +335,7 @@ public class GameActivity extends AppCompatActivity implements
                         quitIntent.putExtra(PLAYER_ID, playerId);
                         quitIntent.putExtra(ROOM_ID, roomId);
 
+                        gameTimer.cancel();
                         startActivity(quitIntent);
                         finish();
 
@@ -322,7 +343,7 @@ public class GameActivity extends AppCompatActivity implements
 
                     case CELL_CLICKED_VALUE:
 
-                        if (preferences.getBoolean(getString(R.string.sound_preference_key), true))
+                        if (preferences.getBoolean(getString(R.string.sound_preference_key), true) && cellClicked != TURN_SKIPPED_CODE)
                             popSound.start();
 
                         for (GridCell gridCell : gameGridCellList) {
@@ -341,11 +362,13 @@ public class GameActivity extends AppCompatActivity implements
                         myTurn = currentPlayerId == playerId;
 
                         if (myTurn) {
+                            startGameTimer();
+
                             if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
                                 startListening();
-                            else
-                                gameRecyclerView.setEnabled(true);
+                            gameRecyclerView.setEnabled(true);
                         } else {
+                            gameTimer.cancel();
                             gameRecyclerView.setEnabled(false);
                         }
 
@@ -358,12 +381,14 @@ public class GameActivity extends AppCompatActivity implements
 
                         if (myTurn) {
                             Toast.makeText(GameActivity.this, "Start the game", Toast.LENGTH_SHORT).show();
+                            startGameTimer();
 
                             if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
                                 startListening();
                             else
                                 gameRecyclerView.setEnabled(true);
                         } else {
+                            gameTimer.cancel();
                             gameRecyclerView.setEnabled(false);
                         }
                         findViewById(R.id.nextRound_button).setVisibility(View.GONE);
@@ -395,12 +420,14 @@ public class GameActivity extends AppCompatActivity implements
 
         roomId = getIntent().getIntExtra(ROOM_ID, -1);
         playerId = getIntent().getIntExtra(PLAYER_ID, -1);
+        currentTimeLimit = getEnumFromValue(getIntent().getIntExtra(TIME_LIMIT_ID, 2));
         playersList = getIntent().getParcelableArrayListExtra(PLAYERS_LIST_ID);
 
         new Handler().post(() -> subscribeToGameEventUpdates(playerId, roomId));
 
         // Creates an ArrayList made up of random values
         CreateGameGridArrayList();
+        CreateGameTimer();
 
         gridRecyclerAdapter = new GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this);
 
@@ -431,6 +458,29 @@ public class GameActivity extends AppCompatActivity implements
         for (int i = 0; i < GRID_SIZE * GRID_SIZE; ++i) {
             gameGridCellList.add(new GridCell(randomArray[i], false));
         }
+    }
+
+    private void CreateGameTimer() {
+        int totalTime = getExactValueFromEnum(currentTimeLimit);
+
+        gameTimer = new CountDownTimer((totalTime + 1) * 1000, 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLimitProgressBar.setProgress((int) (totalTime - millisUntilFinished / 1000));
+                currentTimeTextView.setText(String.valueOf((int) (millisUntilFinished / 1000)));
+            }
+
+            @Override
+            public void onFinish() {
+                timeLimitProgressBar.setProgress(timeLimitProgressBar.getMax());
+                currentTimeTextView.setText(String.valueOf(getExactValueFromEnum(currentTimeLimit)));
+
+                Bundle bundle = new Bundle();
+                bundle.putInt(CELL_CLICKED_ID, TURN_SKIPPED_CODE);
+                getSupportLoaderManager().restartLoader(Constants.CLICK_CELL_LOADER_ID, bundle, GameActivity.this);
+            }
+        };
     }
 
     // Returns the number of lines completed
@@ -538,6 +588,21 @@ public class GameActivity extends AppCompatActivity implements
             Bundle bundle = new Bundle();
             bundle.putInt(CELL_CLICKED_ID, value);
             getSupportLoaderManager().restartLoader(Constants.CLICK_CELL_LOADER_ID, bundle, this);
+        }
+    }
+
+    private void startGameTimer() {
+        timeLimitProgressBar.setIndeterminate(false);
+
+        if (currentTimeLimit == TimeLimitUtils.TIME_LIMIT.INFINITE) {
+            timeLimitProgressBar.setMax(1);
+            timeLimitProgressBar.setProgress(timeLimitProgressBar.getMax());
+            currentTimeTextView.setText(DecimalFormatSymbols.getInstance().getInfinity());
+        } else {
+            int totalTime = getExactValueFromEnum(currentTimeLimit);
+            timeLimitProgressBar.setProgress(0);
+            timeLimitProgressBar.setMax(totalTime);
+            gameTimer.start();
         }
     }
 

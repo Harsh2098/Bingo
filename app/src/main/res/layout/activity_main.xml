@@ -49,7 +49,7 @@
 
     </android.support.design.widget.TextInputLayout>
 
-    <com.hmproductions.bingo.views.ColorPicker
+    <com.hmproductions.bingo.views.CustomPicker
         android:id="@+id/color_picker"
         android:layout_width="240dp"
         android:layout_height="wrap_content"

@@ -7,6 +7,7 @@ public class Constants {
     public static final int GRID_SIZE = 5;
     public static final double SCALING_FACTOR = 0.95;
     public static final int LEADERBOARD_COL_SPAN = 2;
+    public static final int TURN_SKIPPED_CODE = 123;
 
     // First time keys
     public static final String FIRST_TIME_OPENED_KEY = "first-time-key";

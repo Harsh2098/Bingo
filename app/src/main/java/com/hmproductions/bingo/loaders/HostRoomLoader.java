@@ -22,6 +22,7 @@ import static com.hmproductions.bingo.utils.Constants.ROOM_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS;
 import static com.hmproductions.bingo.utils.Constants.SERVER_PORT;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_KEY;
+import static com.hmproductions.bingo.utils.TimeLimitUtils.getValueFromEnum;
 
 public class HostRoomLoader extends AsyncTaskLoader<HostRoomResponse> {
 
@@ -61,7 +62,7 @@ public class HostRoomLoader extends AsyncTaskLoader<HostRoomResponse> {
 
             return actionServiceBlockingStub.hostRoom(HostRoomRequest.newBuilder()
                     .setRoomName(room.getName()).setMaxSize(room.getMaxSize()).setPlayerId(player.getId())
-                    .setPlayerColor(player.getColor()).setPlayerName(player.getName()).build());
+                    .setPlayerColor(player.getColor()).setTimeLimitValue(getValueFromEnum(room.getTimeLimit())).setPlayerName(player.getName()).build());
         } else {
             return null;
         }

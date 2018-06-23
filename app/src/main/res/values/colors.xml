@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primaryColor">#5e35b1</color>
+    <color name="colorAccent">#9162e4</color>
 
     <color name="bingo_primary">#FFFFFF</color>
     <color name="default_background">#FFE7FF</color>

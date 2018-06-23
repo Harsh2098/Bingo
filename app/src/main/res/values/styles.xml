@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">#280680</item>
-        <item name="colorAccent">#9162e4</item>
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@font/default_bingo_font</item>
     </style>
 

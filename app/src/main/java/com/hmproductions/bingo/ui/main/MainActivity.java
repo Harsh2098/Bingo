@@ -23,6 +23,7 @@ import android.support.v4.app.SharedElementCallback;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,7 +48,7 @@ import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.Miscellaneous;
 import com.hmproductions.bingo.views.BaselineGridTextView;
-import com.hmproductions.bingo.views.ColorPicker;
+import com.hmproductions.bingo.views.CustomPicker;
 import com.hmproductions.bingo.views.ReflowText;
 
 import java.util.ArrayList;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements
     EditText playerNameEditText;
 
     @BindView(R.id.color_picker)
-    ColorPicker colorPicker;
+    CustomPicker colorPicker;
 
     @BindView(R.id.main_toolbar)
     Toolbar mainToolbar;
@@ -144,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    // TODO : Fix on long click number picker, we can edit color
     private void setupColorPicker() {
         colorPicker.setMinValue(0);
         colorPicker.setMaxValue(getResources().getStringArray(R.array.colorsName).length - 1);
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void changeFragment(String roomName, View view) {
+    public void changeFragment(String roomName, int timeLimit, View view) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         if (currentFragment instanceof RoomFragment) {
@@ -208,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements
             if (roomName != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString(RoomFragment.ROOM_NAME_BUNDLE_KEY, roomName);
+                bundle.putInt(RoomFragment.TIME_LIMIT_BUNDLE_KEY, timeLimit);
                 roomFragment.setArguments(bundle);
             }
 

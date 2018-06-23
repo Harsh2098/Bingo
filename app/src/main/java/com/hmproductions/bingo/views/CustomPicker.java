@@ -11,9 +11,9 @@ import android.widget.NumberPicker;
 
 import com.hmproductions.bingo.R;
 
-public class ColorPicker extends NumberPicker {
+public class CustomPicker extends NumberPicker {
 
-    public ColorPicker(Context context, AttributeSet attrs) {
+    public CustomPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

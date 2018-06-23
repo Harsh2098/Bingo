@@ -8,15 +8,19 @@ import android.view.View;
 import com.hmproductions.bingo.data.GridCell;
 import com.hmproductions.bingo.data.Player;
 
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import static com.hmproductions.bingo.utils.TimeLimitUtils.TIME_LIMIT.SECONDS_10;
+import static com.hmproductions.bingo.utils.TimeLimitUtils.TIME_LIMIT.SECONDS_3;
+
 public class Miscellaneous {
 
     public interface OnFragmentChangeRequest {
-        void changeFragment(@Nullable String roonName, @Nullable View view);
+        void changeFragment(@Nullable String roomName, int timeLimit, @Nullable View view);
         void finishCurrentActivity();
     }
 
@@ -107,5 +111,18 @@ public class Miscellaneous {
             stringBuilder.append(randomStringGenerationString.charAt(new Random().nextInt(randomStringGenerationString.length())));
         }
         return stringBuilder.toString();
+    }
+    
+    public static String getTimeLimitString(TimeLimitUtils.TIME_LIMIT timeLimit) {
+        switch (timeLimit) {
+            case SECONDS_3:
+                return "3 sec";
+
+            case SECONDS_10:
+                return "10 sec";
+
+            default:
+                return DecimalFormatSymbols.getInstance().getInfinity();
+        }
     }
 }
