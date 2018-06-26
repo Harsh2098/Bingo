@@ -79,6 +79,16 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
         notifyDataSetChanged();
     }
 
+    public void swapDataWithInsertion(List<Player> newList) {
+        this.playersList = newList;
+        notifyItemRangeInserted(0, newList.size());
+    }
+
+    public void swapDataWithDeletion(List<Player> newList) {
+        this.playersList = newList;
+        notifyItemRangeRemoved(0, newList.size());
+    }
+
     public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView playerNameTextView;

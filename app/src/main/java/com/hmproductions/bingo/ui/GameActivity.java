@@ -270,8 +270,6 @@ public class GameActivity extends AppCompatActivity implements
                          */
 
                         if (winnerId == playerId) {
-                            Toast.makeText(GameActivity.this, "You won the game", Toast.LENGTH_SHORT).show();
-
                             if (preferences.getBoolean(getString(R.string.sound_preference_key), true))
                                 celebrationSound.start();
 
@@ -285,8 +283,6 @@ public class GameActivity extends AppCompatActivity implements
                                     .addSizes(new Size(12, 5))
                                     .setPosition(-50f, konfettiView.getWidth() + 50f, -50f, -50f)
                                     .streamFor(400, 2000);
-                        } else {
-                            Toast.makeText(GameActivity.this, getNameFromId(playersList, winnerId) + " has won", Toast.LENGTH_SHORT).show();
                         }
 
                         gameRecyclerView.setEnabled(false);

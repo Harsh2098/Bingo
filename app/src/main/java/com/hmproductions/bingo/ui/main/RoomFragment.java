@@ -269,6 +269,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                         value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_READY_CHANGED ||
                         value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_STATE_CHANGED ||
                         value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
+
                     List<com.hmproductions.bingo.models.Player> responseList = value.getRoomEvent().getPlayersList();
                     maxCount = value.getRoomEvent().getMaxCount();
 
@@ -280,7 +281,14 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
                     if (getActivity() != null)
                         getActivity().runOnUiThread(() -> {
-                            playersRecyclerAdapter.swapData(playersList);
+
+                            if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER) {
+                                playersRecyclerAdapter.swapDataWithInsertion(playersList);
+                            } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
+                                playersRecyclerAdapter.swapDataWithDeletion(playersList);
+                            } else {
+                                playersRecyclerAdapter.swapData(playersList);
+                            }
 
                             if (preferences.getBoolean(FIRST_TIME_JOINED_KEY, true)) {
                                 int position = playersRecyclerAdapter.getReadyTapTargetPosition(currentPlayerId);
