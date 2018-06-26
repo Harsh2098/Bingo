@@ -5,7 +5,9 @@ public class Constants {
     public static final String CLASSIC_TAG = ":::";
 
     public static final int GRID_SIZE = 5;
-    public static final double SCALING_FACTOR = 0.95;
+    public static final float GRID_SCALING_FACTOR = 0.95f;
+    public static final float CELL_SCALING_FACTOR = 0.92f;
+
     public static final int LEADERBOARD_COL_SPAN = 2;
     public static final int TURN_SKIPPED_CODE = 123;
 
@@ -20,7 +22,7 @@ public class Constants {
     public static final int MAX_PLAYERS = 4;
 
     public static final int SERVER_PORT = 8080;
-    public static final String SERVER_ADDRESS = "192.168.0.182"; // Last known public IP - 116.88.119.133
+    public static final String SERVER_ADDRESS = "192.168.0.160"; // Last known public IP - 116.88.119.133
 
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;

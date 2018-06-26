@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -17,13 +15,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hmproductions.bingo.R;
+import com.hmproductions.bingo.animations.GridCircleAnimation;
 import com.hmproductions.bingo.data.GridCell;
+import com.hmproductions.bingo.views.CircleView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
-import static com.hmproductions.bingo.utils.Constants.SCALING_FACTOR;
+import static com.hmproductions.bingo.utils.Constants.GRID_SCALING_FACTOR;
 
 public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecyclerAdapter.GridViewHolder> {
 
@@ -49,8 +49,8 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) this.context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         layoutParams = new RelativeLayout.LayoutParams(
-                (int) (displayMetrics.widthPixels / gridSize * SCALING_FACTOR),
-                (int) (displayMetrics.widthPixels / gridSize * SCALING_FACTOR));
+                (int) (displayMetrics.widthPixels / gridSize * GRID_SCALING_FACTOR),
+                (int) (displayMetrics.widthPixels / gridSize * GRID_SCALING_FACTOR));
 
         Log.v(GRID_LOG_TAG, "Setting cell size to " + displayMetrics.widthPixels / gridSize);
     }
@@ -81,12 +81,11 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
                     Color.parseColor(context.getResources().getStringArray(R.array.colorsRim)[colorPosition])
             );
 
-            holder.value_textView.setBackgroundResource(R.drawable.cell_circle_foreground);
-            GradientDrawable backgroundDrawable = (GradientDrawable) holder.value_textView.getBackground();
+            holder.circleView.setPaintColorId(Color.parseColor(context.getResources().getStringArray(R.array.colorsHex)[colorPosition]));
 
-            backgroundDrawable.setStroke(8,
-                    Color.parseColor(context.getResources().getStringArray(R.array.colorsHex)[colorPosition]));
-            backgroundDrawable.setColor(ContextCompat.getColor(context, R.color.grid_cell_background));
+            GridCircleAnimation animation = new GridCircleAnimation(holder.circleView, 360);
+            animation.setDuration(450);
+            holder.circleView.startAnimation(animation);
 
         } else {
 
@@ -102,19 +101,22 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
         return gridSize * gridSize;
     }
 
-    public void swapData(ArrayList<GridCell> data) {
+    public void swapData(ArrayList<GridCell> data, int position) {
         gameGridCellList = data;
-        notifyDataSetChanged();
+        notifyItemChanged(position);
     }
 
     class GridViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView value_textView;
+        CircleView circleView;
 
         GridViewHolder(View itemView) {
             super(itemView);
 
             value_textView = itemView.findViewById(R.id.value_textView);
+            circleView = itemView.findViewById(R.id.circleView);
+
             itemView.setOnClickListener(this);
         }
 

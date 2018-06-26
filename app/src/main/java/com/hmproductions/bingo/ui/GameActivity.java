@@ -350,7 +350,7 @@ public class GameActivity extends AppCompatActivity implements
                             if (gridCell.getValue() == cellClicked) {
                                 gridCell.setIsClicked(true);
                                 gridCell.setColor(getColorFromNextPlayerId(playersList, currentPlayerId));
-                                gridRecyclerAdapter.swapData(gameGridCellList);
+                                gridRecyclerAdapter.swapData(gameGridCellList, gameGridCellList.indexOf(gridCell));
                                 break;
                             }
                         }
