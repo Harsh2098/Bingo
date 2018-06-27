@@ -212,7 +212,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         if (getArguments() != null) {
             ((TextView)customView.findViewById(R.id.roomName_textView)).setText(getArguments().getString(ROOM_NAME_BUNDLE_KEY));
             ((TextView)customView.findViewById(R.id.timeLimit_textView)).setText(getTimeLimitString(getEnumFromValue(getArguments().getInt(TIME_LIMIT_BUNDLE_KEY))));
-            Log.v(":::", "here 2: " + getArguments().getInt(TIME_LIMIT_BUNDLE_KEY));
         }
 
         if (getContext() != null) {
@@ -261,7 +260,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     private void subscribeToRoomEventsUpdate(int roomId) {
 
-        streamServiceStub.getRoomEventUpdates(RoomSubscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).build(), new StreamObserver<RoomEventUpdate>() {
+        streamServiceStub.getRoomEventUpdates(RoomSubscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).setEventCode(RoomSubscription.EventCode.OTHER).build(), new StreamObserver<RoomEventUpdate>() {
             @Override
             public void onNext(RoomEventUpdate value) {
 
@@ -273,19 +272,32 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                     List<com.hmproductions.bingo.models.Player> responseList = value.getRoomEvent().getPlayersList();
                     maxCount = value.getRoomEvent().getMaxCount();
 
-                    playersList.clear();
-                    for (com.hmproductions.bingo.models.Player currentPlayer : responseList) {
-                        playersList.add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
-                                currentPlayer.getReady()));
+                    int positionOfInsertion = -1, positionOfRemoval = -1;
+
+                    if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER) {
+                        positionOfInsertion = insertAndGetNewPosition(responseList);
+                    } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
+                        positionOfRemoval = deleteAndGetDeletedPosition(responseList);
+                    } else {
+                        playersList.clear();
+                        for (com.hmproductions.bingo.models.Player currentPlayer : responseList) {
+                            playersList.add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
+                                    currentPlayer.getReady()));
+                        }
                     }
 
-                    if (getActivity() != null)
+                    if (getActivity() != null) {
+
+                        // To use variables in lambdas
+                        int finalPositionOfInsertion = positionOfInsertion;
+                        int finalPositionOfRemoval = positionOfRemoval;
+
                         getActivity().runOnUiThread(() -> {
 
                             if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER) {
-                                playersRecyclerAdapter.swapDataWithInsertion(playersList);
+                                playersRecyclerAdapter.swapDataWithInsertion(playersList, finalPositionOfInsertion);
                             } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
-                                playersRecyclerAdapter.swapDataWithDeletion(playersList);
+                                playersRecyclerAdapter.swapDataWithDeletion(playersList, finalPositionOfRemoval);
                             } else {
                                 playersRecyclerAdapter.swapData(playersList);
                             }
@@ -302,6 +314,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                             String text = playersList.size() + " / " + maxCount;
                             countTextView.setText(text);
                         });
+                    }
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 
@@ -350,5 +363,55 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                     });
         }
 
+    }
+
+    private int insertAndGetNewPosition(List<com.hmproductions.bingo.models.Player> responseList) {
+
+        for (com.hmproductions.bingo.models.Player currentModelPlayer : responseList) {
+
+            boolean exists = false;
+
+            for (Player currentDataPlayer : playersList) {
+                if (currentDataPlayer.getId() == currentModelPlayer.getId()) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                Player newPlayer = new Player(currentModelPlayer.getName(), currentModelPlayer.getColor(), currentModelPlayer.getId(), currentModelPlayer.getReady());
+                playersList.add(newPlayer);
+                Log.v(":::", "index of = " + playersList.indexOf(newPlayer));
+                return playersList.indexOf(newPlayer);
+            }
+        }
+
+        return -1;
+    }
+
+    private int deleteAndGetDeletedPosition(List<com.hmproductions.bingo.models.Player> responseList) {
+
+        int returnPosition = -1;
+
+        for (Player currentDataPlayer : playersList) {
+
+            boolean exists = false;
+
+            for (com.hmproductions.bingo.models.Player currentModelPlayer : responseList) {
+                if (currentDataPlayer.getId() == currentModelPlayer.getId()) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                returnPosition = playersList.indexOf(currentDataPlayer);
+                playersList.remove(returnPosition);
+            }
+        }
+
+        Log.v(":::", "return position = " + returnPosition);
+
+        return returnPosition;
     }
 }

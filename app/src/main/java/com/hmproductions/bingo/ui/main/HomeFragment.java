@@ -158,7 +158,6 @@ public class HomeFragment extends Fragment implements
 
             if (rawPlayer != null && args != null) {
 
-
                 loadingDialog.show();
 
                 currentPlayerId = nameToIdHash(rawPlayer.getName());

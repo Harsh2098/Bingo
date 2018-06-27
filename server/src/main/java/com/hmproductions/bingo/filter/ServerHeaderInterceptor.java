@@ -15,6 +15,7 @@ import static com.hmproductions.bingo.utils.Constants.ADD_PLAYER_METHOD_NAME;
 import static com.hmproductions.bingo.utils.Constants.GET_ROOMS_METHOD_NAME;
 import static com.hmproductions.bingo.utils.Constants.HOST_ROOM_METHOD_NAME;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
+import static com.hmproductions.bingo.utils.Constants.REMOVE_PLAYER_METHOD_NAME;
 import static com.hmproductions.bingo.utils.Constants.ROOM_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.SESSION_ID_KEY;
 
@@ -61,7 +62,7 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             };
         }
 
-        if (methodName.equals("com.hmproductions.bingo.BingoActionService/RemovePlayer") ||
+        if (methodName.equals(REMOVE_PLAYER_METHOD_NAME) ||
                 methodName.equals("com.hmproductions.bingo.BingoActionService/QuitPlayer")) {
             removeSessionIdFromList(sessionId);
 

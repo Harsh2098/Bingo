@@ -45,8 +45,18 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
                 currentRoom.getRoomEventSubscriptionArrayList().add(new RoomEventSubscription(responseObserver, request));
             }
 
-            RoomEvent roomEvent = RoomEvent.newBuilder().addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList()))
-                    .setEventCode(RoomEvent.EventCode.PLAYER_STATE_CHANGED).setMaxCount(currentRoom.getMaxSize()).build();
+            RoomEvent roomEvent;
+
+            if (request.getEventCode() == RoomSubscription.EventCode.ADD) {
+                roomEvent = RoomEvent.newBuilder().addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList()))
+                        .setEventCode(RoomEvent.EventCode.ADD_PLAYER).setMaxCount(currentRoom.getMaxSize()).build();
+            } else if (request.getEventCode() == RoomSubscription.EventCode.REMOVE) {
+                roomEvent = RoomEvent.newBuilder().addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList()))
+                        .setEventCode(RoomEvent.EventCode.REMOVE_PLAYER).setMaxCount(currentRoom.getMaxSize()).build();
+            } else {
+                roomEvent = RoomEvent.newBuilder().addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList()))
+                        .setEventCode(RoomEvent.EventCode.PLAYER_STATE_CHANGED).setMaxCount(currentRoom.getMaxSize()).build();
+            }
 
             responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
 
