@@ -17,8 +17,8 @@
         android:layout_marginTop="10dp"
         android:layoutAnimation="@anim/game_grid_animation" />
 
-    <TextView
-        android:id="@+id/turnOrder_textView"
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/grid_shimmerFrameLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -26,10 +26,25 @@
         android:layout_marginEnd="6dp"
         android:layout_marginStart="6dp"
         android:layout_marginTop="16dp"
-        android:text="DEVELOPER'S TURN"
-        android:textAllCaps="true"
-        android:textColor="@android:color/background_dark"
-        android:textSize="18sp" />
+        app:shimmer_auto_start="true"
+        app:shimmer_base_alpha="1"
+        app:shimmer_base_color="@color/dark_background"
+        app:shimmer_colored="true"
+        app:shimmer_duration="450"
+        app:shimmer_highlight_alpha="0.4"
+        app:shimmer_highlight_color="@color/gold_shimmer"
+        app:shimmer_repeat_delay="4000">
+
+        <TextView
+            android:id="@+id/turnOrder_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textColor="@android:color/background_dark"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
     <TextView
         android:id="@+id/currentTime_textView"

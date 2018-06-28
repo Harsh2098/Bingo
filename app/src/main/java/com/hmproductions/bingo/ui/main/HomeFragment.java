@@ -3,7 +3,6 @@ package com.hmproductions.bingo.ui.main;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -88,6 +87,7 @@ public class HomeFragment extends Fragment implements
 
     ConnectionUtils.OnNetworkDownHandler networkDownHandler;
     Miscellaneous.OnFragmentChangeRequest fragmentChangeRequest;
+    Miscellaneous.OnSnackBarRequest snackBarRequest;
 
     interface GetDetails {
         @Nullable
@@ -127,14 +127,14 @@ public class HomeFragment extends Fragment implements
             } else {
                 if (data.getStatusCode() == HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR) {
                     currentPlayerId = -1;
-                    showSnackbarWithMessage(data.getStatusMessage());
+                    snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
 
                 } else if (data.getStatusCode() == HostRoomResponse.StatusCode.NAME_TAKEN) {
                     Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
 
                     hostFab.callOnClick();
                 } else {
-                    showSnackbarWithMessage(data.getStatusMessage());
+                    snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
                     currentRoomId = data.getRoomId();
 
                     fragmentChangeRequest.changeFragment(preferences.getString(ROOM_NAME_KEY, "New Room"),
@@ -181,7 +181,7 @@ public class HomeFragment extends Fragment implements
                 switch (data.getStatusCodeValue()) {
 
                     case AddPlayerResponse.StatusCode.OK_VALUE:
-                        showSnackbarWithMessage(data.getStatusMessage());
+                        snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
                         currentRoomId = data.getRoomId();
                         fragmentChangeRequest.changeFragment(getRoomNameFromRoomId(currentRoomId),
                                 getRoomTimeLimitValueFromRoomId(currentRoomId),
@@ -197,7 +197,7 @@ public class HomeFragment extends Fragment implements
 
                     case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
                     default:
-                        showSnackbarWithMessage(data.getStatusMessage());
+                        snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
                         currentPlayerId = -1;
                         break;
                 }
@@ -217,6 +217,7 @@ public class HomeFragment extends Fragment implements
             networkDownHandler = (ConnectionUtils.OnNetworkDownHandler) context;
             fragmentChangeRequest = (Miscellaneous.OnFragmentChangeRequest) context;
             userDetails = (GetDetails) context;
+            snackBarRequest = (Miscellaneous.OnSnackBarRequest) context;
         } catch (ClassCastException classCastException) {
             throw new ClassCastException(context.toString() + " must implement network down handler.");
         }
@@ -335,9 +336,7 @@ public class HomeFragment extends Fragment implements
                     roomsRecyclerView.setVisibility(View.INVISIBLE);
 
                     if (getActivity() != null && getView() != null && getArguments() != null && getArguments().getBoolean(SplashActivity.SHOW_SNACKBAR_KEY)) {
-                        Snackbar.make(getActivity().findViewById(android.R.id.content), data.getStatusMessage(), Snackbar.LENGTH_LONG)
-                                .setAction(R.string.host, (v) -> hostFab.callOnClick()).show();
-                        hideSnackbarForSometime(Snackbar.LENGTH_LONG);
+                        snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
                     }
                     break;
 
@@ -362,17 +361,6 @@ public class HomeFragment extends Fragment implements
         lastViewHolder = viewHolder;
 
         getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
-    }
-
-    private void showSnackbarWithMessage(String text) {
-        if (getActivity() != null)
-            Snackbar.make(getActivity().findViewById(android.R.id.content), text, Snackbar.LENGTH_SHORT).show();
-        hideSnackbarForSometime(Snackbar.LENGTH_SHORT);
-    }
-
-    private void hideSnackbarForSometime(int length) {
-        hostFab.setVisibility(View.GONE);
-        new Handler().postDelayed(() -> hostFab.setVisibility(View.VISIBLE), length == Snackbar.LENGTH_LONG ? 3500 : 2000);
     }
 
     @Nullable

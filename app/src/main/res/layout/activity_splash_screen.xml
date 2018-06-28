@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/centering_view"
+        app:shimmer_auto_start="true"
         app:shimmer_base_alpha="1"
         app:shimmer_base_color="@color/primaryColor"
         app:shimmer_colored="true"
@@ -23,10 +24,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
+            android:paddingBottom="24dp"
             android:text="@string/splash_app_name"
             android:textColor="?colorPrimary"
-            android:textSize="54sp"
-            android:paddingBottom="24dp"
+            android:textSize="64sp"
             android:textStyle="bold"
             android:transitionName="@string/bingo_app_name_transition" />
 

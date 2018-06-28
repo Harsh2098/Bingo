@@ -376,7 +376,6 @@ public class GameActivity extends AppCompatActivity implements
                         myTurn = currentPlayerId == playerId;
 
                         if (myTurn) {
-                            Toast.makeText(GameActivity.this, "Start the game", Toast.LENGTH_SHORT).show();
                             startGameTimer();
 
                             if (preferences.getBoolean(getString(R.string.tts_preference_key), false))

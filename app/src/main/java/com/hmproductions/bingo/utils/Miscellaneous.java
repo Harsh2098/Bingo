@@ -2,6 +2,7 @@ package com.hmproductions.bingo.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -22,6 +23,10 @@ public class Miscellaneous {
     public interface OnFragmentChangeRequest {
         void changeFragment(@Nullable String roomName, int timeLimit, @Nullable View view);
         void finishCurrentActivity();
+    }
+
+    public interface OnSnackBarRequest {
+        void showSnackBar(String message, int duration);
     }
 
     // Returns an int[size][size] containing numbers 1 to 25 randomly placed

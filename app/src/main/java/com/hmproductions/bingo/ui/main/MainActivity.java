@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.ui.main;
 
 /* Copyright 2016 Keepsafe Software Inc.
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,13 +18,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,7 +66,8 @@ import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_OPENED_KEY;
 public class MainActivity extends AppCompatActivity implements
         ConnectionUtils.OnNetworkDownHandler,
         Miscellaneous.OnFragmentChangeRequest,
-        HomeFragment.GetDetails {
+        HomeFragment.GetDetails,
+        Miscellaneous.OnSnackBarRequest {
 
     public static final String PLAYER_LEFT_ID = "player-left-id";
 
@@ -145,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    // TODO : Fix on long click number picker, we can edit color, time limit overlap with room name, sound when row completed
+    // TODO : Fix on long click number picker, we can edit color, sound when row completed
     private void setupColorPicker() {
         colorPicker.setMinValue(0);
         colorPicker.setMaxValue(getResources().getStringArray(R.array.colorsName).length - 1);
@@ -277,38 +280,52 @@ public class MainActivity extends AppCompatActivity implements
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, homeFragment).commit();
 
             if (homeFragment.getView() != null) {
-                new Handler().postDelayed(() ->
-                                new TapTargetSequence(this).targets(
-                                        TapTarget
-                                                .forToolbarMenuItem(mainToolbar, R.id.settings_action, "Settings", "Toggle settings to call numbers instead of tapping on them")
-                                                .targetRadius(50)
-                                                .drawShadow(true),
-                                        TapTarget
-                                                .forView(homeFragment.getView().findViewById(R.id.noRoomsFound_textView), "Refresh Rooms", "Swipe downwards to refresh rooms list anytime")
-                                                .targetRadius(120).cancelable(true).icon(getDrawable(R.drawable.swipe_icon)).drawShadow(true)
-                                ).listener(new TapTargetSequence.Listener() {
-                                    @Override
-                                    public void onSequenceFinish() {
-                                        homeFragment.onRefresh();
-                                    }
+                new Handler().postDelayed(() -> new TapTargetSequence(this).targets(
+                        TapTarget
+                                .forToolbarMenuItem(mainToolbar, R.id.settings_action, "Settings", "Toggle settings to call numbers instead of tapping on them")
+                                .targetRadius(50)
+                                .drawShadow(true),
+                        TapTarget
+                                .forView(homeFragment.getView().findViewById(R.id.noRoomsFound_textView), "Refresh Rooms", "Swipe downwards to refresh rooms list anytime")
+                                .targetRadius(120).cancelable(true).icon(getDrawable(R.drawable.swipe_icon)).drawShadow(true)
+                        ).listener(new TapTargetSequence.Listener() {
+                            @Override
+                            public void onSequenceFinish() {
+                                homeFragment.onRefresh();
+                            }
 
-                                    @Override
-                                    public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+                            @Override
+                            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
 
-                                    }
+                            }
 
-                                    @Override
-                                    public void onSequenceCanceled(TapTarget lastTarget) {
+                            @Override
+                            public void onSequenceCanceled(TapTarget lastTarget) {
 
-                                    }
-                                })
-                                        .start()
+                            }
+                        })
+                                .start()
 
                         , 450);
+
             }
 
         } else
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, getHomeFragment(true)).commit();
 
+    }
+
+    @Override
+    public void showSnackBar(String message, int duration) {
+        Snackbar.make(findViewById(android.R.id.content), message, duration).show();
+
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        if (currentFragment instanceof HomeFragment && currentFragment.getView() != null) {
+            FloatingActionButton hostFab = currentFragment.getView().findViewById(R.id.host_fab);
+
+            hostFab.setVisibility(View.GONE);
+            new Handler().postDelayed(() -> hostFab.setVisibility(View.VISIBLE), duration == Snackbar.LENGTH_LONG ? 3500 : 2000);
+        }
     }
 }
