@@ -11,4 +11,6 @@
     <color name="player_ready">#99CC00</color>
     <color name="player_not_ready">#CC0000</color>
 
+    <color name="gold_shimmer">#FFD700</color>
+
 </resources>

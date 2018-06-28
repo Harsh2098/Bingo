@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.ui;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,12 +9,15 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
+import com.facebook.shimmer.Shimmer;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.actions.GetSessionIdResponse;
@@ -74,6 +78,9 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
         actionServiceBlockingStub = BingoActionServiceGrpc.newBlockingStub(channel);
 
         bingoAppNameTextView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.zoom_out_animation));
+
+        ShimmerFrameLayout frameLayout = findViewById(R.id.bingo_shimmerFrameLayout);
+        frameLayout.startShimmer();
 
         new Handler().postDelayed(this::startMainActivity, 750);
     }
