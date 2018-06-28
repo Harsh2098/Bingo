@@ -31,8 +31,6 @@ import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.data.Room;
 import com.hmproductions.bingo.data.RoomEventSubscription;
 import com.hmproductions.bingo.models.GameSubscription;
-import com.hmproductions.bingo.models.RoomSubscription;
-import com.hmproductions.bingo.utils.Constants;
 
 import java.util.ArrayList;
 
@@ -177,7 +175,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                         addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK).setRoomId(request.getRoomId())
                                 .setStatusMessage("New room joined").build();
 
-                        sendRoomEventUpdate(request.getRoomId(), Constants.ADD_PLAYER_METHOD_NAME);
+                        sendRoomEventUpdate(request.getRoomId());
 
                         // Server logs
                         System.out.println(request.getPlayer().getName() + " added to the game.");
@@ -247,7 +245,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                     System.out.print("Room with id " + currentRoom.getRoomId() + " destroyed.");
                     roomsList.remove(currentRoom);
                 } else
-                    sendRoomEventUpdate(request.getRoomId(), Constants.REMOVE_PLAYER_METHOD_NAME);
+                    sendRoomEventUpdate(request.getRoomId());
 
                 //Server logs
                 System.out.println(request.getPlayer().getName() + " removed from the game.");
@@ -286,7 +284,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 // Server logs
                 System.out.println(request.getPlayerId() + " id set to " + request.getIsReady());
 
-                sendRoomEventUpdate(request.getRoomId(), "NO-NAME");
+                sendRoomEventUpdate(request.getRoomId());
 
                 responseObserver.onNext(
                         SetPlayerReadyResponse.newBuilder().setStatusCode(SetPlayerReadyResponse.StatusCode.OK).setIsReady(request.getIsReady())
@@ -534,26 +532,13 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         responseObserver.onCompleted();
     }
 
-    private void sendRoomEventUpdate(int roomId, String methodName) {
+    private void sendRoomEventUpdate(int roomId) {
         BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
 
         Room currentRoom = getRoomFromId(roomId);
         if (currentRoom != null) {
             for (RoomEventSubscription currentSubscription : currentRoom.getRoomEventSubscriptionArrayList()) {
-
-                RoomSubscription.EventCode eventCode = RoomSubscription.EventCode.OTHER;
-
-                if (methodName.equals(Constants.ADD_PLAYER_METHOD_NAME)) {
-                    System.out.println("add 1\n");
-                    eventCode = RoomSubscription.EventCode.ADD;
-                } else if (methodName.equals(Constants.REMOVE_PLAYER_METHOD_NAME)) {
-                    System.out.println("remove 1\n");
-                    eventCode = RoomSubscription.EventCode.REMOVE;
-                }
-
-                RoomSubscription roomSubscription = currentSubscription.getSubscription().toBuilder().setEventCode(eventCode).build();
-
-                streamService.getRoomEventUpdates(roomSubscription, currentSubscription.getObserver());
+                streamService.getRoomEventUpdates(currentSubscription.getSubscription(), currentSubscription.getObserver());
             }
         }
     }

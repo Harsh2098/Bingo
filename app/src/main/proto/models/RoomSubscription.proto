@@ -5,13 +5,6 @@ option java_multiple_files = true;
 
 message RoomSubscription {
 
-    enum EventCode {
-        ADD = 0;
-        REMOVE = 1;
-        OTHER = 2;
-    }
-
     uint32 room_id = 1;
     uint32 player_id = 2;
-    EventCode event_code = 3;
 }

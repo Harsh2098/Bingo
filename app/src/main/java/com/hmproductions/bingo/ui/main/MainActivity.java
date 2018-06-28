@@ -26,6 +26,7 @@ import android.support.v4.app.SharedElementCallback;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,6 +62,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_OPENED_KEY;
 
 public class MainActivity extends AppCompatActivity implements
@@ -307,7 +309,6 @@ public class MainActivity extends AppCompatActivity implements
                                 .start()
 
                         , 450);
-
             }
 
         } else
@@ -317,15 +318,21 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void showSnackBar(String message, int duration) {
-        Snackbar.make(findViewById(android.R.id.content), message, duration).show();
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, duration);
 
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-        if (currentFragment instanceof HomeFragment && currentFragment.getView() != null) {
-            FloatingActionButton hostFab = currentFragment.getView().findViewById(R.id.host_fab);
+        Log.v(CLASSIC_TAG, "here 1");
+        if (message.equals("No rooms available") && currentFragment.getView() != null) {
 
-            hostFab.setVisibility(View.GONE);
+            snackbar.setAction("Host", view -> ((HomeFragment) currentFragment).onHostButtonClick());
+
+            FloatingActionButton hostFab = currentFragment.getView().findViewById(R.id.host_fab);
+            Log.v(CLASSIC_TAG, "here 2");
+            hostFab.setVisibility(View.INVISIBLE);
             new Handler().postDelayed(() -> hostFab.setVisibility(View.VISIBLE), duration == Snackbar.LENGTH_LONG ? 3500 : 2000);
         }
+
+        snackbar.show();
     }
 }
