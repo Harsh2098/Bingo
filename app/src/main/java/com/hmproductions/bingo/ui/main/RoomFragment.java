@@ -13,6 +13,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,7 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
@@ -209,8 +211,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         countTextView = customView.findViewById(R.id.count_textView);
 
         if (getArguments() != null) {
-            ((TextView)customView.findViewById(R.id.roomName_textView)).setText(getArguments().getString(ROOM_NAME_BUNDLE_KEY));
-            ((TextView)customView.findViewById(R.id.timeLimit_textView)).setText(getTimeLimitString(getEnumFromValue(getArguments().getInt(TIME_LIMIT_BUNDLE_KEY))));
+            ((TextView) customView.findViewById(R.id.roomName_textView)).setText(getArguments().getString(ROOM_NAME_BUNDLE_KEY));
+            ((TextView) customView.findViewById(R.id.timeLimit_textView)).setText(getTimeLimitString(getEnumFromValue(getArguments().getInt(TIME_LIMIT_BUNDLE_KEY))));
         }
 
         if (getContext() != null) {
@@ -263,43 +265,51 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             @Override
             public void onNext(RoomEventUpdate value) {
 
-                if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER ||
-                        value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_READY_CHANGED ||
-                        value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_STATE_CHANGED ||
-                        value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
+                if (getActivity() != null) {
 
-                    List<com.hmproductions.bingo.models.Player> responseList = value.getRoomEvent().getPlayersList();
-                    maxCount = value.getRoomEvent().getMaxCount();
+                    getActivity().runOnUiThread(() -> {
 
-//                    int positionOfInsertion = -1, positionOfRemoval = -1;
+                        if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER ||
+                                value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_READY_CHANGED ||
+                                value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_STATE_CHANGED ||
+                                value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
 
-//                    if (playersList.size() < responseList.size() && playersList.size() > 0) {
-//                        positionOfInsertion = insertAndGetNewPosition(responseList);
-//                    } else if (playersList.size() > responseList.size()) {
-//                        positionOfRemoval = deleteAndGetDeletedPosition(responseList);
-//                    } else {
-                        playersList.clear();
-                        for (com.hmproductions.bingo.models.Player currentPlayer : responseList) {
-                            playersList.add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
-                                    currentPlayer.getReady()));
-                        }
-//                    }
+                            List<com.hmproductions.bingo.models.Player> responseList = value.getRoomEvent().getPlayersList();
+                            maxCount = value.getRoomEvent().getMaxCount();
 
-                    if (getActivity() != null) {
+                            int positionOfRemoval = -1, positionOfInsertion = -1;
 
-                        // To use variables in lambdas
-//                        int finalPositionOfInsertion = positionOfInsertion;
-//                        int finalPositionOfRemoval = positionOfRemoval;
+                            if (playersList.size() < responseList.size() && playersList.size() > 0) {
 
-                        getActivity().runOnUiThread(() -> {
+                                com.hmproductions.bingo.models.Player currentPlayer = responseList.get(responseList.size() - 1);
+                                playersList.add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
+                                        currentPlayer.getReady()));
+                                positionOfInsertion = playersList.size() - 1;
 
-//                            if (finalPositionOfInsertion != -1) {
-//                                playersRecyclerAdapter.swapDataWithInsertion(playersList, finalPositionOfInsertion);
-//                            } else if (finalPositionOfRemoval != -1) {
-//                                playersRecyclerAdapter.swapDataWithDeletion(playersList, finalPositionOfRemoval);
-//                            } else {
+                            } else if (playersList.size() > responseList.size()) {
+                                positionOfRemoval = deleteAndGetDeletedPosition(responseList);
+                                Log.v(CLASSIC_TAG, "position of removal = " + positionOfRemoval);
+                            } else {
+
+                                playersList.clear();
+                                for (com.hmproductions.bingo.models.Player currentPlayer : responseList) {
+                                    playersList.add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
+                                            currentPlayer.getReady()));
+                                }
+                            }
+
+                            // To use variables in lambdas
+                            int finalPositionOfInsertion = positionOfInsertion;
+                            int finalPositionOfRemoval = positionOfRemoval;
+
+
+                            if (finalPositionOfInsertion != -1) {
+                                playersRecyclerAdapter.swapDataWithInsertion(playersList, finalPositionOfInsertion);
+                            } else if (finalPositionOfRemoval != -1) {
+                                playersRecyclerAdapter.swapDataWithDeletion(playersList, finalPositionOfRemoval);
+                            } else {
                                 playersRecyclerAdapter.swapData(playersList);
-//                            }
+                            }
 
                             if (preferences.getBoolean(FIRST_TIME_JOINED_KEY, true)) {
                                 int position = playersRecyclerAdapter.getReadyTapTargetPosition(currentPlayerId);
@@ -312,8 +322,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
                             String text = playersList.size() + " / " + maxCount;
                             countTextView.setText(text);
-                        });
-                    }
+                        }
+                    });
 
                 } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 
@@ -364,36 +374,15 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     }
 
-    private int insertAndGetNewPosition(List<com.hmproductions.bingo.models.Player> responseList) {
-
-        for (com.hmproductions.bingo.models.Player currentModelPlayer : responseList) {
-
-            boolean exists = false;
-
-            for (Player currentDataPlayer : playersList) {
-                if (currentDataPlayer.getId() == currentModelPlayer.getId()) {
-                    exists = true;
-                    break;
-                }
-            }
-
-            if (!exists) {
-                Player newPlayer = new Player(currentModelPlayer.getName(), currentModelPlayer.getColor(), currentModelPlayer.getId(), currentModelPlayer.getReady());
-                playersList.add(newPlayer);
-                return playersList.indexOf(newPlayer);
-            }
-        }
-
-        return -1;
-    }
-
     private int deleteAndGetDeletedPosition(List<com.hmproductions.bingo.models.Player> responseList) {
 
         int returnPosition = -1;
+        boolean exists = false;
+        Player removalPlayer = null;
 
         for (Player currentDataPlayer : playersList) {
 
-            boolean exists = false;
+            exists = false;
 
             for (com.hmproductions.bingo.models.Player currentModelPlayer : responseList) {
                 if (currentDataPlayer.getId() == currentModelPlayer.getId()) {
@@ -403,9 +392,14 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             }
 
             if (!exists) {
-                returnPosition = playersList.indexOf(currentDataPlayer);
-                playersList.remove(returnPosition);
+                removalPlayer = currentDataPlayer;
+                break;
             }
+        }
+
+        if (!exists) {
+            returnPosition = playersList.indexOf(removalPlayer);
+            playersList.remove(returnPosition);
         }
 
         return returnPosition;

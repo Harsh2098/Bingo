@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,13 +82,11 @@ public class PlayersRecyclerAdapter extends RecyclerView.Adapter<PlayersRecycler
     public void swapDataWithInsertion(List<Player> newList, int position) {
         this.playersList = newList;
         notifyItemInserted(position);
-        Log.v(":::", "position ?" + position);
     }
 
     public void swapDataWithDeletion(List<Player> newList, int position) {
         this.playersList = newList;
         notifyItemRemoved(position);
-        Log.v(":::", "position ?" + position);
     }
 
     public class PlayerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
