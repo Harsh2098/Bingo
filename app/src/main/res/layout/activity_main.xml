@@ -9,11 +9,11 @@
         android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
-        android:background="?colorPrimary"
+        android:background="@color/primaryColor"
         android:orientation="horizontal"
         android:theme="@style/Base.ThemeOverlay.AppCompat.Dark">
 
-        <com.hmproductions.bingo.views.BaselineGridTextView
+        <TextView
             android:id="@+id/toolbarName_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

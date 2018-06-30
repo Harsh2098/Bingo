@@ -19,14 +19,14 @@
         app:shimmer_highlight_alpha="0.4"
         app:shimmer_highlight_color="@color/gold_shimmer">
 
-        <com.hmproductions.bingo.views.BaselineGridTextView
+        <TextView
             android:id="@+id/toolbarName_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:paddingBottom="24dp"
             android:text="@string/splash_app_name"
-            android:textColor="?colorPrimary"
+            android:textColor="@color/primaryColor"
             android:textSize="64sp"
             android:textStyle="bold"
             android:transitionName="@string/bingo_app_name_transition" />

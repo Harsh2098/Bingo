@@ -22,7 +22,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.SharedElementCallback;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -49,12 +48,9 @@ import com.hmproductions.bingo.ui.settings.SettingsActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.Miscellaneous;
-import com.hmproductions.bingo.views.BaselineGridTextView;
 import com.hmproductions.bingo.views.CustomPicker;
-import com.hmproductions.bingo.views.ReflowText;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -126,26 +122,10 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        setSharedElementToolbarReflowCallback();
-
         currentPlayerId = currentRoomId = -1;
 
         startTapTargetView();
         preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
-    }
-
-    private void setSharedElementToolbarReflowCallback() {
-        setEnterSharedElementCallback(new SharedElementCallback() {
-            @Override
-            public void onSharedElementStart(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
-                ReflowText.setupReflow(getIntent(), findViewById(R.id.toolbarName_textView));
-            }
-
-            @Override
-            public void onSharedElementEnd(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
-                ReflowText.setupReflow(new ReflowText.ReflowableTextView(findViewById(R.id.toolbarName_textView)));
-            }
-        });
     }
 
     private void setupColorPicker() {
@@ -235,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onNetworkDownError() {
-        BaselineGridTextView bingoTextView = mainToolbar.findViewById(R.id.toolbarName_textView);
+        TextView bingoTextView = mainToolbar.findViewById(R.id.toolbarName_textView);
 
         startActivity(new Intent(this, SplashActivity.class), ActivityOptionsCompat
                 .makeSceneTransitionAnimation(this, bingoTextView, bingoTextView.getTransitionName()).toBundle());

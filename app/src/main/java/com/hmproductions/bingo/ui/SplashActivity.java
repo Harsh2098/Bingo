@@ -22,8 +22,6 @@ import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
 import com.hmproductions.bingo.loaders.SessionIdLoader;
 import com.hmproductions.bingo.ui.main.MainActivity;
 import com.hmproductions.bingo.utils.Constants;
-import com.hmproductions.bingo.views.BaselineGridTextView;
-import com.hmproductions.bingo.views.ReflowText;
 
 import javax.inject.Inject;
 
@@ -109,8 +107,7 @@ public class SplashActivity extends AppCompatActivity implements LoaderManager.L
             Intent mainActivityIntent = new Intent(this, MainActivity.class);
             mainActivityIntent.putExtra(SHOW_SNACKBAR_KEY, true);
 
-            BaselineGridTextView bingoTextView = findViewById(R.id.toolbarName_textView);
-            ReflowText.addExtras(mainActivityIntent, new ReflowText.ReflowableTextView(bingoTextView));
+            TextView bingoTextView = findViewById(R.id.toolbarName_textView);
 
             startActivity(mainActivityIntent, ActivityOptionsCompat
                     .makeSceneTransitionAnimation(this, bingoTextView, bingoTextView.getTransitionName()).toBundle());
