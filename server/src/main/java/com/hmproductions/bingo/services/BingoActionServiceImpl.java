@@ -205,7 +205,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         } else {
             addPlayerResponse =
                     AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.ROOM_NOT_EXIST)
-                            .setStatusMessage("Room does not exist.").setRoomId(-1).build();
+                            .setStatusMessage("Room does not exist").setRoomId(-1).build();
         }
 
         responseObserver.onNext(addPlayerResponse);
