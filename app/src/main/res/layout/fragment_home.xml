@@ -18,6 +18,15 @@
         android:src="@drawable/add_icon"
         app:fabSize="auto" />
 
+    <ProgressBar
+        android:id="@+id/home_progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="12dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

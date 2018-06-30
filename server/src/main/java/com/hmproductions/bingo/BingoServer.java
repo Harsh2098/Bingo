@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -33,6 +34,7 @@ public class BingoServer {
                 .intercept(new ServerHeaderInterceptor())
                 .addTransportFilter(new TerminationFilter())
                 .useTransportSecurity(serverCertificateFile, serverKeyFile)
+                .handshakeTimeout(30, TimeUnit.SECONDS)
                 .build();
 
         try {

@@ -13,7 +13,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +53,6 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
@@ -266,9 +264,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             public void onNext(RoomEventUpdate value) {
 
                 if (getActivity() != null) {
-
                     getActivity().runOnUiThread(() -> {
-
                         if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER ||
                                 value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_READY_CHANGED ||
                                 value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_STATE_CHANGED ||
@@ -288,7 +284,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
                             } else if (playersList.size() > responseList.size()) {
                                 positionOfRemoval = deleteAndGetDeletedPosition(responseList);
-                                Log.v(CLASSIC_TAG, "position of removal = " + positionOfRemoval);
                             } else {
 
                                 playersList.clear();
@@ -322,13 +317,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
                             String text = playersList.size() + " / " + maxCount;
                             countTextView.setText(text);
-                        }
-                    });
+                        } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 
-                } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
 
-                    if (getActivity() != null)
-                        getActivity().runOnUiThread(() -> {
                             getLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
 
                             Intent gameIntent = new Intent(getContext(), GameActivity.class);
@@ -342,7 +333,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                             startActivity(gameIntent);
 
                             fragmentChangeRequest.finishCurrentActivity();
-                        });
+
+                        }
+                    });
                 }
             }
 

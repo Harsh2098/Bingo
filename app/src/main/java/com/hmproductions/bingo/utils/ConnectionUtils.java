@@ -22,7 +22,7 @@ public class ConnectionUtils {
         try {
             Socket socket = new Socket();
             SocketAddress socketAddress = new InetSocketAddress(host, port);
-            socket.connect(socketAddress, 10000);
+            socket.connect(socketAddress, 30000);
             socket.close();
             return true;
         } catch (IOException e) {

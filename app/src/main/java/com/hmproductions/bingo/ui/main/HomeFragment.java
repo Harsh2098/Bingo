@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,10 +75,12 @@ public class HomeFragment extends Fragment implements
     SharedPreferences preferences;
 
     FloatingActionButton hostFab;
+    ProgressBar homeProgressBar;
+
     SwipeRefreshLayout roomSwipeRefreshLayout;
     RecyclerView roomsRecyclerView;
+
     TextView noRoomsTextView;
-    AlertDialog loadingDialog;
     RoomsRecyclerAdapter.RoomViewHolder lastViewHolder = null;
 
     private ArrayList<Room> roomsArrayList = new ArrayList<>();
@@ -103,6 +106,7 @@ public class HomeFragment extends Fragment implements
         @Override
         public Loader<HostRoomResponse> onCreateLoader(int id, @Nullable Bundle args) {
 
+            showHomeProgressBar(true);
             Player player = userDetails.getUserDetails();
 
             if (player != null && args != null && getContext() != null) {
@@ -122,6 +126,7 @@ public class HomeFragment extends Fragment implements
         @Override
         public void onLoadFinished(@NonNull Loader<HostRoomResponse> loader, HostRoomResponse data) {
 
+            showHomeProgressBar(false);
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
@@ -155,10 +160,9 @@ public class HomeFragment extends Fragment implements
         public Loader<AddPlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
 
             Player rawPlayer = userDetails.getUserDetails();
+            showHomeProgressBar(true);
 
             if (rawPlayer != null && args != null) {
-
-                loadingDialog.show();
 
                 currentPlayerId = nameToIdHash(rawPlayer.getName());
 
@@ -173,8 +177,7 @@ public class HomeFragment extends Fragment implements
         @Override
         public void onLoadFinished(@NonNull Loader<AddPlayerResponse> loader, AddPlayerResponse data) {
 
-            loadingDialog.dismiss();
-
+            showHomeProgressBar(false);
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
@@ -232,17 +235,12 @@ public class HomeFragment extends Fragment implements
         ButterKnife.bind(this, customView);
 
         hostFab = customView.findViewById(R.id.host_fab);
+        homeProgressBar = customView.findViewById(R.id.home_progressBar);
         roomSwipeRefreshLayout = customView.findViewById(R.id.roomRecyclerView_swipeRefreshLayout);
         roomSwipeRefreshLayout.setOnRefreshListener(this);
 
         roomsRecyclerView = customView.findViewById(R.id.rooms_recyclerView);
         noRoomsTextView = customView.findViewById(R.id.noRoomsFound_textView);
-
-        if (getContext() != null) {
-            View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.loading_dialog, null);
-            ((TextView) dialogView.findViewById(R.id.progressDialog_textView)).setText(R.string.processing_request);
-            loadingDialog = new AlertDialog.Builder(getContext()).setView(dialogView).setCancelable(false).create();
-        }
 
         roomsRecyclerAdapter = new RoomsRecyclerAdapter(getContext(), null, this);
 
@@ -306,13 +304,13 @@ public class HomeFragment extends Fragment implements
     @Override
     public Loader<GetRoomsResponse> onCreateLoader(int id, @Nullable Bundle args) {
 
+        roomSwipeRefreshLayout.setRefreshing(true);
         return getContext() != null ? new GetRoomsLoader(getContext(), actionServiceBlockingStub) : null;
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<GetRoomsResponse> loader, GetRoomsResponse data) {
 
-        loadingDialog.dismiss();
         roomSwipeRefreshLayout.setRefreshing(false);
 
         if (data == null)
@@ -382,6 +380,13 @@ public class HomeFragment extends Fragment implements
 
     @Override
     public void onRefresh() {
+        roomSwipeRefreshLayout.setRefreshing(true);
         getLoaderManager().restartLoader(GET_ROOMS_LOADER_ID, null, this);
+    }
+
+    private void showHomeProgressBar(boolean show) {
+        homeProgressBar.setVisibility(show? View.VISIBLE: View.GONE);
+        if (show) hostFab.hide();
+        else hostFab.show();
     }
 }
