@@ -148,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    // TODO : Fix on long click number picker, we can edit color, sound when row completed
     private void setupColorPicker() {
         colorPicker.setMinValue(0);
         colorPicker.setMaxValue(getResources().getStringArray(R.array.colorsName).length - 1);

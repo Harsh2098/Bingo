@@ -41,4 +41,10 @@ public class CustomPicker extends NumberPicker {
             ((EditText) view).setTypeface(ResourcesCompat.getFont(getContext(), R.font.default_bingo_font));
         }
     }
+
+    // Prevents user from search in number picker for color. Prevents custom picker editable.
+    @Override
+    public void setDescendantFocusability(int focusability) {
+        super.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+    }
 }

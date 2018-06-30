@@ -157,7 +157,7 @@ public class GameActivity extends AppCompatActivity implements
     KonfettiView konfettiView;
 
     private SpeechRecognizer speechRecognizer;
-    private MediaPlayer celebrationSound, popSound;
+    private MediaPlayer celebrationSound, popSound, rowCompletedSound;
     private GameGridRecyclerAdapter gridRecyclerAdapter;
     private Intent speechRecognitionIntent;
     private CountDownTimer gameTimer;
@@ -436,6 +436,7 @@ public class GameActivity extends AppCompatActivity implements
 
         celebrationSound = MediaPlayer.create(this, R.raw.tada_celebration);
         popSound = MediaPlayer.create(this, R.raw.pop);
+        rowCompletedSound = MediaPlayer.create(this, R.raw.shooting_star);
 
         speechRecognitionIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
@@ -526,6 +527,16 @@ public class GameActivity extends AppCompatActivity implements
         if (secondaryDiagonalFormed) counter++;
 
         if (counter > GRID_SIZE) counter = GRID_SIZE;
+
+        int previousCount = 0;
+        if (B.getCurrentTextColor() == Color.parseColor("#FF0000")) previousCount++;
+        if (I.getCurrentTextColor() == Color.parseColor("#FF0000")) previousCount++;
+        if (N.getCurrentTextColor() == Color.parseColor("#FF0000")) previousCount++;
+        if (G.getCurrentTextColor() == Color.parseColor("#FF0000")) previousCount++;
+        if (O.getCurrentTextColor() == Color.parseColor("#FF0000")) previousCount++;
+
+        if (counter > previousCount)
+            rowCompletedSound.start();
 
         switch (counter) {
             // severe fall through
