@@ -37,6 +37,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 editor.putBoolean(Constants.FIRST_TIME_PLAYED_KEY, true);
                 editor.putBoolean(Constants.FIRST_TIME_OPENED_KEY, true);
                 editor.putBoolean(Constants.FIRST_TIME_JOINED_KEY, true);
+                editor.putBoolean(Constants.FIRST_TIME_WON_KEY, true);
                 editor.apply();
             }
         }

@@ -358,6 +358,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                             super.onTargetClick(view);
                             getActivity().getSupportLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, null, setPlayerReadyLoader);
                         }
+
+                        @Override
+                        public void onOuterCircleClick(TapTargetView view) {
+                            super.onOuterCircleClick(view);
+                            view.dismiss(false);
+                        }
                     });
         }
 

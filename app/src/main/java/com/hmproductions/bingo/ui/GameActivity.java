@@ -717,7 +717,14 @@ public class GameActivity extends AppCompatActivity implements
                             .forView(findViewById(R.id.talkToSpeak_imageButton), "How to use Mic", "Tap this once to call out number if mic does not recognise your number in the first time")
                             .targetRadius(50)
                             .icon(getDrawable(R.drawable.mic_icon_white))
-                            .cancelable(true));
+                            .cancelable(true),
+                    new TapTargetView.Listener() {
+                        @Override
+                        public void onOuterCircleClick(TapTargetView view) {
+                            super.onOuterCircleClick(view);
+                            view.dismiss(false);
+                        }
+                    });
 
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean(FIRST_TIME_PLAYED_KEY, false);
@@ -739,6 +746,12 @@ public class GameActivity extends AppCompatActivity implements
                         public void onTargetClick(TapTargetView view) {
                             super.onTargetClick(view);
                             onNextRoundButtonClick();
+                        }
+
+                        @Override
+                        public void onOuterCircleClick(TapTargetView view) {
+                            super.onOuterCircleClick(view);
+                            view.dismiss(false);
                         }
                     });
 

@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements
 
         currentPlayerId = currentRoomId = -1;
 
-        startTapTargetView();
+        startTapTargetSequence();
         preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
     }
 
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements
         return homeFragment;
     }
 
-    private void startTapTargetView() {
+    private void startTapTargetSequence() {
 
         if (preferences.getBoolean(FIRST_TIME_OPENED_KEY, true)) {
 
@@ -245,35 +245,40 @@ public class MainActivity extends AppCompatActivity implements
 
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, homeFragment).commit();
 
-            if (homeFragment.getView() != null) {
-                new Handler().postDelayed(() -> new TapTargetSequence(this).targets(
-                        TapTarget
-                                .forToolbarMenuItem(mainToolbar, R.id.settings_action, "Settings", "Toggle settings to call numbers instead of tapping on them")
-                                .targetRadius(50)
-                                .drawShadow(true),
-                        TapTarget
-                                .forView(homeFragment.getView().findViewById(R.id.noRoomsFound_textView), "Refresh Rooms", "Swipe downwards to refresh rooms list anytime")
-                                .targetRadius(120).cancelable(true).icon(getDrawable(R.drawable.swipe_icon)).drawShadow(true)
-                        ).listener(new TapTargetSequence.Listener() {
-                            @Override
-                            public void onSequenceFinish() {
-                                homeFragment.onRefresh();
-                            }
+            new Handler().postDelayed(() -> {
+                        if (homeFragment.getView() != null) {
+                            new TapTargetSequence(this).targets(
+                                    TapTarget
+                                            .forToolbarMenuItem(mainToolbar, R.id.settings_action, "Settings", "Toggle settings to call numbers instead of tapping on them")
+                                            .targetRadius(50)
+                                            .drawShadow(true),
+                                    TapTarget
+                                            .forView(homeFragment.getView().findViewById(R.id.noRoomsFound_textView), "Refresh Rooms", "Swipe downwards to refresh rooms list anytime")
+                                            .targetRadius(120).cancelable(true).icon(getDrawable(R.drawable.swipe_icon)).drawShadow(true)
+                            ).listener(new TapTargetSequence.Listener() {
+                                @Override
+                                public void onSequenceFinish() {
+                                    homeFragment.onRefresh();
+                                }
 
-                            @Override
-                            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+                                @Override
+                                public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
 
-                            }
+                                }
 
-                            @Override
-                            public void onSequenceCanceled(TapTarget lastTarget) {
+                                @Override
+                                public void onSequenceCanceled(TapTarget lastTarget) {
 
-                            }
-                        })
-                                .start()
+                                }
+                            })
+                                    .continueOnCancel(true)
+                                    .start();
+                        }
+                    }
+                    , 450);
 
-                        , 450);
-            }
+
+            preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
 
         } else
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, getHomeFragment(true)).commit();
