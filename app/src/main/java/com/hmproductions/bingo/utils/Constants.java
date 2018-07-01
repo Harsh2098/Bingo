@@ -20,9 +20,10 @@ public class Constants {
     // TODO (Release) : Change min players
     public static final int MIN_PLAYERS = 1;
     public static final int MAX_PLAYERS = 4;
+    public static final int MAX_SERVER_CAPACITY = 10001;
 
     public static final int SERVER_PORT = 8080;
-    public static final String SERVER_ADDRESS = "192.168.0.182"; // Last known public IP - 116.88.119.133
+    public static final String SERVER_ADDRESS = "116.88.119.133"; // Last known public IP - 116.88.119.133
 
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;

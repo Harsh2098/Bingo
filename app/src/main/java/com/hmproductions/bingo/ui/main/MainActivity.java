@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.main_toolbar)
     Toolbar mainToolbar;
 
-    // TODO : what if another player loses connection, make player ID generation more random
+    // TODO : what if another player loses connection
     static int currentPlayerId = -1, currentRoomId = -1;
     static ArrayList<Player> playersList = new ArrayList<>();
 

@@ -2,7 +2,6 @@ package com.hmproductions.bingo.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -15,8 +14,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import static com.hmproductions.bingo.utils.TimeLimitUtils.TIME_LIMIT.SECONDS_10;
-import static com.hmproductions.bingo.utils.TimeLimitUtils.TIME_LIMIT.SECONDS_3;
+import static com.hmproductions.bingo.utils.Constants.MAX_SERVER_CAPACITY;
 
 public class Miscellaneous {
 
@@ -55,7 +53,7 @@ public class Miscellaneous {
 
     public static int nameToIdHash(String name) {
         return ((int)name.charAt(0) * (int)name.charAt(name.length()/2) * (int)name.charAt(name.length() - 1) *
-                (int)(System.currentTimeMillis() % 100)) % 1001;
+                (int)(System.currentTimeMillis() % 100) * 7) % MAX_SERVER_CAPACITY;
     }
 
     public static String getNameFromId(ArrayList<Player> playerArrayList, int id) {
