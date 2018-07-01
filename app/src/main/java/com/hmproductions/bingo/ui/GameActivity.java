@@ -15,6 +15,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
@@ -153,6 +154,9 @@ public class GameActivity extends AppCompatActivity implements
     @BindView(R.id.currentTime_textView)
     TextView currentTimeTextView;
 
+    @BindView(R.id.quitButton)
+    FloatingActionButton quitFab;
+
     @BindView(R.id.konfettiView)
     KonfettiView konfettiView;
 
@@ -206,6 +210,8 @@ public class GameActivity extends AppCompatActivity implements
         @NonNull
         @Override
         public Loader<QuitPlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
+            quitFab.startAnimation(AnimationUtils.loadAnimation(GameActivity.this, R.anim.clockwise_rotate));
+
             return new QuitLoader(GameActivity.this, actionServiceBlockingStub,
                     com.hmproductions.bingo.models.Player.newBuilder().setColor(getColorFromId(playersList, playerId))
                             .setId(playerId).setReady(true).setName(getNameFromId(playersList, playerId)).setWinCount(0).build(), roomId);
@@ -213,6 +219,7 @@ public class GameActivity extends AppCompatActivity implements
 
         @Override
         public void onLoadFinished(@NonNull Loader<QuitPlayerResponse> loader, QuitPlayerResponse data) {
+            quitFab.hide();
             if (data == null) {
                 onNetworkDownError();
             } else {

@@ -58,6 +58,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     public static ArrayList<Room> roomsList = new ArrayList<>();
 
     @Override
+    @Deprecated
     public void getGridSize(GetGridSizeRequest request, StreamObserver<GetGridSizeResponse> responseObserver) {
 
         GetGridSizeResponse response;
