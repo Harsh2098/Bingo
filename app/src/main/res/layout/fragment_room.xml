@@ -21,10 +21,10 @@
         android:transitionName="@string/room_name_transition" />
 
     <ImageView
+        android:id="@+id/roomClock_imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="4dp"
         android:layout_toStartOf="@id/timeLimit_textView"
         android:contentDescription="@string/stopwatch_image"
         android:src="@drawable/stopwatch_icon" />
@@ -33,12 +33,14 @@
         android:id="@+id/timeLimit_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/roomClock_imageView"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="4dp"
+        android:layout_alignTop="@+id/roomClock_imageView"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
         android:layout_toStartOf="@id/count_linearLayout"
-        android:paddingEnd="20dp"
-        android:paddingStart="20dp"
+        android:gravity="center"
         android:textColor="@android:color/background_dark"
         android:textSize="16sp" />
 

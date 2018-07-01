@@ -102,101 +102,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         }
     }
 
-    private LoaderManager.LoaderCallbacks<RemovePlayerResponse> removePlayerLoader = new LoaderManager.LoaderCallbacks<RemovePlayerResponse>() {
-
-        @NonNull
-        @Override
-        public Loader<RemovePlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
-
-            showQuitProgressBar(true);
-
-            for (Player player : playersList) {
-                if (player.getId() == currentPlayerId) {
-                    return new RemovePlayerLoader(getContext(), actionServiceBlockingStub, player, currentRoomId);
-                }
-            }
-
-            // If not found
-            return new RemovePlayerLoader(getContext(), actionServiceBlockingStub, fakePlayer, currentRoomId);
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<RemovePlayerResponse> loader, RemovePlayerResponse data) {
-
-            showQuitProgressBar(false);
-
-            if (data == null) {
-                networkDownHandler.onNetworkDownError();
-            } else {
-
-                if (data.getStatusCode() == RemovePlayerResponse.StatusCode.OK) {
-                    currentPlayerId = currentRoomId = -1;
-                    playersList.clear();
-                    playersRecyclerAdapter.swapData(null);
-                    fragmentChangeRequest.changeFragment(null, -1, null);
-                }
-            }
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<RemovePlayerResponse> loader) {
-            // Do nothing
-        }
-    };
-
-    private LoaderManager.LoaderCallbacks<SetPlayerReadyResponse> setPlayerReadyLoader = new LoaderManager.LoaderCallbacks<SetPlayerReadyResponse>() {
-        @NonNull
-        @Override
-        public Loader<SetPlayerReadyResponse> onCreateLoader(int id, @Nullable Bundle args) {
-
-            showQuitProgressBar(true);
-            return new SetReadyLoader(getContext(), actionServiceBlockingStub, currentPlayerId, !getPlayerReady(currentPlayerId), currentRoomId);
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<SetPlayerReadyResponse> loader, SetPlayerReadyResponse data) {
-
-            showQuitProgressBar(false);
-            if (data == null) {
-                networkDownHandler.onNetworkDownError();
-            } else {
-                if (data.getStatusCode() == SetPlayerReadyResponse.StatusCode.SERVER_ERROR) {
-                    Toast.makeText(getContext(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<SetPlayerReadyResponse> loader) {
-            // Do nothing
-        }
-    };
-
-    private LoaderManager.LoaderCallbacks<Unsubscribe.UnsubscribeResponse> unsubscribeLoader = new LoaderManager.LoaderCallbacks<Unsubscribe.UnsubscribeResponse>() {
-        @NonNull
-        @Override
-        public Loader<Unsubscribe.UnsubscribeResponse> onCreateLoader(int id, @Nullable Bundle args) {
-
-            return new UnsubscribeLoader(getContext(), actionServiceBlockingStub, currentPlayerId, currentRoomId);
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<Unsubscribe.UnsubscribeResponse> loader, Unsubscribe.UnsubscribeResponse data) {
-
-            if (data == null) {
-                networkDownHandler.onNetworkDownError();
-            } else {
-                if (data.getStatusCode() == Unsubscribe.UnsubscribeResponse.StatusCode.INTERNAL_SERVER_ERROR)
-                    Toast.makeText(getContext(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<Unsubscribe.UnsubscribeResponse> loader) {
-            // Do nothing
-        }
-    };
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -313,14 +218,14 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
                             String text = playersList.size() + " / " + maxCount;
                             countTextView.setText(text);
-                        } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START) {
-
+                        } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.GAME_START && getView() != null) {
 
                             getLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
 
                             Intent gameIntent = new Intent(getContext(), GameActivity.class);
                             gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
                             gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);
+                            gameIntent.putExtra(GameActivity.ROOM_NAME_EXTRA_KEY, ((TextView) getView().findViewById(R.id.roomName_textView)).getText().toString());
 
                             if (getArguments() != null)
                                 gameIntent.putExtra(GameActivity.TIME_LIMIT_ID, getArguments().getInt(TIME_LIMIT_BUNDLE_KEY));
@@ -405,4 +310,100 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         leaveButton.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
 
     }
+
+    private LoaderManager.LoaderCallbacks<RemovePlayerResponse> removePlayerLoader = new LoaderManager.LoaderCallbacks<RemovePlayerResponse>() {
+
+        @NonNull
+        @Override
+        public Loader<RemovePlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
+
+            showQuitProgressBar(true);
+
+            for (Player player : playersList) {
+                if (player.getId() == currentPlayerId) {
+                    return new RemovePlayerLoader(getContext(), actionServiceBlockingStub, player, currentRoomId);
+                }
+            }
+
+            // If not found
+            return new RemovePlayerLoader(getContext(), actionServiceBlockingStub, fakePlayer, currentRoomId);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<RemovePlayerResponse> loader, RemovePlayerResponse data) {
+
+            showQuitProgressBar(false);
+
+            if (data == null) {
+                networkDownHandler.onNetworkDownError();
+            } else {
+
+                if (data.getStatusCode() == RemovePlayerResponse.StatusCode.OK) {
+                    currentPlayerId = currentRoomId = -1;
+                    playersList.clear();
+                    playersRecyclerAdapter.swapData(null);
+                    fragmentChangeRequest.changeFragment(null, -1, null);
+                }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<RemovePlayerResponse> loader) {
+            // Do nothing
+        }
+    };
+
+    private LoaderManager.LoaderCallbacks<SetPlayerReadyResponse> setPlayerReadyLoader = new LoaderManager.LoaderCallbacks<SetPlayerReadyResponse>() {
+        @NonNull
+        @Override
+        public Loader<SetPlayerReadyResponse> onCreateLoader(int id, @Nullable Bundle args) {
+
+            showQuitProgressBar(true);
+            return new SetReadyLoader(getContext(), actionServiceBlockingStub, currentPlayerId, !getPlayerReady(currentPlayerId), currentRoomId);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<SetPlayerReadyResponse> loader, SetPlayerReadyResponse data) {
+
+            showQuitProgressBar(false);
+            if (data == null) {
+                networkDownHandler.onNetworkDownError();
+            } else {
+                if (data.getStatusCode() == SetPlayerReadyResponse.StatusCode.SERVER_ERROR) {
+                    Toast.makeText(getContext(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<SetPlayerReadyResponse> loader) {
+            // Do nothing
+        }
+    };
+
+    private LoaderManager.LoaderCallbacks<Unsubscribe.UnsubscribeResponse> unsubscribeLoader = new LoaderManager.LoaderCallbacks<Unsubscribe.UnsubscribeResponse>() {
+        @NonNull
+        @Override
+        public Loader<Unsubscribe.UnsubscribeResponse> onCreateLoader(int id, @Nullable Bundle args) {
+
+            return new UnsubscribeLoader(getContext(), actionServiceBlockingStub, currentPlayerId, currentRoomId);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<Unsubscribe.UnsubscribeResponse> loader, Unsubscribe.UnsubscribeResponse data) {
+
+            if (data == null) {
+                networkDownHandler.onNetworkDownError();
+            } else {
+                if (data.getStatusCode() == Unsubscribe.UnsubscribeResponse.StatusCode.INTERNAL_SERVER_ERROR)
+                    Toast.makeText(getContext(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<Unsubscribe.UnsubscribeResponse> loader) {
+            // Do nothing
+        }
+    };
+
 }

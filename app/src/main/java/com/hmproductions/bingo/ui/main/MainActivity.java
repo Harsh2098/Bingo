@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +43,8 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.hmproductions.bingo.ui.main.RoomFragment.ROOM_NAME_BUNDLE_KEY;
+import static com.hmproductions.bingo.ui.main.RoomFragment.TIME_LIMIT_BUNDLE_KEY;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_OPENED_KEY;
 
 public class MainActivity extends AppCompatActivity implements
@@ -75,10 +76,11 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.main_toolbar)
     Toolbar mainToolbar;
 
+    // TODO : what if another player loses connection, make player ID generation more random
     static int currentPlayerId = -1, currentRoomId = -1;
     static ArrayList<Player> playersList = new ArrayList<>();
 
-    AlertDialog loadingDialog, helpDialog;
+    AlertDialog helpDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,10 +95,6 @@ public class MainActivity extends AppCompatActivity implements
         mainToolbar.setTitle("");
         setSupportActionBar(mainToolbar);
 
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.loading_dialog, null);
-        ((TextView) dialogView.findViewById(R.id.progressDialog_textView)).setText(R.string.processing_request);
-        loadingDialog = new AlertDialog.Builder(this).setView(dialogView).setCancelable(false).create();
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         if (getIntent().getAction() != null && getIntent().getAction().equals(Constants.QUIT_GAME_ACTION)) {
@@ -104,7 +102,14 @@ public class MainActivity extends AppCompatActivity implements
                 currentPlayerId = getIntent().getIntExtra(GameActivity.PLAYER_ID, currentPlayerId);
                 currentRoomId = getIntent().getIntExtra(GameActivity.ROOM_ID, currentRoomId);
 
-                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new RoomFragment()).commit();
+                RoomFragment roomFragment = new RoomFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putInt(TIME_LIMIT_BUNDLE_KEY, getIntent().getIntExtra(TIME_LIMIT_BUNDLE_KEY, 2));
+                bundle.putString(ROOM_NAME_BUNDLE_KEY, getIntent().getStringExtra(GameActivity.ROOM_NAME_EXTRA_KEY));
+                roomFragment.setArguments(bundle);
+
+                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, roomFragment).commit();
                 return;
             }
         }
@@ -179,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements
             if (roomName != null) {
                 Bundle bundle = new Bundle();
                 bundle.putString(RoomFragment.ROOM_NAME_BUNDLE_KEY, roomName);
-                bundle.putInt(RoomFragment.TIME_LIMIT_BUNDLE_KEY, timeLimit);
+                bundle.putInt(TIME_LIMIT_BUNDLE_KEY, timeLimit);
                 roomFragment.setArguments(bundle);
             }
 
@@ -192,6 +197,8 @@ public class MainActivity extends AppCompatActivity implements
 
             playerNameEditText.setEnabled(false);
             colorPicker.setEnabled(false);
+
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         }
     }
 

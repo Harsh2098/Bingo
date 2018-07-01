@@ -23,6 +23,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.GridLayoutAnimationController;
@@ -57,6 +58,7 @@ import com.hmproductions.bingo.loaders.QuitLoader;
 import com.hmproductions.bingo.models.GameEvent;
 import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.ui.main.MainActivity;
+import com.hmproductions.bingo.ui.main.RoomFragment;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.TimeLimitUtils;
@@ -93,6 +95,7 @@ import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.valueClicked;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getExactValueFromEnum;
+import static com.hmproductions.bingo.utils.TimeLimitUtils.getValueFromEnum;
 
 public class GameActivity extends AppCompatActivity implements
         GameGridRecyclerAdapter.GridCellClickListener,
@@ -103,6 +106,7 @@ public class GameActivity extends AppCompatActivity implements
     public static final String PLAYER_ID = "player-id";
     public static final String ROOM_ID = "room-id";
     public static final String TIME_LIMIT_ID = "time-limit-id";
+    public static final String ROOM_NAME_EXTRA_KEY = "room-name-extra-key";
 
     public static final String PLAYERS_LIST_ID = "players-list-id";
     private static final String LEADERBOARD_LIST_KEY = "leaderboard-list-key";
@@ -169,7 +173,9 @@ public class GameActivity extends AppCompatActivity implements
     ArrayList<GridCell> gameGridCellList = new ArrayList<>();
 
     private int playerId = -1, roomId = -1;
-    TimeLimitUtils.TIME_LIMIT currentTimeLimit = TimeLimitUtils.TIME_LIMIT.INFINITE;
+
+    private String currentRoomName = "";
+    private TimeLimitUtils.TIME_LIMIT currentTimeLimit = TimeLimitUtils.TIME_LIMIT.INFINITE;
 
     private boolean gameCompleted = false, myTurn = false;
     private ArrayList<Player> playersList = new ArrayList<>();
@@ -324,10 +330,13 @@ public class GameActivity extends AppCompatActivity implements
                         break;
 
                     case PLAYER_QUIT_VALUE:
+                        // Here winner ID refers to the ID of player who has quit
                         Intent quitIntent = new Intent(GameActivity.this, MainActivity.class);
                         quitIntent.setAction(Constants.QUIT_GAME_ACTION);
 
+                        quitIntent.putExtra(RoomFragment.TIME_LIMIT_BUNDLE_KEY, getValueFromEnum(currentTimeLimit));
                         quitIntent.putExtra(MainActivity.PLAYER_LEFT_ID, playerId == winnerId);
+                        quitIntent.putExtra(ROOM_NAME_EXTRA_KEY, currentRoomName);
 
                         if (currentPlayerId == winnerId) {
                             startActivity(quitIntent);
@@ -337,6 +346,8 @@ public class GameActivity extends AppCompatActivity implements
 
                         quitIntent.putExtra(PLAYER_ID, playerId);
                         quitIntent.putExtra(ROOM_ID, roomId);
+
+                        Log.v(":::", "value from enum = " + getValueFromEnum(currentTimeLimit));
 
                         gameTimer.cancel();
                         startActivity(quitIntent);
@@ -423,6 +434,7 @@ public class GameActivity extends AppCompatActivity implements
         roomId = getIntent().getIntExtra(ROOM_ID, -1);
         playerId = getIntent().getIntExtra(PLAYER_ID, -1);
         currentTimeLimit = getEnumFromValue(getIntent().getIntExtra(TIME_LIMIT_ID, 2));
+        currentRoomName = getIntent().getStringExtra(ROOM_NAME_EXTRA_KEY);
         playersList = getIntent().getParcelableArrayListExtra(PLAYERS_LIST_ID);
 
         new Handler().post(() -> subscribeToGameEventUpdates(playerId, roomId));
