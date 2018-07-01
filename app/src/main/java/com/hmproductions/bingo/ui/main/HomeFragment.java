@@ -132,14 +132,14 @@ public class HomeFragment extends Fragment implements
             } else {
                 if (data.getStatusCode() == HostRoomResponse.StatusCode.INTERNAL_SERVER_ERROR) {
                     currentPlayerId = -1;
-                    snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
+                    snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_SHORT);
 
                 } else if (data.getStatusCode() == HostRoomResponse.StatusCode.NAME_TAKEN) {
                     Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
 
                     hostFab.callOnClick();
                 } else {
-                    snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
+                    snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_SHORT);
                     currentRoomId = data.getRoomId();
 
                     fragmentChangeRequest.changeFragment(preferences.getString(ROOM_NAME_KEY, "New Room"),
@@ -200,7 +200,7 @@ public class HomeFragment extends Fragment implements
 
                     case AddPlayerResponse.StatusCode.ROOM_FULL_VALUE:
                     default:
-                        snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
+                        snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_SHORT);
                         currentPlayerId = -1;
                         break;
                 }
@@ -334,7 +334,7 @@ public class HomeFragment extends Fragment implements
                     roomsRecyclerView.setVisibility(View.INVISIBLE);
 
                     if (getActivity() != null && getView() != null && getArguments() != null && getArguments().getBoolean(SplashActivity.SHOW_SNACKBAR_KEY)) {
-                        snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_LONG);
+                        snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_SHORT);
                     }
                     break;
 

@@ -10,12 +10,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,11 +74,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     private int maxCount = Constants.MIN_PLAYERS;
 
-    RecyclerView playersRecyclerView;
+    Button leaveButton;
     TextView countTextView;
+    ProgressBar leaveProgressBar;
+    RecyclerView playersRecyclerView;
     LinearLayoutManager linearLayoutManager;
 
-    AlertDialog loadingDialog;
     ConnectionUtils.OnNetworkDownHandler networkDownHandler;
     Miscellaneous.OnFragmentChangeRequest fragmentChangeRequest;
 
@@ -106,7 +108,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         @Override
         public Loader<RemovePlayerResponse> onCreateLoader(int id, @Nullable Bundle args) {
 
-            loadingDialog.show();
+            showQuitProgressBar(true);
 
             for (Player player : playersList) {
                 if (player.getId() == currentPlayerId) {
@@ -121,7 +123,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         @Override
         public void onLoadFinished(@NonNull Loader<RemovePlayerResponse> loader, RemovePlayerResponse data) {
 
-            loadingDialog.dismiss();
+            showQuitProgressBar(false);
 
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
@@ -147,16 +149,14 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         @Override
         public Loader<SetPlayerReadyResponse> onCreateLoader(int id, @Nullable Bundle args) {
 
-            loadingDialog.show();
-
+            showQuitProgressBar(true);
             return new SetReadyLoader(getContext(), actionServiceBlockingStub, currentPlayerId, !getPlayerReady(currentPlayerId), currentRoomId);
         }
 
         @Override
         public void onLoadFinished(@NonNull Loader<SetPlayerReadyResponse> loader, SetPlayerReadyResponse data) {
 
-            loadingDialog.dismiss();
-
+            showQuitProgressBar(false);
             if (data == null) {
                 networkDownHandler.onNetworkDownError();
             } else {
@@ -207,16 +207,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         playersRecyclerView = customView.findViewById(R.id.players_recyclerView);
         countTextView = customView.findViewById(R.id.count_textView);
+        leaveButton = customView.findViewById(R.id.leave_button);
+        leaveProgressBar = customView.findViewById(R.id.quit_progressBar);
 
         if (getArguments() != null) {
             ((TextView) customView.findViewById(R.id.roomName_textView)).setText(getArguments().getString(ROOM_NAME_BUNDLE_KEY));
             ((TextView) customView.findViewById(R.id.timeLimit_textView)).setText(getTimeLimitString(getEnumFromValue(getArguments().getInt(TIME_LIMIT_BUNDLE_KEY))));
-        }
-
-        if (getContext() != null) {
-            View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.loading_dialog, null);
-            ((TextView) dialogView.findViewById(R.id.progressDialog_textView)).setText(R.string.processing_request);
-            loadingDialog = new AlertDialog.Builder(getContext()).setView(dialogView).setCancelable(false).create();
         }
 
         playersRecyclerAdapter = new PlayersRecyclerAdapter(playersList, getContext(), this);
@@ -396,5 +392,11 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         }
 
         return returnPosition;
+    }
+
+    private void showQuitProgressBar(boolean show) {
+        leaveProgressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        leaveButton.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+
     }
 }

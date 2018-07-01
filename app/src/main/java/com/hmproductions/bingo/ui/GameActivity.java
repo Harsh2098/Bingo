@@ -672,9 +672,14 @@ public class GameActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(@NonNull Loader<ClickGridCellResponse> loader, ClickGridCellResponse data) {
-        if (data.getStatusCode() == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR ||
-                data.getStatusCode() == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
-            Toast.makeText(this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+
+        if (data == null) {
+            onNetworkDownError();
+        } else {
+            if (data.getStatusCode() == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR ||
+                    data.getStatusCode() == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
+                Toast.makeText(this, data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
