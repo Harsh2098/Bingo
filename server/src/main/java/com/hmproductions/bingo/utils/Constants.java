@@ -15,6 +15,9 @@ public class Constants {
     public static final String GET_ROOMS_METHOD_NAME = "com.hmproductions.bingo.BingoActionService/GetRooms";
     public static final String REMOVE_PLAYER_METHOD_NAME = "com.hmproductions.bingo.BingoActionService/RemovePlayer";
 
+    public static final String ROOM_STREAMING_METHOD_NAME = "com.hmproductions.bingo.BingoStreamService/GetRoomEventUpdates";
+    public static final String GAME_STREAMING_METHOD_NAME = "com.hmproductions.bingo.BingoStreamService/GetGameEventUpdates";
+
     public static final int NO_WINNER_ID_CODE = -1;
     public static final int PLAYER_QUIT_CODE = -2;
     public static final int NEXT_ROUND_CODE = -3;

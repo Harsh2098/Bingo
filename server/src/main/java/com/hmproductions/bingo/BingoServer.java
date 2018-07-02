@@ -2,6 +2,7 @@ package com.hmproductions.bingo;
 
 import com.hmproductions.bingo.data.ConnectionData;
 import com.hmproductions.bingo.filter.ServerHeaderInterceptor;
+import com.hmproductions.bingo.filter.StreamTerminationTracer;
 import com.hmproductions.bingo.filter.TerminationFilter;
 import com.hmproductions.bingo.services.BingoActionServiceImpl;
 import com.hmproductions.bingo.services.BingoStreamServiceImpl;
@@ -35,6 +36,7 @@ public class BingoServer {
                 .addTransportFilter(new TerminationFilter())
                 .useTransportSecurity(serverCertificateFile, serverKeyFile)
                 .handshakeTimeout(30, TimeUnit.SECONDS)
+                .addStreamTracerFactory(new StreamTerminationTracer())
                 .build();
 
         try {

@@ -76,8 +76,6 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
                 currentRoom.getGameEventSubscriptionArrayList().add(new GameEventSubscription(request.getPlayerId(), responseObserver, request));
             }
 
-            System.out.println("Sending update");
-
             GameEvent gameEvent;
 
             if (request.getFirstSubscription()) {
