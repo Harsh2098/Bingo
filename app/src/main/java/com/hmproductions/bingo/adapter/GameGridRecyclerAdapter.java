@@ -72,7 +72,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
 
         holder.value_textView.setText(String.valueOf(currentGridCell.getValue()));
 
-        if (gameGridCellList.get(position).getIsClicked()) {
+        if (gameGridCellList.get(position).isClicked()) {
 
             int colorPosition = Arrays.asList(context.getResources().getStringArray(R.array.colorsName)).indexOf(currentGridCell.getColor());
 

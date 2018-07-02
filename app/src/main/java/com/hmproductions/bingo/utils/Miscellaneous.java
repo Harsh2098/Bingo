@@ -95,7 +95,7 @@ public class Miscellaneous {
 
     public static boolean valueClicked(ArrayList<GridCell> gridCellArrayList, int value) {
         for (GridCell gridCell : gridCellArrayList) {
-            if (gridCell.getValue() == value && gridCell.getIsClicked())
+            if (gridCell.getValue() == value && gridCell.isClicked())
                 return true;
         }
         return false;

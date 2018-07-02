@@ -362,7 +362,7 @@ public class GameActivity extends AppCompatActivity implements
 
                         for (GridCell gridCell : gameGridCellList) {
                             if (gridCell.getValue() == cellClicked) {
-                                gridCell.setIsClicked(true);
+                                gridCell.setClicked(true);
                                 gridCell.setColor(getColorFromNextPlayerId(playersList, currentPlayerId));
                                 gridRecyclerAdapter.swapData(gameGridCellList, gameGridCellList.indexOf(gridCell));
                                 break;
@@ -507,7 +507,7 @@ public class GameActivity extends AppCompatActivity implements
         for (int i = 0; i < GRID_SIZE; ++i) {
             boolean columnFormed = true;
             for (int j = 0; j < GRID_SIZE; ++j)
-                if (!gameGridCellList.get(j * GRID_SIZE + i).getIsClicked()) {
+                if (!gameGridCellList.get(j * GRID_SIZE + i).isClicked()) {
                     columnFormed = false;
                     break;
                 }
@@ -518,7 +518,7 @@ public class GameActivity extends AppCompatActivity implements
         for (int i = 0; i < GRID_SIZE; ++i) {
             boolean rowFormed = true;
             for (int j = 0; j < GRID_SIZE; ++j) {
-                if (!gameGridCellList.get(i * GRID_SIZE + j).getIsClicked()) {
+                if (!gameGridCellList.get(i * GRID_SIZE + j).isClicked()) {
                     rowFormed = false;
                     break;
                 }
@@ -529,7 +529,7 @@ public class GameActivity extends AppCompatActivity implements
         // Checking for diagonals
         boolean mainDiagonalFormed = true;
         for (int i = 0; i < GRID_SIZE; ++i) {
-            if (!gameGridCellList.get(i * GRID_SIZE + i).getIsClicked()) {
+            if (!gameGridCellList.get(i * GRID_SIZE + i).isClicked()) {
                 mainDiagonalFormed = false;
                 break;
             }
@@ -538,7 +538,7 @@ public class GameActivity extends AppCompatActivity implements
 
         boolean secondaryDiagonalFormed = true;
         for (int i = 0; i < GRID_SIZE; ++i) {
-            if (!gameGridCellList.get(i * GRID_SIZE + (GRID_SIZE - i - 1)).getIsClicked()) {
+            if (!gameGridCellList.get(i * GRID_SIZE + (GRID_SIZE - i - 1)).isClicked()) {
                 secondaryDiagonalFormed = false;
                 break;
             }
