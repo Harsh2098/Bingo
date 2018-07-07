@@ -7,10 +7,10 @@
     android:background="@color/default_background">
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/bingo_shimmerFrameLayout"
+        android:id="@+id/bingoShimmerFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/centering_view"
+        android:layout_above="@+id/centeringView"
         app:shimmer_auto_start="true"
         app:shimmer_base_alpha="1"
         app:shimmer_base_color="@color/primaryColor"
@@ -20,7 +20,7 @@
         app:shimmer_highlight_color="@color/gold_shimmer">
 
         <TextView
-            android:id="@+id/toolbarName_textView"
+            android:id="@+id/appNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
@@ -34,16 +34,16 @@
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <View
-        android:id="@+id/centering_view"
+        android:id="@+id/centeringView"
         android:layout_width="1dp"
         android:layout_height="1dp"
         android:layout_centerInParent="true" />
 
     <TextView
-        android:id="@+id/loading_textView"
+        android:id="@+id/loadingTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/centering_view"
+        android:layout_below="@+id/centeringView"
         android:layout_marginTop="60dp"
         android:gravity="center"
         android:text="@string/starting"
