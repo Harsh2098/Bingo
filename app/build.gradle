@@ -114,8 +114,3 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.jetbrains.anko:anko:0.10.5"
 }
-
-repositories {
-    mavenCentral()
-}
-

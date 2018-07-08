@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityOptionsCompat
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -22,14 +21,16 @@ import com.hmproductions.bingo.utils.Constants.SERVER_ADDRESS
 import com.hmproductions.bingo.utils.Constants.SERVER_PORT
 import io.grpc.ManagedChannel
 import kotlinx.android.synthetic.main.activity_splash_screen.*
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import org.jetbrains.anko.yesButton
 import javax.inject.Inject
 
 class SplashActivity : AppCompatActivity() {
 
     companion object {
-        public const val SHOW_SNACKBAR_KEY = "show-snackbar-key"
+        const val SHOW_SNACKBAR_KEY = "show-snackbar-key"
     }
 
     @Inject
@@ -52,13 +53,11 @@ class SplashActivity : AppCompatActivity() {
         appNameTextView.animation = AnimationUtils.loadAnimation(this, R.anim.zoom_out_animation)
 
         if (!isGooglePlayServicesAvailable(this)) {
-            val playServicesBuilder = AlertDialog.Builder(this)
-            playServicesBuilder
-                    .setMessage("Bingo requires latest version of google play services.")
-                    .setPositiveButton("Close") { _, _ -> finish() }
-                    .setTitle("Update PlayServices")
-                    .setCancelable(true)
-                    .show()
+
+            alert("Bingo requires latest version of google play services", "Update PlayServices") {
+                isCancelable = false
+                yesButton { finish() }
+            }.show()
         }
 
         actionServiceBlockingStub = BingoActionServiceGrpc.newBlockingStub(channel)
