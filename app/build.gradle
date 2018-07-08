@@ -31,7 +31,16 @@ android {
         experimental = true
     }
 
-    sourceSets.main.kotlin.srcDirs 'build/generated/source/proto'
+    sourceSets {
+        debug.java.srcDirs += 'build/generated/source/proto/debug/java'
+        debug.java.srcDirs += 'build/generated/source/proto/debug/grpc'
+        debug.java.srcDirs += 'build/generated/source/proto/debug/javalite'
+        release.java.srcDirs += 'build/generated/source/proto/release/java'
+        release.java.srcDirs += 'build/generated/source/proto/release/grpc'
+        release.java.srcDirs += 'build/generated/source/proto/release/javalite'
+        main.proto.srcDirs += 'src/main/proto'
+        main.kotlin.srcDirs 'build/generated/source/proto'
+    }
 }
 
 protobuf {

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package com.hmproductions.bingo.models;
+option java_multiple_files = true;
+
+message RoomSubscription {
+
+    uint32 room_id = 1;
+    uint32 player_id = 2;
+}

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package com.hmproductions.bingo.actions;
+option java_multiple_files = true;
+
+import "models/Player.proto";
+
+message QuitPlayerRequest {
+
+    models.Player player = 1;
+    uint32 room_id = 2;
+}
+
+message QuitPlayerResponse {
+
+    enum StatusCode {
+        OK = 0;
+        ROOM_NOT_EXIST = 1;
+        SERVER_ERROR = 2;
+    }
+
+    StatusCode status_code = 1;
+    string status_message = 2;
+}

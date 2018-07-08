@@ -29,7 +29,7 @@ import javax.inject.Inject
 class SplashActivity : AppCompatActivity() {
 
     companion object {
-        val SHOW_SNACKBAR_KEY = "show-snackbar-key"
+        public const val SHOW_SNACKBAR_KEY = "show-snackbar-key"
     }
 
     @Inject
@@ -55,7 +55,7 @@ class SplashActivity : AppCompatActivity() {
             val playServicesBuilder = AlertDialog.Builder(this)
             playServicesBuilder
                     .setMessage("Bingo requires latest version of google play services.")
-                    .setPositiveButton("Close") { dialogInterface, i -> finish() }
+                    .setPositiveButton("Close") { _, _ -> finish() }
                     .setTitle("Update PlayServices")
                     .setCancelable(true)
                     .show()
@@ -76,7 +76,7 @@ class SplashActivity : AppCompatActivity() {
             Handler().postDelayed({
                 Snackbar
                         .make(findViewById<View>(android.R.id.content), "Please check internet connection", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("RETRY") { v -> startMainActivity() }
+                        .setAction("RETRY") { _ -> startMainActivity() }
                         .show()
             }, 500)
             return
@@ -105,7 +105,7 @@ class SplashActivity : AppCompatActivity() {
                     Handler().postDelayed({
                         Snackbar
                                 .make(findViewById<View>(android.R.id.content), "Couldn't connect to server", Snackbar.LENGTH_INDEFINITE)
-                                .setAction("RETRY") { v -> startMainActivity() }
+                                .setAction("RETRY") { _ -> startMainActivity() }
                                 .show()
                     }, 500)
                 }
