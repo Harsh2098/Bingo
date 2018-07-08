@@ -37,8 +37,6 @@ public class ChannelModule {
     @Provides
     @BingoApplicationScope
     public ManagedChannel getManagedChannel(Context context) {
-
-
         try {
             return OkHttpChannelBuilder
                     .forAddress(Constants.SERVER_ADDRESS, Constants.SERVER_PORT)
