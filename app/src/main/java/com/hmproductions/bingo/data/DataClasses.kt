@@ -4,8 +4,6 @@ import android.os.Parcelable
 import com.hmproductions.bingo.utils.TimeLimitUtils
 import kotlinx.android.parcel.Parcelize
 
-data class ClickCellRequest(val roomId: Int, val playerId: Int, val cellClicked: Int)
-
 data class GridCell(val value: Int, var isClicked: Boolean) {
     var color: String? = null
 }

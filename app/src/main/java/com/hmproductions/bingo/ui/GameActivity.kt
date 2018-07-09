@@ -9,13 +9,10 @@ import android.os.Handler
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
-import android.support.v4.app.LoaderManager.LoaderCallbacks
-import android.support.v4.content.Loader
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.animation.GridLayoutAnimationController
@@ -27,28 +24,24 @@ import com.google.android.gms.common.util.NumberUtils
 import com.hmproductions.bingo.BingoActionServiceGrpc
 import com.hmproductions.bingo.BingoStreamServiceGrpc
 import com.hmproductions.bingo.R
-import com.hmproductions.bingo.actions.BroadcastWinnerResponse
+import com.hmproductions.bingo.actions.*
+import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellRequest
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse
-import com.hmproductions.bingo.actions.QuitPlayerResponse
-import com.hmproductions.bingo.actions.StartNextRoundResponse
 import com.hmproductions.bingo.adapter.GameGridRecyclerAdapter
 import com.hmproductions.bingo.adapter.LeaderboardRecyclerAdapter
 import com.hmproductions.bingo.dagger.ContextModule
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent
-import com.hmproductions.bingo.data.ClickCellRequest
 import com.hmproductions.bingo.data.GridCell
 import com.hmproductions.bingo.data.LeaderboardPlayer
 import com.hmproductions.bingo.data.Player
 import com.hmproductions.bingo.datastreams.GameEventUpdate
-import com.hmproductions.bingo.loaders.BroadcastWinnerLoader
-import com.hmproductions.bingo.loaders.ClickCellLoader
-import com.hmproductions.bingo.loaders.NextRoundLoader
-import com.hmproductions.bingo.loaders.QuitLoader
 import com.hmproductions.bingo.models.GameEvent.EventCode.*
 import com.hmproductions.bingo.models.GameSubscription
 import com.hmproductions.bingo.ui.main.MainActivity
 import com.hmproductions.bingo.ui.main.RoomFragment
 import com.hmproductions.bingo.utils.ConnectionUtils
+import com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo
+import com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp
 import com.hmproductions.bingo.utils.Constants
 import com.hmproductions.bingo.utils.Constants.*
 import com.hmproductions.bingo.utils.Miscellaneous.*
@@ -58,16 +51,17 @@ import io.grpc.stub.StreamObserver
 import kotlinx.android.synthetic.main.activity_game.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
 import java.text.DecimalFormatSymbols
 import java.util.*
 import javax.inject.Inject
 
-class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, LoaderCallbacks<ClickGridCellResponse>, ConnectionUtils.OnNetworkDownHandler, RecognitionListener {
+class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, ConnectionUtils.OnNetworkDownHandler, RecognitionListener {
 
     companion object {
-
         const val PLAYER_ID = "player-id"
         const val ROOM_ID = "room-id"
         const val TIME_LIMIT_ID = "time-limit-id"
@@ -111,77 +105,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     private var gameGridCellList = ArrayList<GridCell>()
     private var playersList = ArrayList<Player>()
-
-    /*
-     *  cellsClicked[] keeps track of the grid cells clicked by the user
-     *  mData holds the list of GridCells
-     *  lastClickPosition holds the X,Y position of recently clicked grid cell
-     */
-
-    private val broadcastWinnerLoader = object : LoaderCallbacks<BroadcastWinnerResponse> {
-
-        override fun onCreateLoader(id: Int, args: Bundle?): Loader<BroadcastWinnerResponse> {
-            return BroadcastWinnerLoader(this@GameActivity, actionServiceBlockingStub, roomId,
-                    com.hmproductions.bingo.models.Player.newBuilder().setName(getNameFromId(playersList, playerId))
-                            .setId(playerId).setColor(getColorFromId(playersList, playerId)).setReady(true).build())
-        }
-
-        override fun onLoadFinished(loader: Loader<BroadcastWinnerResponse>, data: BroadcastWinnerResponse?) {
-            if (data == null) {
-                onNetworkDownError()
-            } else {
-                if (data.statusCode == BroadcastWinnerResponse.StatusCode.INTERNAL_SERVER_ERROR)
-                    toast(data.statusMessage)
-            }
-        }
-
-        override fun onLoaderReset(loader: Loader<BroadcastWinnerResponse>) {
-            // Do nothing
-        }
-    }
-
-    private val quitPlayerLoader = object : LoaderCallbacks<QuitPlayerResponse> {
-        override fun onCreateLoader(id: Int, args: Bundle?): Loader<QuitPlayerResponse> {
-            quitButton.startAnimation(AnimationUtils.loadAnimation(this@GameActivity, R.anim.clockwise_rotate))
-
-            return QuitLoader(this@GameActivity, actionServiceBlockingStub,
-                    com.hmproductions.bingo.models.Player.newBuilder().setColor(getColorFromId(playersList, playerId))
-                            .setId(playerId).setReady(true).setName(getNameFromId(playersList, playerId)).setWinCount(0).build(), roomId)
-        }
-
-        override fun onLoadFinished(loader: Loader<QuitPlayerResponse>, data: QuitPlayerResponse?) {
-            quitButton.hide()
-            if (data == null) {
-                onNetworkDownError()
-            } else {
-                if (data.statusCode == QuitPlayerResponse.StatusCode.SERVER_ERROR)
-                    toast(data.statusMessage)
-            }
-        }
-
-        override fun onLoaderReset(loader: Loader<QuitPlayerResponse>) {
-            // Do nothing
-        }
-    }
-
-    private val startNextRoundLoader = object : LoaderCallbacks<StartNextRoundResponse> {
-        override fun onCreateLoader(id: Int, args: Bundle?): Loader<StartNextRoundResponse> {
-            return NextRoundLoader(this@GameActivity, actionServiceBlockingStub, playerId, roomId)
-        }
-
-        override fun onLoadFinished(loader: Loader<StartNextRoundResponse>, data: StartNextRoundResponse?) {
-            if (data == null) {
-                onNetworkDownError()
-            } else {
-                if (data.statusCode == StartNextRoundResponse.StatusCode.INTERNAL_SERVER_ERROR)
-                    toast(data.statusMessage)
-            }
-        }
-
-        override fun onLoaderReset(loader: Loader<StartNextRoundResponse>) {
-
-        }
-    }
 
     private val gridCellReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -238,7 +161,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                             turnOrderTextView.text = if (winnerId == playerId) "You won" else getNameFromId(playersList, winnerId)!! + " won"
                             gameCompleted = true
                         }
-
                         gameTimer?.cancel()
                     }
 
@@ -260,8 +182,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         quitIntent.putExtra(PLAYER_ID, playerId)
                         quitIntent.putExtra(ROOM_ID, roomId)
 
-                        Log.v(":::", "value from enum = " + getValueFromEnum(currentTimeLimit))
-
                         gameTimer?.cancel()
                         startActivity(quitIntent)
                         finish()
@@ -282,23 +202,22 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         }
 
                         if (numberOfLinesCompleted() == 5 && !gameCompleted)
-                            supportLoaderManager.restartLoader(Constants.BROADCAST_WINNER_LOADER_ID, null,
-                                    broadcastWinnerLoader)
+                            broadcastWinnerAsynchronously()
 
                         myTurn = currentPlayerId == playerId
 
                         if (myTurn) {
                             startGameTimer()
 
-                            if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
-                                startListening()
+                            if (preferences.getBoolean(getString(R.string.tts_preference_key), false)) speechRecognizer.startListening(speechRecognitionIntent)
                             gameRecyclerView.isEnabled = true
+
                         } else {
-                            gameTimer!!.cancel()
+                            gameTimer?.cancel()
                             gameRecyclerView.isEnabled = false
                         }
 
-                        setTurnOrderText(currentPlayerId)
+                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else getNameFromId(playersList, currentPlayerId)!! + "\'s turn"
                     }
 
                     GAME_STARTED_VALUE -> {
@@ -309,11 +228,11 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                             startGameTimer()
 
                             if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
-                                startListening()
+                                speechRecognizer.startListening(speechRecognitionIntent)
                             else
                                 gameRecyclerView.isEnabled = true
                         } else {
-                            gameTimer!!.cancel()
+                            gameTimer?.cancel()
                             gameRecyclerView.isEnabled = false
                         }
 
@@ -321,7 +240,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         startMicTapTargetView()
 
-                        setTurnOrderText(currentPlayerId)
+                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else getNameFromId(playersList, currentPlayerId)!! + "\'s turn"
                     }
 
                     NEXT_ROUND_VALUE -> recreate()
@@ -353,10 +272,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         gridRecyclerAdapter = GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this)
 
-        gameRecyclerView.layoutManager = GridLayoutManager(this, GRID_SIZE)
-        gameRecyclerView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.game_grid_animation) as GridLayoutAnimationController
-        gameRecyclerView.adapter = gridRecyclerAdapter
-        gameRecyclerView.setHasFixedSize(true)
+        with(gameRecyclerView) {
+            layoutManager = GridLayoutManager(this@GameActivity, GRID_SIZE)
+            layoutAnimation = AnimationUtils.loadLayoutAnimation(this@GameActivity, R.anim.game_grid_animation) as GridLayoutAnimationController
+            adapter = gridRecyclerAdapter
+            setHasFixedSize(true)
+        }
 
         celebrationSound = MediaPlayer.create(this, R.raw.tada_celebration)
         popSound = MediaPlayer.create(this, R.raw.pop)
@@ -394,10 +315,23 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 timeLimitProgressBar.progress = timeLimitProgressBar.max
                 currentTimeTextView.text = getExactValueFromEnum(currentTimeLimit).toString()
 
-                val bundle = Bundle()
-                bundle.putInt(CELL_CLICKED_ID, TURN_SKIPPED_CODE)
-                supportLoaderManager.restartLoader(Constants.CLICK_CELL_LOADER_ID, bundle, this@GameActivity)
+                clickCellAsynchronously(TURN_SKIPPED_CODE)
             }
+        }
+    }
+
+    private fun startGameTimer() {
+        timeLimitProgressBar.isIndeterminate = false
+
+        if (currentTimeLimit == TimeLimitUtils.TIME_LIMIT.INFINITE) {
+            timeLimitProgressBar.max = 1
+            timeLimitProgressBar.progress = timeLimitProgressBar.max
+            currentTimeTextView.text = DecimalFormatSymbols.getInstance().infinity
+        } else {
+            val totalTime = getExactValueFromEnum(currentTimeLimit)
+            timeLimitProgressBar.progress = 0
+            timeLimitProgressBar.max = totalTime
+            gameTimer?.start()
         }
     }
 
@@ -475,7 +409,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 .setCancelable(false)
                 .setTitle("Confirm Quit")
                 .setMessage("Game will be cancelled. Do you want to forfeit ?")
-                .setPositiveButton(R.string.quit) { _, _ -> supportLoaderManager.restartLoader(Constants.QUIT_PLAYER_LOADER_ID, null, quitPlayerLoader) }
+                .setPositiveButton(R.string.quit) { _, _ -> quitPlayerAsynchronously() }
                 .setNegativeButton(R.string.no) { dI, _ -> dI.dismiss() }
                 .show()
     }
@@ -483,7 +417,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     @OnClick(R.id.nextRoundButton)
     fun onNextRoundButtonClick() {
         toast("Waiting for other players")
-        supportLoaderManager.restartLoader(NEXT_ROUND_LOADER_ID, null, startNextRoundLoader)
+        startNextRoundAsynchronously()
     }
 
     @OnClick(R.id.talkToSpeakImageButton)
@@ -497,106 +431,79 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     }
 
     override fun onGridCellClick(value: Int) {
+        if (preferences.getBoolean(getString(R.string.tts_preference_key), false)) speechRecognizer.stopListening()
+        if (myTurn && !valueClicked(gameGridCellList, value)) clickCellAsynchronously(value)
+    }
 
-        if (preferences.getBoolean(getString(R.string.tts_preference_key), false)) {
-            speechRecognizer.stopListening()
-        }
+    // Click grid cell request 
+    private fun clickCellAsynchronously(value: Int) {
+        doAsync {
+            if (getConnectionInfo(this@GameActivity) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
+                val data = actionServiceBlockingStub.clickGridCell(ClickGridCellRequest.newBuilder().setRoomId(roomId)
+                        .setPlayerId(playerId).setCellClicked(value).build())
 
-        if (myTurn && !valueClicked(gameGridCellList, value)) {
-            val bundle = Bundle()
-            bundle.putInt(CELL_CLICKED_ID, value)
-            supportLoaderManager.restartLoader(Constants.CLICK_CELL_LOADER_ID, bundle, this)
+                uiThread {
+                    if (data.statusCode == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR || data.statusCode == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
+                        toast(data.statusMessage)
+                }
+            } else {
+                uiThread { onNetworkDownError() }
+            }
         }
     }
 
-    private fun startGameTimer() {
-        timeLimitProgressBar.isIndeterminate = false
+    // Broadcast winner request
+    private fun broadcastWinnerAsynchronously() {
+        doAsync {
+            if (getConnectionInfo(this@GameActivity) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
 
-        if (currentTimeLimit == TimeLimitUtils.TIME_LIMIT.INFINITE) {
-            timeLimitProgressBar.max = 1
-            timeLimitProgressBar.progress = timeLimitProgressBar.max
-            currentTimeTextView.text = DecimalFormatSymbols.getInstance().infinity
-        } else {
-            val totalTime = getExactValueFromEnum(currentTimeLimit)
-            timeLimitProgressBar.progress = 0
-            timeLimitProgressBar.max = totalTime
-            gameTimer?.start()
-        }
-    }
+                val data = actionServiceBlockingStub.broadcastWinner(BroadcastWinnerRequest.newBuilder().setRoomId(roomId)
+                        .setPlayer(com.hmproductions.bingo.models.Player.newBuilder().setName(getNameFromId(playersList, playerId))
+                                .setId(playerId).setColor(getColorFromId(playersList, playerId)).setReady(true).build()).build())
 
-    private fun subscribeToGameEventUpdates(playerId: Int, roomId: Int) {
-
-        val gameSubscription = GameSubscription.newBuilder().setFirstSubscription(true).setWinnerId(-1)
-                .setCellClicked(-1).setRoomId(roomId).setPlayerId(playerId).build()
-
-        streamServiceStub.getGameEventUpdates(gameSubscription, object : StreamObserver<GameEventUpdate> {
-            override fun onNext(value: GameEventUpdate) {
-
-                val gameEvent = value.gameEvent
-                val leaderboardPlayerArrayList = ArrayList<LeaderboardPlayer>()
-
-                for (currentPlayer in gameEvent.leaderboardList) {
-                    leaderboardPlayerArrayList.add(LeaderboardPlayer(currentPlayer.name, currentPlayer.color,
-                            currentPlayer.winCount))
+                uiThread {
+                    if (data.statusCode == BroadcastWinnerResponse.StatusCode.INTERNAL_SERVER_ERROR) toast(data.statusMessage)
                 }
 
-                val intent = Intent(Constants.GRID_CELL_CLICK_ACTION)
-                intent.putExtra(EVENT_CODE_ID, gameEvent.eventCodeValue)
-                intent.putExtra(CELL_CLICKED_ID, gameEvent.cellClicked)
-                intent.putExtra(CURRENT_PLAYER_ID, gameEvent.currentPlayerId)
-                intent.putExtra(WON_ID, gameEvent.winner)
-                intent.putParcelableArrayListExtra(LEADER_BOARD_LIST_KEY, leaderboardPlayerArrayList)
-                LocalBroadcastManager.getInstance(this@GameActivity).sendBroadcast(intent)
+            } else {
+                uiThread { onNetworkDownError() }
             }
-
-            override fun onError(t: Throwable) {
-
-            }
-
-            override fun onCompleted() {
-
-            }
-        })
-    }
-
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<ClickGridCellResponse> {
-
-        return if (args != null) {
-            ClickCellLoader(this, actionServiceBlockingStub,
-                    ClickCellRequest(roomId, playerId, args.getInt(CELL_CLICKED_ID)))
-        } else {
-            ClickCellLoader(this, actionServiceBlockingStub,
-                    ClickCellRequest(roomId, playerId, -1))
         }
     }
 
-    override fun onLoadFinished(loader: Loader<ClickGridCellResponse>, data: ClickGridCellResponse?) {
+    // Quit player request
+    private fun quitPlayerAsynchronously() {
+        quitButton.startAnimation(AnimationUtils.loadAnimation(this@GameActivity, R.anim.clockwise_rotate))
 
-        if (data == null) {
-            onNetworkDownError()
-        } else {
-            if (data.statusCode == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR || data.statusCode == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
-                toast(data.statusMessage)
+        doAsync {
+            if (getConnectionInfo(this@GameActivity) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
+                val data = actionServiceBlockingStub.quitPlayer(QuitPlayerRequest.newBuilder().setRoomId(roomId).setPlayer(com.hmproductions.bingo.models.Player.newBuilder().setColor(getColorFromId(playersList, playerId))
+                        .setId(playerId).setReady(true).setName(getNameFromId(playersList, playerId)).setWinCount(0).build()).build())
+
+                uiThread {
+                    if (data.statusCode == QuitPlayerResponse.StatusCode.SERVER_ERROR) toast(data.statusMessage)
+                }
+
+            } else {
+                uiThread { onNetworkDownError() }
+            }
         }
     }
 
-    override fun onLoaderReset(loader: Loader<ClickGridCellResponse>) {
-        // Do nothing
-    }
+    // Next Round request 
+    private fun startNextRoundAsynchronously() {
+        doAsync {
+            if (getConnectionInfo(this@GameActivity) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
+                val data = actionServiceBlockingStub.startNextRound(StartNextRoundRequest.newBuilder().setPlayerId(playerId).setRoomId(roomId).build())
 
-    override fun onResume() {
-        super.onResume()
-        LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
-                IntentFilter(Constants.GRID_CELL_CLICK_ACTION))
-    }
+                uiThread {
+                    if (data.statusCode == StartNextRoundResponse.StatusCode.INTERNAL_SERVER_ERROR) toast(data.statusMessage)
+                }
 
-    override fun onPause() {
-        super.onPause()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver)
-    }
-
-    private fun setTurnOrderText(currentPlayerId: Int) {
-        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else getNameFromId(playersList, currentPlayerId)!! + "\'s turn"
+            } else {
+                uiThread { onNetworkDownError() }
+            }
+        }
     }
 
     private fun startMicTapTargetView() {
@@ -647,11 +554,53 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         }
     }
 
-    private fun startListening() = speechRecognizer.startListening(speechRecognitionIntent)
-
     override fun onNetworkDownError() {
         startActivity(Intent(this, SplashActivity::class.java))
         finish()
+    }
+
+    private fun subscribeToGameEventUpdates(playerId: Int, roomId: Int) {
+
+        val gameSubscription = GameSubscription.newBuilder().setFirstSubscription(true).setWinnerId(-1)
+                .setCellClicked(-1).setRoomId(roomId).setPlayerId(playerId).build()
+
+        streamServiceStub.getGameEventUpdates(gameSubscription, object : StreamObserver<GameEventUpdate> {
+            override fun onNext(value: GameEventUpdate) {
+
+                val gameEvent = value.gameEvent
+                val leaderboardPlayerArrayList = ArrayList<LeaderboardPlayer>()
+
+                for (currentPlayer in gameEvent.leaderboardList) {
+                    leaderboardPlayerArrayList.add(LeaderboardPlayer(currentPlayer.name, currentPlayer.color,
+                            currentPlayer.winCount))
+                }
+
+                val intent = Intent(Constants.GRID_CELL_CLICK_ACTION)
+                with(intent) {
+                    putExtra(EVENT_CODE_ID, gameEvent.eventCodeValue)
+                    putExtra(CELL_CLICKED_ID, gameEvent.cellClicked)
+                    putExtra(CURRENT_PLAYER_ID, gameEvent.currentPlayerId)
+                    putExtra(WON_ID, gameEvent.winner)
+                    putParcelableArrayListExtra(LEADER_BOARD_LIST_KEY, leaderboardPlayerArrayList)
+                }
+                LocalBroadcastManager.getInstance(this@GameActivity).sendBroadcast(intent)
+            }
+
+            override fun onError(t: Throwable) {}
+
+            override fun onCompleted() {}
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
+                IntentFilter(Constants.GRID_CELL_CLICK_ACTION))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver)
     }
 
     // ================================== Speech Recognition Methods Implementations ==================================
