@@ -391,7 +391,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         if (gLetterTextView.currentTextColor == Color.parseColor("#FF0000")) previousCount++
         if (oLetterTextView.currentTextColor == Color.parseColor("#FF0000")) previousCount++
 
-        if (counter > previousCount)
+        if (counter > previousCount && preferences.getBoolean(getString(R.string.sound_preference_key), true))
             rowCompletedSound.start()
 
         oLetterTextView.textColor = Color.parseColor(if (counter >= GRID_SIZE) "#FF0000" else "#000000")
