@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -9,7 +10,7 @@
     android:orientation="vertical">
 
     <com.hmproductions.bingo.views.GridRecyclerView
-        android:id="@+id/game_recyclerView"
+        android:id="@+id/gameRecyclerView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -18,11 +19,11 @@
         android:layoutAnimation="@anim/game_grid_animation" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/grid_shimmerFrameLayout"
+        android:id="@+id/gridShimmerFrameLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/game_recyclerView"
+        android:layout_below="@+id/gameRecyclerView"
         android:layout_marginEnd="6dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="16dp"
@@ -36,7 +37,7 @@
         app:shimmer_repeat_delay="4000">
 
         <TextView
-            android:id="@+id/turnOrder_textView"
+            android:id="@+id/turnOrderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
@@ -47,25 +48,25 @@
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <TextView
-        android:id="@+id/currentTime_textView"
+        android:id="@+id/currentTimeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/timeLimit_progressBar"
-        android:layout_alignEnd="@+id/timeLimit_progressBar"
-        android:layout_alignStart="@+id/timeLimit_progressBar"
-        android:layout_alignTop="@+id/timeLimit_progressBar"
-        android:layout_below="@+id/game_recyclerView"
+        android:layout_alignBottom="@+id/timeLimitProgressBar"
+        android:layout_alignEnd="@+id/timeLimitProgressBar"
+        android:layout_alignStart="@+id/timeLimitProgressBar"
+        android:layout_alignTop="@+id/timeLimitProgressBar"
+        android:layout_below="@+id/gameRecyclerView"
         android:gravity="center"
         android:textColor="@android:color/background_dark"
         android:textSize="18sp" />
 
     <ProgressBar
-        android:id="@+id/timeLimit_progressBar"
+        android:id="@+id/timeLimitProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="44dp"
         android:layout_height="44dp"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/game_recyclerView"
+        android:layout_below="@+id/gameRecyclerView"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/progress_track"
@@ -73,7 +74,7 @@
         android:progressDrawable="@drawable/progress_circle" />
 
     <LinearLayout
-        android:id="@+id/bingo_linearLayout"
+        android:id="@+id/bingoLinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/quitButton"
@@ -84,7 +85,7 @@
         android:visibility="visible">
 
         <TextView
-            android:id="@+id/B_textView"
+            android:id="@+id/bLetterTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -97,7 +98,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/I_textView"
+            android:id="@+id/iLetterTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -110,7 +111,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/N_textView"
+            android:id="@+id/nLetterTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -123,7 +124,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/G_textView"
+            android:id="@+id/gLetterTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -136,7 +137,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/O_textView"
+            android:id="@+id/oLetterTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -151,14 +152,14 @@
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/leaderBoard_recyclerView"
+        android:id="@+id/leaderBoardRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/quitButton"
         android:visibility="gone" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/nextRound_button"
+        android:id="@+id/nextRoundButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -168,7 +169,8 @@
         android:backgroundTint="@android:color/holo_orange_dark"
         android:visibility="visible"
         app:fabSize="auto"
-        app:srcCompat="@drawable/next_icon" />
+        app:srcCompat="@drawable/next_icon"
+        tools:ignore="RelativeOverlap" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/quitButton"
@@ -183,7 +185,7 @@
         app:srcCompat="@drawable/exit_icon" />
 
     <ImageButton
-        android:id="@+id/talkToSpeak_imageButton"
+        android:id="@+id/talkToSpeakImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
