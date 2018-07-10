@@ -39,7 +39,7 @@ import com.hmproductions.bingo.models.GameEvent.EventCode.*
 import com.hmproductions.bingo.models.GameSubscription
 import com.hmproductions.bingo.ui.main.MainActivity
 import com.hmproductions.bingo.ui.main.RoomFragment
-import com.hmproductions.bingo.utils.ConnectionUtils
+import com.hmproductions.bingo.utils.ConnectionUtils.OnNetworkDownHandler
 import com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo
 import com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp
 import com.hmproductions.bingo.utils.Constants
@@ -59,7 +59,7 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 import javax.inject.Inject
 
-class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, ConnectionUtils.OnNetworkDownHandler, RecognitionListener {
+class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, OnNetworkDownHandler, RecognitionListener {
 
     companion object {
         const val PLAYER_ID = "player-id"
@@ -149,16 +149,15 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         startNextRoundButtonTapTargetView()
 
                         leaderBoardRecyclerView.layoutManager = GridLayoutManager(this@GameActivity, LEADERBOARD_COL_SPAN)
-                        leaderBoardRecyclerView.adapter = LeaderboardRecyclerAdapter(
-                                this@GameActivity, intent.getParcelableArrayListExtra(LEADER_BOARD_LIST_KEY), null)
+                        leaderBoardRecyclerView.adapter = LeaderboardRecyclerAdapter(this@GameActivity, intent.getParcelableArrayListExtra(LEADER_BOARD_LIST_KEY))
                         leaderBoardRecyclerView.setHasFixedSize(true)
 
                         if (gameCompleted) {
                             val winnerTextBuilder = StringBuilder(turnOrderTextView.text.toString())
-                            winnerTextBuilder.insert(winnerTextBuilder.lastIndexOf(" "), ", " + getNameFromId(playersList, winnerId)!!)
+                            winnerTextBuilder.insert(winnerTextBuilder.lastIndexOf(" "), ", ${getNameFromId(playersList, winnerId)!!}")
                             turnOrderTextView.text = winnerTextBuilder.toString()
                         } else {
-                            turnOrderTextView.text = if (winnerId == playerId) "You won" else getNameFromId(playersList, winnerId)!! + " won"
+                            turnOrderTextView.text = if (winnerId == playerId) "You won" else "${getNameFromId(playersList, winnerId)!!} won"
                             gameCompleted = true
                         }
                         gameTimer?.cancel()
@@ -217,7 +216,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                             gameRecyclerView.isEnabled = false
                         }
 
-                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else getNameFromId(playersList, currentPlayerId)!! + "\'s turn"
+                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else "${getNameFromId(playersList, currentPlayerId)!!} \'s turn"
                     }
 
                     GAME_STARTED_VALUE -> {
@@ -240,7 +239,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         startMicTapTargetView()
 
-                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else getNameFromId(playersList, currentPlayerId)!! + "\'s turn"
+                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else "${getNameFromId(playersList, currentPlayerId)!!} \'s turn"
                     }
 
                     NEXT_ROUND_VALUE -> recreate()
@@ -308,12 +307,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
             override fun onTick(millisUntilFinished: Long) {
                 timeLimitProgressBar.progress = (totalTime - millisUntilFinished / 1000).toInt()
-                currentTimeTextView.text = (millisUntilFinished / 1000).toInt().toString()
+                currentTimeTextView.text = "${millisUntilFinished / 1000}"
             }
 
             override fun onFinish() {
                 timeLimitProgressBar.progress = timeLimitProgressBar.max
-                currentTimeTextView.text = getExactValueFromEnum(currentTimeLimit).toString()
+                currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit)}"
 
                 clickCellAsynchronously(TURN_SKIPPED_CODE)
             }

@@ -52,7 +52,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
                 (int) (displayMetrics.widthPixels / gridSize * GRID_SCALING_FACTOR),
                 (int) (displayMetrics.widthPixels / gridSize * GRID_SCALING_FACTOR));
 
-        Log.v(GRID_LOG_TAG, "Setting cell size to " + displayMetrics.widthPixels / gridSize);
+        Log.d(GRID_LOG_TAG, "Setting cell size to " + displayMetrics.widthPixels / gridSize);
     }
 
     @NonNull
