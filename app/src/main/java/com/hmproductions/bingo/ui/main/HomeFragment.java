@@ -81,7 +81,7 @@ public class HomeFragment extends Fragment implements
     RecyclerView roomsRecyclerView;
 
     TextView noRoomsTextView;
-    RoomsRecyclerAdapter.RoomViewHolder lastViewHolder = null;
+    View lastItemView = null;
 
     private ArrayList<Room> roomsArrayList = new ArrayList<>();
 
@@ -188,7 +188,7 @@ public class HomeFragment extends Fragment implements
                         currentRoomId = data.getRoomId();
                         fragmentChangeRequest.changeFragment(getRoomNameFromRoomId(currentRoomId),
                                 getRoomTimeLimitValueFromRoomId(currentRoomId),
-                                lastViewHolder.itemView.findViewById(R.id.roomName_textView));
+                                lastItemView.findViewById(R.id.roomName_textView));
                         break;
 
                     case AddPlayerResponse.StatusCode.COLOR_TAKEN_VALUE:
@@ -351,12 +351,12 @@ public class HomeFragment extends Fragment implements
     }
 
     @Override
-    public void onRoomClick(RoomsRecyclerAdapter.RoomViewHolder viewHolder, int position) {
+    public void onRoomClick(View view, int position) {
 
         Bundle bundle = new Bundle();
         bundle.putInt(ROOM_ID_KEY, roomsArrayList.get(position).getRoomId());
 
-        lastViewHolder = viewHolder;
+        lastItemView = view;
 
         getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
     }

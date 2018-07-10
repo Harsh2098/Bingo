@@ -25,12 +25,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@id/timeLimit_textView"
+        android:layout_toStartOf="@id/timeLimitTextView"
         android:contentDescription="@string/stopwatch_image"
         android:src="@drawable/stopwatch_icon" />
 
     <TextView
-        android:id="@+id/timeLimit_textView"
+        android:id="@+id/timeLimitTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/roomClock_imageView"
@@ -39,7 +39,7 @@
         android:layout_marginEnd="12dp"
         android:layout_marginStart="2dp"
         android:layout_marginTop="2dp"
-        android:layout_toStartOf="@id/count_linearLayout"
+        android:layout_toStartOf="@id/countLinearLayout"
         android:gravity="center"
         android:textColor="@android:color/background_dark"
         android:textSize="16sp" />

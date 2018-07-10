@@ -117,7 +117,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         if (getArguments() != null) {
             ((TextView) customView.findViewById(R.id.roomName_textView)).setText(getArguments().getString(ROOM_NAME_BUNDLE_KEY));
-            ((TextView) customView.findViewById(R.id.timeLimit_textView)).setText(getTimeLimitString(getEnumFromValue(getArguments().getInt(TIME_LIMIT_BUNDLE_KEY))));
+            ((TextView) customView.findViewById(R.id.timeLimitTextView)).setText(getTimeLimitString(getEnumFromValue(getArguments().getInt(TIME_LIMIT_BUNDLE_KEY))));
         }
 
         playersRecyclerAdapter = new PlayersRecyclerAdapter(playersList, getContext(), this);
