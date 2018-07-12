@@ -61,6 +61,7 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
+import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
@@ -84,7 +85,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     @Inject
     SharedPreferences preferences;
 
-    private int maxCount = Constants.MIN_PLAYERS;
+    private int maxCount = Constants.MIN_PLAYERS; // Setting minimum maximum count to minimum number of players (2) by default
 
     Button leaveButton;
     TextView countTextView;
@@ -99,6 +100,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     PlayersRecyclerAdapter playersRecyclerAdapter;
 
     private Player fakePlayer = new Player("", "", -1, false);
+    private boolean wasDisconnected = true;
 
     public RoomFragment() {
         // Required empty public constructor
@@ -160,13 +162,18 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             @Override
             public void onAvailable(Network network) {
                 super.onAvailable(network);
-                subscribeToRoomEventsUpdate(currentRoomId);
+
+                if (wasDisconnected)
+                    subscribeToRoomEventsUpdate(currentRoomId);
             }
 
             @Override
             public void onLost(Network network) {
                 super.onLost(network);
                 Log.d(CLASSIC_TAG, "connection lost");
+
+                if (getContext() != null && getConnectionInfo(getContext()))
+                    wasDisconnected = true;
             }
         };
     }
