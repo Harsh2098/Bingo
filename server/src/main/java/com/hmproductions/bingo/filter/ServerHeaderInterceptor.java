@@ -29,7 +29,7 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
         Metadata.Key<String> metadataSessionIdKey = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
         String sessionId = headers.get(metadataSessionIdKey);
 
-        System.out.println("Call with session id : " + sessionId + " and method name is " + methodName);
+        System.out.println("Call with session id : " + sessionId);
 
         if (methodName.equals("com.hmproductions.bingo.BingoActionService/GetSessionId")) {
             return next.startCall(call, headers);

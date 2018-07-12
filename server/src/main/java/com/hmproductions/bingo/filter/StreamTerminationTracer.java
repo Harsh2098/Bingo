@@ -18,11 +18,6 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
 
                 return new ServerStreamTracer() {
                     @Override
-                    public void serverCallStarted(ServerCallInfo<?, ?> callInfo) {
-                        super.serverCallStarted(callInfo);
-                    }
-
-                    @Override
                     public void streamClosed(Status status) {
                         super.streamClosed(status);
                         System.out.println("Room streaming closed");
@@ -32,11 +27,6 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
             case Constants.GAME_STREAMING_METHOD_NAME:
                 return new ServerStreamTracer() {
                     @Override
-                    public void serverCallStarted(ServerCallInfo<?, ?> callInfo) {
-                        super.serverCallStarted(callInfo);
-                    }
-
-                    @Override
                     public void streamClosed(Status status) {
                         super.streamClosed(status);
                         System.out.println("Game streaming closed");
@@ -44,8 +34,7 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
                 };
 
             default:
-                return new ServerStreamTracer() {
-                };
+                return new ServerStreamTracer() {};
         }
     }
 }

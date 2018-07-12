@@ -17,7 +17,7 @@ import kotlin.Comparator
 import kotlin.Int
 import kotlin.with
 
-class RoomsRecyclerAdapter(private val context: Context, private var roomArrayList: ArrayList<Room>?, private val listener: OnRoomItemClickListener) : RecyclerView.Adapter<RoomsRecyclerAdapter.RoomViewHolder>() {
+class RoomsRecyclerAdapter(private val context: Context, private var roomArrayList: ArrayList<Room>, private val listener: OnRoomItemClickListener) : RecyclerView.Adapter<RoomsRecyclerAdapter.RoomViewHolder>() {
 
     companion object {
         private const val HEADER_TYPE = -435
@@ -35,34 +35,28 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = RoomViewHolder(LayoutInflater.from(context).inflate(
             if (viewType == NORMAL_TYPE) R.layout.room_list_item else R.layout.room_heading_item, parent, false), listener)
 
-    override fun onBindViewHolder(holder: RoomViewHolder, position: Int) = holder.bindRoom(roomArrayList?.get(position))
+    override fun onBindViewHolder(holder: RoomViewHolder, position: Int) = holder.bindRoom(roomArrayList[position])
 
-    override fun getItemCount() = if (roomArrayList?.size == 0) 0 else roomArrayList?.size ?: 0
+    override fun getItemCount() = roomArrayList.size
 
-    override fun getItemViewType(position: Int) = if (roomArrayList?.get(position)?.roomId == HEADER_TYPE) HEADER_TYPE else NORMAL_TYPE
-
-    fun swapData(newList: ArrayList<Room>) {
-        roomArrayList = newList
-        createHeadersAndRefactorRooms()
-        notifyDataSetChanged()
-    }
+    override fun getItemViewType(position: Int) = if (roomArrayList[position].roomId == HEADER_TYPE) HEADER_TYPE else NORMAL_TYPE
 
     private fun createHeadersAndRefactorRooms() {
-        if (roomArrayList != null && roomArrayList!!.size > 0) {
-            roomArrayList?.sortWith(Comparator { (_, countA, maxSizeA), (_, countB, maxSizeB) -> Integer.compare(maxSizeB - countB, maxSizeA - countA) })
+        if (roomArrayList.size > 0) {
+            roomArrayList.sortWith(Comparator { (_, countA, maxSizeA), (_, countB, maxSizeB) -> Integer.compare(maxSizeB - countB, maxSizeA - countA) })
 
-            if (roomArrayList!![0].maxSize != roomArrayList!![0].count)
-                roomArrayList!!.add(0, Room(HEADER_TYPE, 0, 0, "Available Rooms", TimeLimitUtils.TIME_LIMIT.INFINITE))
+            if (roomArrayList[0].maxSize != roomArrayList[0].count)
+                roomArrayList.add(0, Room(HEADER_TYPE, 0, 0, "Available Rooms", TimeLimitUtils.TIME_LIMIT.INFINITE))
 
             var roomsFullPosition = -1
-            for (room in roomArrayList!!)
+            for (room in roomArrayList)
                 if (room.maxSize == room.count && room.roomId != HEADER_TYPE) {
-                    roomsFullPosition = roomArrayList!!.indexOf(room)
+                    roomsFullPosition = roomArrayList.indexOf(room)
                     break
                 }
 
             if (roomsFullPosition != -1) {
-                roomArrayList!!.add(roomsFullPosition, Room(HEADER_TYPE, 0, 0, "Full Rooms", TimeLimitUtils.TIME_LIMIT.INFINITE))
+                roomArrayList.add(roomsFullPosition, Room(HEADER_TYPE, 0, 0, "Full Rooms", TimeLimitUtils.TIME_LIMIT.INFINITE))
             }
         }
     }

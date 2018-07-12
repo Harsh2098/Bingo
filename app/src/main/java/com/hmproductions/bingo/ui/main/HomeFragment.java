@@ -85,7 +85,6 @@ public class HomeFragment extends Fragment implements
 
     private ArrayList<Room> roomsArrayList = new ArrayList<>();
 
-    RoomsRecyclerAdapter roomsRecyclerAdapter;
     GetDetails userDetails;
 
     ConnectionUtils.OnNetworkDownHandler networkDownHandler;
@@ -242,10 +241,7 @@ public class HomeFragment extends Fragment implements
         roomsRecyclerView = customView.findViewById(R.id.rooms_recyclerView);
         noRoomsTextView = customView.findViewById(R.id.noRoomsFound_textView);
 
-        roomsRecyclerAdapter = new RoomsRecyclerAdapter(getContext(), null, this);
-
         roomsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        roomsRecyclerView.setAdapter(roomsRecyclerAdapter);
         roomsRecyclerView.setHasFixedSize(false);
 
         getLoaderManager().restartLoader(GET_ROOMS_LOADER_ID, null, this);
@@ -326,7 +322,9 @@ public class HomeFragment extends Fragment implements
                         roomsArrayList.add(new Room(currentRoom.getRoomId(), currentRoom.getCount(), currentRoom.getMaxSize(),
                                 currentRoom.getRoomName(), getEnumFromValue(currentRoom.getTimeLimitValue())));
                     }
-                    roomsRecyclerAdapter.swapData(roomsArrayList);
+
+                    if (getContext() != null)
+                        roomsRecyclerView.setAdapter(new RoomsRecyclerAdapter(getContext(), roomsArrayList, this));
                     break;
 
                 case NO_ROOMS:
@@ -351,7 +349,7 @@ public class HomeFragment extends Fragment implements
     }
 
     @Override
-    public void onRoomClick(View view, int position) {
+    public void onRoomClick(@NonNull View view, int position) {
 
         Bundle bundle = new Bundle();
         bundle.putInt(ROOM_ID_KEY, roomsArrayList.get(position).getRoomId());
