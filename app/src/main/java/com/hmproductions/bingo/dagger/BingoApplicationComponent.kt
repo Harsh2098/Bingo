@@ -9,7 +9,7 @@ import com.hmproductions.bingo.ui.SplashActivity
 import dagger.Component
 
 @BingoApplicationScope
-@Component(modules = [(StubModule::class), (ChannelModule::class), (ContextModule::class), (PreferencesModule::class), (SystemServiceModule::class)])
+@Component(modules = [(StubModule::class), (ChannelModule::class), (ContextModule::class), (PreferencesModule::class), (ConnectivityModule::class)])
 interface BingoApplicationComponent {
 
     fun inject(mainActivity: MainActivity)

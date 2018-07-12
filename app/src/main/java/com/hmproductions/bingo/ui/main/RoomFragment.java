@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Network;
-import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.os.Handler;
@@ -81,6 +80,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     @Inject
     ConnectivityManager connectivityManager;
+
+    @Inject
+    NetworkRequest networkRequest;
 
     @Inject
     SharedPreferences preferences;
@@ -451,9 +453,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     @Override
     public void onResume() {
         super.onResume();
-        NetworkRequest networkRequest = new NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR).build();
-
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
     }
 
