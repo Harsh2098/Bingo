@@ -31,4 +31,8 @@ public class ConnectionData {
     public void setRoomId(int roomId) {
         this.roomId = roomId;
     }
+
+    public void setRemoteAddress(String remoteAddress) {
+        this.remoteAddress = remoteAddress;
+    }
 }

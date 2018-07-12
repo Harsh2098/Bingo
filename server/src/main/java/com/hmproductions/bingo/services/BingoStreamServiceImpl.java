@@ -43,6 +43,7 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
 
             if (!found) {
                 currentRoom.getRoomEventSubscriptionArrayList().add(new RoomEventSubscription(responseObserver, request));
+                System.out.println("Adding " + request.getPlayerId() + " to room " + request.getRoomId());
             }
 
             RoomEvent roomEvent = RoomEvent.newBuilder().addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList()))

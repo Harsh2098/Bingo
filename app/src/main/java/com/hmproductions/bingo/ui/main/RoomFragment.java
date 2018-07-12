@@ -3,6 +3,10 @@ package com.hmproductions.bingo.ui.main;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -12,6 +16,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,12 +54,16 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
 import io.grpc.stub.StreamObserver;
 
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
+import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 
@@ -70,6 +79,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     BingoStreamServiceGrpc.BingoStreamServiceStub streamServiceStub;
 
     @Inject
+    ConnectivityManager connectivityManager;
+
+    @Inject
     SharedPreferences preferences;
 
     private int maxCount = Constants.MIN_PLAYERS;
@@ -82,6 +94,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     ConnectionUtils.OnNetworkDownHandler networkDownHandler;
     Miscellaneous.OnFragmentChangeRequest fragmentChangeRequest;
+    ConnectivityManager.NetworkCallback networkCallback;
 
     PlayersRecyclerAdapter playersRecyclerAdapter;
 
@@ -120,6 +133,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             ((TextView) customView.findViewById(R.id.timeLimitTextView)).setText(getTimeLimitString(getEnumFromValue(getArguments().getInt(TIME_LIMIT_BUNDLE_KEY))));
         }
 
+        setupNetworkCallback();
+
         playersRecyclerAdapter = new PlayersRecyclerAdapter(playersList, getContext(), this);
 
         linearLayoutManager = new LinearLayoutManager(getContext());
@@ -127,8 +142,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         playersRecyclerView.setLayoutManager(linearLayoutManager);
         playersRecyclerView.setAdapter(playersRecyclerAdapter);
         playersRecyclerView.setHasFixedSize(false);
-
-        subscribeToRoomEventsUpdate(currentRoomId);
 
         return customView;
     }
@@ -139,6 +152,23 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                 return currentPlayer.isReady();
         }
         return true;
+    }
+
+    private void setupNetworkCallback() {
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+
+            @Override
+            public void onAvailable(Network network) {
+                super.onAvailable(network);
+                subscribeToRoomEventsUpdate(currentRoomId);
+            }
+
+            @Override
+            public void onLost(Network network) {
+                super.onLost(network);
+                Log.d(CLASSIC_TAG, "connection lost");
+            }
+        };
     }
 
     @OnClick(R.id.leave_button)
@@ -160,7 +190,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     private void subscribeToRoomEventsUpdate(int roomId) {
 
-        streamServiceStub.getRoomEventUpdates(RoomSubscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).build(), new StreamObserver<RoomEventUpdate>() {
+        Metadata metadata = new Metadata();
+
+        Metadata.Key<String> metadataKey = Metadata.Key.of(PLAYER_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
+        metadata.put(metadataKey, String.valueOf(currentPlayerId));
+
+        MetadataUtils.attachHeaders(streamServiceStub, metadata).getRoomEventUpdates(RoomSubscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).build(), new StreamObserver<RoomEventUpdate>() {
             @Override
             public void onNext(RoomEventUpdate value) {
 
@@ -406,4 +441,18 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         }
     };
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        NetworkRequest networkRequest = new NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR).build();
+
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        connectivityManager.unregisterNetworkCallback(networkCallback);
+    }
 }

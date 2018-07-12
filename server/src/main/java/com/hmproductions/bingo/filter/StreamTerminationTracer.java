@@ -14,7 +14,7 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
         System.out.println("Stream tracer called with method name " + fullMethodName);
 
         switch (fullMethodName) {
-            case Constants.ROOM_STREAMING_METHOD_NAME:
+            case Constants.ROOM_STREAMING_METHOD:
 
                 return new ServerStreamTracer() {
                     @Override
@@ -24,7 +24,7 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
                     }
                 };
 
-            case Constants.GAME_STREAMING_METHOD_NAME:
+            case Constants.GAME_STREAMING_METHOD:
                 return new ServerStreamTracer() {
                     @Override
                     public void streamClosed(Status status) {

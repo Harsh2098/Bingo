@@ -1,12 +1,7 @@
 package com.hmproductions.bingo.ui.main;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -17,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,7 +45,6 @@ import butterknife.ButterKnife;
 
 import static com.hmproductions.bingo.ui.main.RoomFragment.ROOM_NAME_BUNDLE_KEY;
 import static com.hmproductions.bingo.ui.main.RoomFragment.TIME_LIMIT_BUNDLE_KEY;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_OPENED_KEY;
 
 public class MainActivity extends AppCompatActivity implements
@@ -88,8 +81,6 @@ public class MainActivity extends AppCompatActivity implements
     static ArrayList<Player> playersList = new ArrayList<>();
 
     AlertDialog helpDialog;
-    private ConnectivityManager.NetworkCallback networkCallback;
-    private ConnectivityManager connectivityManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
 
         setupColorPicker();
-        setupNetworkCallback();
 
         mainToolbar.setTitle("");
         setSupportActionBar(mainToolbar);
@@ -137,19 +127,6 @@ public class MainActivity extends AppCompatActivity implements
         colorPicker.setWrapSelectorWheel(true);
     }
 
-    private void setupNetworkCallback() {
-        networkCallback = new ConnectivityManager.NetworkCallback() {
-            
-            @Override
-            public void onLost(Network network) {
-                super.onLost(network);
-                Log.v(CLASSIC_TAG, network.toString());
-            }
-        };
-
-        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
@@ -180,13 +157,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         playerNameEditText.setText(preferences.getString(PLAYER_NAME_KEY, ""));
         colorPicker.setValue(preferences.getInt(PLAYER_COLOR_KEY, 0));
-
-        NetworkRequest networkRequest = new NetworkRequest.Builder()
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                .build();
-
-        connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
     }
 
     @Override
@@ -196,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements
         editor.putString(PLAYER_NAME_KEY, playerNameEditText.getText().toString());
         editor.putInt(PLAYER_COLOR_KEY, colorPicker.getValue());
         editor.apply();
-        connectivityManager.unregisterNetworkCallback(networkCallback);
     }
 
     @Override
