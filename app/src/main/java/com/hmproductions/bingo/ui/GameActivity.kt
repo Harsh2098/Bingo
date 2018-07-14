@@ -3,12 +3,16 @@ package com.hmproductions.bingo.ui
 import android.content.*
 import android.graphics.Color
 import android.media.MediaPlayer
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.support.design.widget.Snackbar
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -39,12 +43,15 @@ import com.hmproductions.bingo.models.GameEvent.EventCode.*
 import com.hmproductions.bingo.models.GameSubscription
 import com.hmproductions.bingo.ui.main.MainActivity
 import com.hmproductions.bingo.ui.main.RoomFragment
-import com.hmproductions.bingo.utils.ConnectionUtils.*
+import com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo
+import com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp
 import com.hmproductions.bingo.utils.Constants
 import com.hmproductions.bingo.utils.Constants.*
 import com.hmproductions.bingo.utils.Miscellaneous.*
 import com.hmproductions.bingo.utils.TimeLimitUtils
 import com.hmproductions.bingo.utils.TimeLimitUtils.*
+import io.grpc.Metadata
+import io.grpc.stub.MetadataUtils
 import io.grpc.stub.StreamObserver
 import kotlinx.android.synthetic.main.activity_game.*
 import nl.dionsegijn.konfetti.models.Shape
@@ -57,7 +64,7 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 import javax.inject.Inject
 
-class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, OnNetworkDownHandler, RecognitionListener {
+class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, RecognitionListener {
 
     companion object {
         const val PLAYER_ID = "player-id"
@@ -83,6 +90,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     @Inject
     lateinit var actionServiceBlockingStub: BingoActionServiceGrpc.BingoActionServiceBlockingStub
 
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
+
+    @Inject
+    lateinit var networkRequest: NetworkRequest
+
     private lateinit var speechRecognizer: SpeechRecognizer
     private lateinit var speechRecognitionIntent: Intent
 
@@ -100,9 +113,13 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     private var gameCompleted = false
     private var myTurn = false
+    private var wasDisconnected = true
 
     private var gameGridCellList = ArrayList<GridCell>()
     private var playersList = ArrayList<Player>()
+
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
+    private lateinit var snackbar: Snackbar
 
     private val gridCellReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -261,11 +278,11 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         currentRoomName = intent.getStringExtra(ROOM_NAME_EXTRA_KEY)
         playersList = intent.getParcelableArrayListExtra(PLAYERS_LIST_ID)
 
-        Handler().post { subscribeToGameEventUpdates(playerId, roomId) }
-
         // Creates an ArrayList made up of random values
         createGameGridArrayList()
         createGameTimer()
+        createNetworkCallback()
+        snackbar = Snackbar.make(findViewById<View>(android.R.id.content), "Internet connection unavailable", Snackbar.LENGTH_INDEFINITE)
 
         gridRecyclerAdapter = GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this)
 
@@ -313,6 +330,24 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit)}"
 
                 clickCellAsynchronously(TURN_SKIPPED_CODE)
+            }
+        }
+    }
+
+    private fun createNetworkCallback() {
+
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
+
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                if (wasDisconnected) subscribeToGameEventUpdates(playerId, roomId)
+                snackbar.dismiss()
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                if (!getConnectionInfo(this@GameActivity)) wasDisconnected = true
+                onNetworkDownError()
             }
         }
     }
@@ -551,9 +586,18 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         }
     }
 
-    override fun onNetworkDownError() {
-        startActivity(Intent(this, SplashActivity::class.java))
-        finish()
+    private fun onNetworkDownError() {
+        snackbar.show()
+        gameTimer?.cancel()
+
+        Handler().postDelayed({
+            if (!getConnectionInfo(this)) {
+                startActivity(Intent(this, SplashActivity::class.java))
+                Constants.SESSION_ID = null
+                finish()
+            }
+        }, 30000)
+
     }
 
     private fun subscribeToGameEventUpdates(playerId: Int, roomId: Int) {
@@ -561,7 +605,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         val gameSubscription = GameSubscription.newBuilder().setFirstSubscription(true).setWinnerId(-1)
                 .setCellClicked(-1).setRoomId(roomId).setPlayerId(playerId).build()
 
-        streamServiceStub.getGameEventUpdates(gameSubscription, object : StreamObserver<GameEventUpdate> {
+        val metadata = Metadata()
+
+        val metadataKey = Metadata.Key.of(PLAYER_ID_KEY, Metadata.ASCII_STRING_MARSHALLER)
+        metadata.put(metadataKey, playerId.toString())
+
+        MetadataUtils.attachHeaders(streamServiceStub, metadata).getGameEventUpdates(gameSubscription, object : StreamObserver<GameEventUpdate> {
             override fun onNext(value: GameEventUpdate) {
 
                 val gameEvent = value.gameEvent
@@ -591,12 +640,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     override fun onResume() {
         super.onResume()
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
         LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
                 IntentFilter(Constants.GRID_CELL_CLICK_ACTION))
     }
 
     override fun onPause() {
         super.onPause()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver)
     }
 
