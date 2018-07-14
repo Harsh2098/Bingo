@@ -11,6 +11,7 @@ public class Constants {
     public static final int SESSION_ID_LENGTH = 23;
 
     public static final String GET_SESSION_ID_METHOD = "com.hmproductions.bingo.BingoActionService/GetSessionId";
+    public static final String RECONNECT_METHOD = "com.hmproductions.bingo.BingoActionService/Reconnect";
     public static final String ADD_PLAYER_METHOD = "com.hmproductions.bingo.BingoActionService/AddPlayer";
     public static final String HOST_ROOM_METHOD = "com.hmproductions.bingo.BingoActionService/HostRoom";
     public static final String GET_ROOMS_METHOD = "com.hmproductions.bingo.BingoActionService/GetRooms";

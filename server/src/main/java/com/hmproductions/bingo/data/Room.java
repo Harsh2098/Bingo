@@ -2,6 +2,8 @@ package com.hmproductions.bingo.data;
 
 import java.util.ArrayList;
 
+import static com.hmproductions.bingo.utils.RoomUtils.getValueFromEnum;
+
 public class Room {
 
     public enum Status { WAITING, INGAME }
@@ -39,6 +41,24 @@ public class Room {
 
     public void changeRoomStatus(Status status) {
         this.status = status;
+    }
+
+    public static String getRoomNameFromId(ArrayList<Room> roomArrayList, int roomId) {
+        for (Room room : roomArrayList) {
+            if (room.getRoomId() == roomId)
+                return room.getName();
+        }
+
+        return null;
+    }
+
+    public static int getTimeLimitFromRoomId(ArrayList<Room> roomArrayList, int roomId) {
+        for (Room room : roomArrayList) {
+            if (room.getRoomId() == roomId)
+                return getValueFromEnum(room.getTimeLimit());
+        }
+
+        return -1;
     }
 
     /* =========================== Getters and Setters =========================== */

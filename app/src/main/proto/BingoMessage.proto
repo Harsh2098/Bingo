@@ -12,6 +12,7 @@ import "actions/ClickGridCell.proto";
 import "actions/BroadcastWinner.proto";
 import "actions/QuitPlayer.proto";
 import "actions/StartNextRound.proto";
+import "actions/Reconnect.proto";
 
 import "actions/GetSessionId.proto";
 import "actions/GetRooms.proto";
@@ -28,6 +29,7 @@ service BingoActionService {
     rpc GetGridSize(actions.GetGridSizeRequest) returns (actions.GetGridSizeResponse);
 
     rpc GetSessionId(actions.GetSessionIdRequest) returns (actions.GetSessionIdResponse);
+    rpc Reconnect(actions.ReconnectRequest) returns (actions.ReconnectResponse);
     rpc HostRoom(actions.HostRoomRequest) returns (actions.HostRoomResponse);
     rpc GetRooms(actions.GetRoomsRequest) returns (actions.GetRoomsResponse);
 

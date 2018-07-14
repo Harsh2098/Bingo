@@ -43,7 +43,7 @@ public class MiscellaneousUtils {
 
     public static int generateRoomId(String name) {
         return ((int)name.charAt(0) * (int)name.charAt(name.length()/2) * (int)name.charAt(name.length() - 1) *
-                (int)(System.currentTimeMillis() % 100)) % 101;
+                (int)(System.currentTimeMillis() % 100) * 97) % 101;
     }
 
     public static void removeConnectionData(ArrayList<ConnectionData> data, int playerId) {

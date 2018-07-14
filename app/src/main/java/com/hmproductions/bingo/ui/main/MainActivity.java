@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements
         HomeFragment.GetDetails,
         Miscellaneous.OnSnackBarRequest {
 
-    public static final String PLAYER_LEFT_ID = "player-left-id";
+    public static final String PLAYER_LEFT_KEY = "player-left-key";
 
     private static final String PLAYER_NAME_KEY = "player-name-key";
     private static final String PLAYER_COLOR_KEY = "player-color-key";
@@ -97,8 +97,9 @@ public class MainActivity extends AppCompatActivity implements
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        if (getIntent().getAction() != null && getIntent().getAction().equals(Constants.QUIT_GAME_ACTION)) {
-            if (!getIntent().getBooleanExtra(PLAYER_LEFT_ID, true)) {
+        if (getIntent().getAction() != null &&
+                (getIntent().getAction().equals(Constants.QUIT_GAME_ACTION) || getIntent().getAction().equals(Constants.RECONNECT_ACTION))) {
+            if (!getIntent().getBooleanExtra(PLAYER_LEFT_KEY, true)) {
                 currentPlayerId = getIntent().getIntExtra(GameActivity.PLAYER_ID, currentPlayerId);
                 currentRoomId = getIntent().getIntExtra(GameActivity.ROOM_ID, currentRoomId);
 

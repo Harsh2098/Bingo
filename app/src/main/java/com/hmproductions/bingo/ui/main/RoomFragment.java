@@ -174,7 +174,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                 super.onLost(network);
                 Log.d(CLASSIC_TAG, "connection lost");
 
-                if (getContext() != null && getConnectionInfo(getContext()))
+                if (getContext() != null && !getConnectionInfo(getContext()))
                     wasDisconnected = true;
             }
         };

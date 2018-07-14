@@ -23,22 +23,18 @@ public class Constants {
     static final int MAX_SERVER_CAPACITY = 10001;
 
     public static final int SERVER_PORT = 8080;
-    public static final String SERVER_ADDRESS = "192.168.0.160"; // Last known public IP - 116.88.119.133
+    public static final String SERVER_ADDRESS = "192.168.0.182"; // Last known public IP - 116.88.119.133
 
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;
     public static final int READY_PLAYER_LOADER_ID = 301;
     public static final int UNSUBSCRIBE_LOADER_ID = 401;
-    public static final int CLICK_CELL_LOADER_ID = 501;
-    public static final int BROADCAST_WINNER_LOADER_ID = 601;
-    public static final int QUIT_PLAYER_LOADER_ID = 701;
-    public static final int NEXT_ROUND_LOADER_ID = 801;
-    public static final int INTERNET_CONNECTION_LOADER_ID = 901;
-    public static final int GET_ROOMS_LOADER_ID = 1001;
-    public static final int HOST_ROOM_LOADER_ID = 2001;
+    public static final int GET_ROOMS_LOADER_ID = 701;
+    public static final int HOST_ROOM_LOADER_ID = 801;
 
     public static final String GRID_CELL_CLICK_ACTION = "grid-cell-click-action";
     public static final String QUIT_GAME_ACTION = "quit-game-action";
+    public static final String RECONNECT_ACTION = "reconnect-action";
 
     public static String SESSION_ID = null;
     public static final String SESSION_ID_KEY = "sessionid";

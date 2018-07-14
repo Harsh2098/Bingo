@@ -39,9 +39,7 @@ import com.hmproductions.bingo.models.GameEvent.EventCode.*
 import com.hmproductions.bingo.models.GameSubscription
 import com.hmproductions.bingo.ui.main.MainActivity
 import com.hmproductions.bingo.ui.main.RoomFragment
-import com.hmproductions.bingo.utils.ConnectionUtils.OnNetworkDownHandler
-import com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo
-import com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp
+import com.hmproductions.bingo.utils.ConnectionUtils.*
 import com.hmproductions.bingo.utils.Constants
 import com.hmproductions.bingo.utils.Constants.*
 import com.hmproductions.bingo.utils.Miscellaneous.*
@@ -169,7 +167,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         quitIntent.action = Constants.QUIT_GAME_ACTION
 
                         quitIntent.putExtra(RoomFragment.TIME_LIMIT_BUNDLE_KEY, getValueFromEnum(currentTimeLimit))
-                        quitIntent.putExtra(MainActivity.PLAYER_LEFT_ID, playerId == winnerId)
+                        quitIntent.putExtra(MainActivity.PLAYER_LEFT_KEY, playerId == winnerId)
                         quitIntent.putExtra(ROOM_NAME_EXTRA_KEY, currentRoomName)
 
                         if (currentPlayerId == winnerId) {

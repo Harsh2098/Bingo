@@ -17,6 +17,8 @@ import com.hmproductions.bingo.actions.HostRoomRequest;
 import com.hmproductions.bingo.actions.HostRoomResponse;
 import com.hmproductions.bingo.actions.QuitPlayerRequest;
 import com.hmproductions.bingo.actions.QuitPlayerResponse;
+import com.hmproductions.bingo.actions.ReconnectRequest;
+import com.hmproductions.bingo.actions.ReconnectResponse;
 import com.hmproductions.bingo.actions.RemovePlayerRequest;
 import com.hmproductions.bingo.actions.RemovePlayerResponse;
 import com.hmproductions.bingo.actions.SetPlayerReadyRequest;
@@ -37,6 +39,8 @@ import java.util.ArrayList;
 import io.grpc.stub.StreamObserver;
 
 import static com.hmproductions.bingo.BingoServer.connectionDataList;
+import static com.hmproductions.bingo.data.Room.getRoomNameFromId;
+import static com.hmproductions.bingo.data.Room.getTimeLimitFromRoomId;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_CODE;
 import static com.hmproductions.bingo.utils.Constants.NO_WINNER_ID_CODE;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_QUIT_CODE;
@@ -82,6 +86,28 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         responseObserver.onNext(GetSessionIdResponse.newBuilder().setStatusCode(GetSessionIdResponse.StatusCode.OK)
                 .setStatusMessage("New session ID attached").setSessionId(sessionId).build());
 
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void reconnect(ReconnectRequest request, StreamObserver<ReconnectResponse> responseObserver) {
+
+        ConnectionData connectionData = null;
+
+        for (ConnectionData currentConnectionData: connectionDataList) {
+            if (currentConnectionData.getSessionId().equals(request.getSessionsId()))
+                connectionData = currentConnectionData;
+        }
+
+        if (connectionData != null) {
+            responseObserver.onNext(ReconnectResponse.newBuilder().setStatusCode(ReconnectResponse.StatusCode.OK).setPlayerId(connectionData.getPlayerId())
+                    .setRoomId(connectionData.getRoomId()).setRoomName(getRoomNameFromId(roomsList, connectionData.getRoomId()))
+                    .setTimeLimit(getTimeLimitFromRoomId(roomsList, connectionData.getRoomId()))
+                    .setStatusMessage("Player can be reconnected").build());
+        } else {
+            responseObserver.onNext(ReconnectResponse.newBuilder().setStatusCode(ReconnectResponse.StatusCode.SESSION_ID_NOT_EXIST)
+                    .setStatusMessage("Sessions ID is invalid or outdated").build());
+        }
         responseObserver.onCompleted();
     }
 
@@ -472,6 +498,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             if (found) {
                 currentRoom.getPlayersList().remove(removePlayer);
                 currentRoom.setCount(currentRoom.getCount() - 1);
+                currentRoom.changeRoomStatus(Room.Status.WAITING);
             }
 
             found = false;

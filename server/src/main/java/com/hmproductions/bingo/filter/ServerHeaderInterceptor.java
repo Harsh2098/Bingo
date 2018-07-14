@@ -19,6 +19,7 @@ import static com.hmproductions.bingo.utils.Constants.GET_SESSION_ID_METHOD;
 import static com.hmproductions.bingo.utils.Constants.HOST_ROOM_METHOD;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.QUIT_PLAYER_METHOD;
+import static com.hmproductions.bingo.utils.Constants.RECONNECT_METHOD;
 import static com.hmproductions.bingo.utils.Constants.REMOVE_PLAYER_METHOD;
 import static com.hmproductions.bingo.utils.Constants.ROOM_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.ROOM_STREAMING_METHOD;
@@ -66,6 +67,10 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             call.close(Status.UNAUTHENTICATED.withDescription("Session Id is empty"), headers);
             return new ServerCall.Listener<ReqT>() {
             };
+        }
+
+        if (methodName.equals(RECONNECT_METHOD)) {
+            return next.startCall(call, headers);
         }
 
         if (!sessionIdExists(sessionId)) {
