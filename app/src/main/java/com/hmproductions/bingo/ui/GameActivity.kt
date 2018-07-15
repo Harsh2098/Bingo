@@ -12,6 +12,7 @@ import android.os.Handler
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
@@ -119,7 +120,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private var playersList = ArrayList<Player>()
 
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
-    private lateinit var snackbar: Snackbar
+    private lateinit var snackBar: Snackbar
 
     private val gridCellReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -282,7 +283,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         createGameGridArrayList()
         createGameTimer()
         createNetworkCallback()
-        snackbar = Snackbar.make(findViewById<View>(android.R.id.content), "Internet connection unavailable", Snackbar.LENGTH_INDEFINITE)
+        snackBar = Snackbar.make(findViewById<View>(android.R.id.content), "Internet connection unavailable", Snackbar.LENGTH_INDEFINITE)
 
         gridRecyclerAdapter = GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this)
 
@@ -341,7 +342,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 if (wasDisconnected) subscribeToGameEventUpdates(playerId, roomId)
-                snackbar.dismiss()
+                showSnackBar(false)
             }
 
             override fun onLost(network: Network) {
@@ -587,7 +588,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     }
 
     private fun onNetworkDownError() {
-        snackbar.show()
+        showSnackBar(true)
         gameTimer?.cancel()
 
         Handler().postDelayed({
@@ -597,7 +598,16 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 finish()
             }
         }, 30000)
+    }
 
+    private fun showSnackBar(show: Boolean) = if (show) {
+        findViewById<FloatingActionButton>(R.id.quitButton).hide()
+        findViewById<FloatingActionButton>(R.id.nextRoundButton).hide()
+        snackBar.show()
+    } else {
+        findViewById<FloatingActionButton>(R.id.quitButton).show()
+        findViewById<FloatingActionButton>(R.id.nextRoundButton).show()
+        snackBar.dismiss()
     }
 
     private fun subscribeToGameEventUpdates(playerId: Int, roomId: Int) {
