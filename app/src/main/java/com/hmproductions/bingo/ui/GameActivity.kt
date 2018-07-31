@@ -237,25 +237,29 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                     GAME_STARTED_VALUE -> {
 
-                        myTurn = currentPlayerId == playerId
+                        if(!gameCompleted) {
+                            myTurn = currentPlayerId == playerId
 
-                        if (myTurn) {
-                            startGameTimer()
+                            if (myTurn) {
+                                startGameTimer()
 
-                            if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
-                                speechRecognizer.startListening(speechRecognitionIntent)
-                            else
-                                gameRecyclerView.isEnabled = true
+                                if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
+                                    speechRecognizer.startListening(speechRecognitionIntent)
+                                else
+                                    gameRecyclerView.isEnabled = true
+                            } else {
+                                gameTimer?.cancel()
+                                gameRecyclerView.isEnabled = false
+                            }
+
+                            nextRoundButton.hide()
+
+                            startMicTapTargetView()
+
+                            turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else "${getNameFromId(playersList, currentPlayerId)!!} \'s turn"
                         } else {
-                            gameTimer?.cancel()
-                            gameRecyclerView.isEnabled = false
+                            myTurn = false
                         }
-
-                        nextRoundButton.hide()
-
-                        startMicTapTargetView()
-
-                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else "${getNameFromId(playersList, currentPlayerId)!!} \'s turn"
                     }
 
                     NEXT_ROUND_VALUE -> recreate()
@@ -293,10 +297,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             adapter = gridRecyclerAdapter
             setHasFixedSize(true)
         }
-
-        celebrationSound = MediaPlayer.create(this, R.raw.tada_celebration)
-        popSound = MediaPlayer.create(this, R.raw.pop)
-        rowCompletedSound = MediaPlayer.create(this, R.raw.shooting_star)
 
         speechRecognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         speechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
@@ -341,8 +341,25 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                if (wasDisconnected)
+                if (wasDisconnected) {
                     subscribeToGameEventUpdates(playerId, roomId)
+
+                    doAsync {
+                        val metadata = Metadata()
+                        val metadataKey: Metadata.Key<String> = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER)
+                        metadata.put(metadataKey, Constants.SESSION_ID)
+
+                        val data = MetadataUtils.attachHeaders(actionServiceBlockingStub, metadata).reconnect(ReconnectRequest.newBuilder().setSessionsId(Constants.SESSION_ID).build())
+
+                        uiThread {
+                            if(data.statusCode == ReconnectResponse.StatusCode.SESSION_ID_NOT_EXIST) {
+                                startActivity(Intent(this@GameActivity, SplashActivity::class.java))
+                                Constants.SESSION_ID = null
+                                finish()
+                            }
+                        }
+                    }
+                }
                 runOnUiThread { showSnackBar(false) }
             }
 
@@ -544,7 +561,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         if (preferences.getBoolean(FIRST_TIME_PLAYED_KEY, true)) {
             TapTargetView.showFor(this,
                     TapTarget
-                            .forView(findViewById(R.id.talkToSpeakImageButton), "How to use Mic", "Tap this once to call out number if mic does not recognise your number in the first time")
+                            .forView(findViewById(R.id.talkToSpeakImageButton), "How to use Mic", "Call out your number after the beep. Tap here if mic doesn't recognise number in the first time.")
                             .targetRadius(50)
                             .icon(getDrawable(R.drawable.mic_icon_white))
                             .cancelable(true),
@@ -598,7 +615,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 Constants.SESSION_ID = null
                 finish()
             }
-        }, 30000)
+        }, 30000) // TODO : What if after 30 secs the user has lost connection 2nd time
     }
 
     private fun showSnackBar(show: Boolean) = if (show) {
@@ -660,6 +677,13 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         super.onPause()
         connectivityManager.unregisterNetworkCallback(networkCallback)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        celebrationSound = MediaPlayer.create(this, R.raw.tada_celebration)
+        popSound = MediaPlayer.create(this, R.raw.pop)
+        rowCompletedSound = MediaPlayer.create(this, R.raw.swoosh)
     }
 
     override fun onStop() {

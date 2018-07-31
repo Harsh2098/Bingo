@@ -154,7 +154,8 @@
         android:id="@+id/leaderBoardRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/quitButton"
+        android:layout_above="@+id/talkToSpeakImageButton"
+        android:layout_marginBottom="12dp"
         android:visibility="gone" />
 
     <android.support.design.widget.FloatingActionButton
@@ -166,7 +167,7 @@
         android:layout_marginBottom="6dp"
         android:layout_marginEnd="8dp"
         android:backgroundTint="@android:color/holo_orange_dark"
-        android:visibility="visible"
+        android:visibility="gone"
         app:fabSize="auto"
         app:srcCompat="@drawable/next_icon"
         tools:ignore="RelativeOverlap" />
