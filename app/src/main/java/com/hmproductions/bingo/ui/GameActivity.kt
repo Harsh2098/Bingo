@@ -341,14 +341,15 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                if (wasDisconnected) subscribeToGameEventUpdates(playerId, roomId)
-                showSnackBar(false)
+                if (wasDisconnected)
+                    subscribeToGameEventUpdates(playerId, roomId)
+                runOnUiThread { showSnackBar(false) }
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
                 if (!getConnectionInfo(this@GameActivity)) wasDisconnected = true
-                onNetworkDownError()
+                runOnUiThread { onNetworkDownError() }
             }
         }
     }
@@ -659,6 +660,13 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         super.onPause()
         connectivityManager.unregisterNetworkCallback(networkCallback)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        celebrationSound.release()
+        popSound.release()
+        rowCompletedSound.release()
     }
 
     // ================================== Speech Recognition Methods Implementations ==================================
