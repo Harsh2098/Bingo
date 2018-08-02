@@ -17,6 +17,7 @@ import java.util.Random;
 
 import io.grpc.stub.StreamObserver;
 
+import static com.hmproductions.bingo.utils.Constants.CLEAR_GAME_SUBSCRIPTION;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_CODE;
 import static com.hmproductions.bingo.utils.Constants.NO_WINNER_ID_CODE;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_QUIT_CODE;
@@ -69,6 +70,11 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
 
     @Override
     public void getGameEventUpdates(GameSubscription request, StreamObserver<GameEventUpdate> responseObserver) {
+
+        if (request.getCellClicked() == CLEAR_GAME_SUBSCRIPTION) {
+            responseObserver.onCompleted();
+            return;
+        }
 
         Room currentRoom = getRoomFromId(request.getRoomId());
 

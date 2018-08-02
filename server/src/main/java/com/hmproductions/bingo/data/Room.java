@@ -1,7 +1,11 @@
 package com.hmproductions.bingo.data;
 
+import com.hmproductions.bingo.models.GameSubscription;
+import com.hmproductions.bingo.services.BingoStreamServiceImpl;
+
 import java.util.ArrayList;
 
+import static com.hmproductions.bingo.utils.Constants.CLEAR_GAME_SUBSCRIPTION;
 import static com.hmproductions.bingo.utils.RoomUtils.getValueFromEnum;
 
 public class Room {
@@ -41,6 +45,15 @@ public class Room {
 
     public void changeRoomStatus(Status status) {
         this.status = status;
+
+        if (status == Status.WAITING) {
+            BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
+            for(GameEventSubscription subscription : gameEventSubscriptionArrayList) {
+                streamService.getGameEventUpdates(GameSubscription.newBuilder().setCellClicked(CLEAR_GAME_SUBSCRIPTION).build(),
+                        subscription.getObserver());
+            }
+            gameEventSubscriptionArrayList.clear();
+        }
     }
 
     public static String getRoomNameFromId(ArrayList<Room> roomArrayList, int roomId) {

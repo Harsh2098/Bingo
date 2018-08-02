@@ -232,7 +232,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                             gameRecyclerView.isEnabled = false
                         }
 
-                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else "${getNameFromId(playersList, currentPlayerId)!!} \'s turn"
+                        turnOrderTextView.text = if (currentPlayerId == playerId) "Your turn" else "${getNameFromId(playersList, currentPlayerId)!!}\'s turn"
                     }
 
                     GAME_STARTED_VALUE -> {

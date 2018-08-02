@@ -26,5 +26,6 @@ public class Constants {
     public static final int PLAYER_QUIT_CODE = -2;
     public static final int NEXT_ROUND_CODE = -3;
     public static final int SKIPPED_TURN_CODE = 123;
+    public static final int CLEAR_GAME_SUBSCRIPTION = 456;
 
 }

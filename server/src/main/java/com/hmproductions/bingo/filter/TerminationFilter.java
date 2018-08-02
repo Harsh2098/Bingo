@@ -32,7 +32,7 @@ public class TerminationFilter extends ServerTransportFilter {
             int playerId = getPlayerIdFromRemoteAddress(connectionDataList, remoteAddress);
             int roomId = getRoomIdFromRemoteAddress(connectionDataList, remoteAddress);
 
-            System.out.println("Transport termination detected. Player ID = " + playerId + " Room ID = " + roomId);
+            System.out.println("Transport termination detected. Player name = " + getNameFromRoomId(roomsList, roomId, playerId) + " Room ID = " + roomId);
 
             if (playerId != -1 && roomId != -1) {
                 forceQuitPlayer(roomId, playerId);
