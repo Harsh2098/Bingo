@@ -5,12 +5,14 @@ public class Player {
     private String name, color;
     private int id, winCount;
     private boolean isReady;
+    private boolean skipped;
 
-    public Player(String name, String color, int id, boolean isReady) {
+    public Player(String name, String color, int id, boolean isReady, boolean skipped) {
         this.name = name;
         this.color = color;
         this.id = id;
         this.isReady = isReady;
+        this.skipped = skipped;
     }
 
     public String getName() {
@@ -41,5 +43,11 @@ public class Player {
         isReady = ready;
     }
 
+    public boolean isSkipped() {
+        return skipped;
+    }
 
+    public void setSkipped(boolean skipped) {
+        this.skipped = skipped;
+    }
 }

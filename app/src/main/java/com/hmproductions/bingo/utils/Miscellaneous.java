@@ -124,8 +124,11 @@ public class Miscellaneous {
             case SECONDS_10:
                 return "10 sec";
 
+            case MINUTE_1:
+                return "1 min";
+
             default:
-                return DecimalFormatSymbols.getInstance().getInfinity();
+                return "";
         }
     }
 }

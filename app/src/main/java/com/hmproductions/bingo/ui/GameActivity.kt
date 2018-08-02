@@ -61,7 +61,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
-import java.text.DecimalFormatSymbols
 import java.util.*
 import javax.inject.Inject
 
@@ -110,7 +109,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private var playerId = -1
     private var roomId = -1
     private var currentRoomName = ""
-    private var currentTimeLimit: TimeLimitUtils.TIME_LIMIT = TimeLimitUtils.TIME_LIMIT.INFINITE
+    private var currentTimeLimit: TimeLimitUtils.TIME_LIMIT = TimeLimitUtils.TIME_LIMIT.MINUTE_1
 
     private var gameCompleted = false
     private var myTurn = false
@@ -221,8 +220,9 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         myTurn = currentPlayerId == playerId
 
+                        startGameTimer(myTurn)
+
                         if (myTurn) {
-                            startGameTimer()
 
                             if (preferences.getBoolean(getString(R.string.tts_preference_key), false)) speechRecognizer.startListening(speechRecognitionIntent)
                             gameRecyclerView.isEnabled = true
@@ -237,11 +237,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                     GAME_STARTED_VALUE -> {
 
-                        if(!gameCompleted) {
+                        if (!gameCompleted) {
                             myTurn = currentPlayerId == playerId
 
+                            startGameTimer(myTurn)
+
                             if (myTurn) {
-                                startGameTimer()
 
                                 if (preferences.getBoolean(getString(R.string.tts_preference_key), false))
                                     speechRecognizer.startListening(speechRecognitionIntent)
@@ -352,7 +353,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         val data = MetadataUtils.attachHeaders(actionServiceBlockingStub, metadata).reconnect(ReconnectRequest.newBuilder().setSessionsId(Constants.SESSION_ID).build())
 
                         uiThread {
-                            if(data.statusCode == ReconnectResponse.StatusCode.SESSION_ID_NOT_EXIST) {
+                            if (data.statusCode == ReconnectResponse.StatusCode.SESSION_ID_NOT_EXIST) {
                                 startActivity(Intent(this@GameActivity, SplashActivity::class.java))
                                 Constants.SESSION_ID = null
                                 finish()
@@ -371,19 +372,13 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         }
     }
 
-    private fun startGameTimer() {
+    private fun startGameTimer(realTimer: Boolean) {
         timeLimitProgressBar.isIndeterminate = false
+        val totalTime = getExactValueFromEnum(currentTimeLimit)
+        timeLimitProgressBar.progress = 0
+        timeLimitProgressBar.max = totalTime
 
-        if (currentTimeLimit == TimeLimitUtils.TIME_LIMIT.INFINITE) {
-            timeLimitProgressBar.max = 1
-            timeLimitProgressBar.progress = timeLimitProgressBar.max
-            currentTimeTextView.text = DecimalFormatSymbols.getInstance().infinity
-        } else {
-            val totalTime = getExactValueFromEnum(currentTimeLimit)
-            timeLimitProgressBar.progress = 0
-            timeLimitProgressBar.max = totalTime
-            gameTimer?.start()
-        }
+        if (realTimer) gameTimer?.start()
     }
 
     // Returns the number of lines completed

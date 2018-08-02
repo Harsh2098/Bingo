@@ -8,7 +8,7 @@ public class Room {
 
     public enum Status { WAITING, INGAME }
 
-    public enum TIME_LIMIT { SECONDS_3, SECONDS_10, INFINITE }
+    public enum TIME_LIMIT { SECONDS_3, SECONDS_10, MINUTE_1 }
 
     private int roomId, count, currentPlayerPosition, maxSize;
     private Status status;
@@ -59,6 +59,27 @@ public class Room {
         }
 
         return -1;
+    }
+
+    public boolean setPlayerSkipped(int playerId) {
+        for(Player player : playersList) {
+            if (player.getId() == playerId) {
+                if(player.isSkipped())
+                    return true;
+                else {
+                    player.setSkipped(true);
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void setPlayerNotSkipped(int playerId) {
+        for (Player player : playersList)
+            if (player.getId() == playerId) {
+                player.setSkipped(false);
+            }
     }
 
     /* =========================== Getters and Setters =========================== */

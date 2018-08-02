@@ -32,6 +32,7 @@ import com.hmproductions.bingo.data.GameEventSubscription;
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.data.Room;
 import com.hmproductions.bingo.data.RoomEventSubscription;
+import com.hmproductions.bingo.filter.TerminationFilter;
 import com.hmproductions.bingo.models.GameSubscription;
 
 import java.util.ArrayList;
@@ -115,7 +116,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     public void hostRoom(HostRoomRequest request, StreamObserver<HostRoomResponse> responseObserver) {
 
         ArrayList<Player> playersArrayList = new ArrayList<>();
-        playersArrayList.add(new Player(request.getPlayerName(), request.getPlayerColor(), request.getPlayerId(), false));
+        playersArrayList.add(new Player(request.getPlayerName(), request.getPlayerColor(), request.getPlayerId(), false, false));
 
         if (!roomNameAlreadyTaken(request.getRoomName())) {
             int newRoomId = generateRoomId(request.getRoomName());
@@ -195,7 +196,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                     if (!colorAlreadyTaken(currentRoom.getRoomId(), currentPlayer.getColor())) {
 
                         currentRoom.getPlayersList().add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
-                                currentPlayer.getReady()));
+                                currentPlayer.getReady(), false));
 
                         currentRoom.setCount(currentRoom.getCount() + 1);
 
@@ -390,6 +391,15 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
             if (request.getCellClicked() == SKIPPED_TURN_CODE) {
                 System.out.println("Player with ID " + request.getPlayerId() + " skipped turn.\n");
+
+                boolean skippedTwice = currentRoom.setPlayerSkipped(request.getPlayerId());
+
+                if (skippedTwice) {
+                    // TODO : Does this work; Kick the player out of the room, if possible ban him from Bingo !
+                    TerminationFilter.forceQuitPlayer(currentRoom.getRoomId(), request.getPlayerId());
+                }
+            } else {
+                currentRoom.setPlayerNotSkipped(request.getPlayerId());
             }
 
             System.out.print("Cell clicked = " + request.getCellClicked() + "\n");

@@ -8,7 +8,7 @@ message HostRoomRequest {
     enum TimeLimit {
         SECONDS_3 = 0;
         SECONDS_10 = 1;
-        INFINITE = 2;
+        MINUTE_1 = 2;
     }
 
     string room_name = 1;

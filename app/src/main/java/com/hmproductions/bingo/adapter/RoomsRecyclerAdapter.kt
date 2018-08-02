@@ -46,7 +46,7 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
             roomArrayList.sortWith(Comparator { (_, countA, maxSizeA), (_, countB, maxSizeB) -> Integer.compare(maxSizeB - countB, maxSizeA - countA) })
 
             if (roomArrayList[0].maxSize != roomArrayList[0].count)
-                roomArrayList.add(0, Room(HEADER_TYPE, 0, 0, "Available Rooms", TimeLimitUtils.TIME_LIMIT.INFINITE))
+                roomArrayList.add(0, Room(HEADER_TYPE, 0, 0, "Available Rooms", TimeLimitUtils.TIME_LIMIT.MINUTE_1))
 
             var roomsFullPosition = -1
             for (room in roomArrayList)
@@ -56,7 +56,7 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
                 }
 
             if (roomsFullPosition != -1) {
-                roomArrayList.add(roomsFullPosition, Room(HEADER_TYPE, 0, 0, "Full Rooms", TimeLimitUtils.TIME_LIMIT.INFINITE))
+                roomArrayList.add(roomsFullPosition, Room(HEADER_TYPE, 0, 0, "Full Rooms", TimeLimitUtils.TIME_LIMIT.MINUTE_1))
             }
         }
     }

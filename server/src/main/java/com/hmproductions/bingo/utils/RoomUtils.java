@@ -62,7 +62,7 @@ public class RoomUtils {
         switch (value) {
             case 0 : return TIME_LIMIT.SECONDS_3;
             case 1 : return TIME_LIMIT.SECONDS_10;
-            default: return TIME_LIMIT.INFINITE;
+            default: return TIME_LIMIT.MINUTE_1;
         }
     }
 }

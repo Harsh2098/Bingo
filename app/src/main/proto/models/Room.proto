@@ -10,7 +10,7 @@ message Room {
     enum TimeLimit {
         SECONDS_3 = 0;
         SECONDS_10 = 1;
-        INFINITE = 2;
+        MINUTE_1 = 2;
     }
 
     uint32 room_id = 1;

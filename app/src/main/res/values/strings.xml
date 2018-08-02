@@ -19,7 +19,7 @@
     <string-array name="timeLimitOptions">
         <item>3 sec</item>
         <item>10 sec</item>
-        <item>Unlimited</item>
+        <item>1 min</item>
     </string-array>
 
     <string-array name="colorsName">

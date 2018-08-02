@@ -28,8 +28,6 @@ public class TerminationFilter extends ServerTransportFilter {
         // We can call unsubscribe and remove player on new instance since both of these service functions work on static data
         if (transportAttrs != null && transportAttrs.get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR) != null) {
 
-            BingoActionServiceImpl bingoActionService = new BingoActionServiceImpl();
-
             String remoteAddress = transportAttrs.get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString();
             int playerId = getPlayerIdFromRemoteAddress(connectionDataList, remoteAddress);
             int roomId = getRoomIdFromRemoteAddress(connectionDataList, remoteAddress);
@@ -37,67 +35,73 @@ public class TerminationFilter extends ServerTransportFilter {
             System.out.println("Transport termination detected. Player ID = " + playerId + " Room ID = " + roomId);
 
             if (playerId != -1 && roomId != -1) {
-                Player player = Player.newBuilder().setId(playerId).setName(getNameFromRoomId(roomsList, roomId, playerId)).build();
-
-                bingoActionService.unsubscribe(Unsubscribe.UnsubscribeRequest.newBuilder().setPlayerId(playerId).build(),
-                        new StreamObserver<Unsubscribe.UnsubscribeResponse>() {
-                            @Override
-                            public void onNext(Unsubscribe.UnsubscribeResponse value) {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable t) {
-
-                            }
-
-                            @Override
-                            public void onCompleted() {
-
-                            }
-                        });
-
-                bingoActionService.removePlayer(RemovePlayerRequest.newBuilder().setPlayer(player).build(),
-                        new StreamObserver<RemovePlayerResponse>() {
-                            @Override
-                            public void onNext(RemovePlayerResponse value) {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable t) {
-
-                            }
-
-                            @Override
-                            public void onCompleted() {
-
-                            }
-                        });
-
-                /*  This is a very hacky way to check if user has abruply left the game. Since we call QuitPlayer here we need to tell
-                    that the player has abruptly left and don't stream update to this player. This is done by setting winCount to -101  */
-                bingoActionService.quitPlayer(QuitPlayerRequest.newBuilder().setRoomId(roomId)
-                                .setPlayer(Player.newBuilder().setWinCount(-101).setId(playerId).setReady(true).build()).build(),
-                        new StreamObserver<QuitPlayerResponse>() {
-                            @Override
-                            public void onNext(QuitPlayerResponse value) {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable t) {
-
-                            }
-
-                            @Override
-                            public void onCompleted() {
-
-                            }
-                        });
-
-                System.out.println("Transport for player id " + playerId + " terminated");
+                forceQuitPlayer(roomId, playerId);
             }
         }
+    }
+
+    public static void forceQuitPlayer(int roomId, int playerId) {
+
+        BingoActionServiceImpl bingoActionService = new BingoActionServiceImpl();
+        Player player = Player.newBuilder().setId(playerId).setName(getNameFromRoomId(roomsList, roomId, playerId)).build();
+
+        bingoActionService.unsubscribe(Unsubscribe.UnsubscribeRequest.newBuilder().setPlayerId(playerId).build(),
+                new StreamObserver<Unsubscribe.UnsubscribeResponse>() {
+                    @Override
+                    public void onNext(Unsubscribe.UnsubscribeResponse value) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+                });
+
+        bingoActionService.removePlayer(RemovePlayerRequest.newBuilder().setPlayer(player).build(),
+                new StreamObserver<RemovePlayerResponse>() {
+                    @Override
+                    public void onNext(RemovePlayerResponse value) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+                });
+
+                /*  This is a very hacky way to check if user has abruptly left the game. Since we call QuitPlayer here we need to tell
+                    that the player has abruptly left and don't stream update to this player. This is done by setting winCount to -101  */
+        bingoActionService.quitPlayer(QuitPlayerRequest.newBuilder().setRoomId(roomId)
+                        .setPlayer(Player.newBuilder().setWinCount(-101).setId(playerId).setReady(true).build()).build(),
+                new StreamObserver<QuitPlayerResponse>() {
+                    @Override
+                    public void onNext(QuitPlayerResponse value) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+                });
+
+        System.out.println("Transport for player id " + playerId + " terminated");
     }
 }
