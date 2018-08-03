@@ -61,24 +61,6 @@ public class MiscellaneousUtils {
         }
     }
 
-    public static int getPlayerIdFromRemoteAddress(ArrayList<ConnectionData> data, String remoteAddress) {
-
-        for (ConnectionData currentData : data) {
-            if (currentData.getRemoteAddress().equals(remoteAddress))
-                return currentData.getPlayerId();
-        }
-        return -1;
-    }
-
-    public static int getRoomIdFromRemoteAddress(ArrayList<ConnectionData> data, String remoteAddress) {
-
-        for (ConnectionData currentData : data) {
-            if (currentData.getRemoteAddress().equals(remoteAddress))
-                return currentData.getRoomId();
-        }
-        return -1;
-    }
-
     @Nullable
     public static String getNameFromRoomId(ArrayList<Room> roomsList, int roomId, int playerId) {
         for (Room room : roomsList) {

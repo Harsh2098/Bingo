@@ -36,6 +36,8 @@ import com.hmproductions.bingo.filter.TerminationFilter;
 import com.hmproductions.bingo.models.GameSubscription;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.grpc.stub.StreamObserver;
 
@@ -52,10 +54,11 @@ import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateRoomId;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.generateSessionId;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.removeConnectionData;
 import static com.hmproductions.bingo.utils.RoomUtils.colorAlreadyTaken;
-import static com.hmproductions.bingo.utils.RoomUtils.getEnumFromValue;
 import static com.hmproductions.bingo.utils.RoomUtils.getRoomFromId;
-import static com.hmproductions.bingo.utils.RoomUtils.getValueFromEnum;
 import static com.hmproductions.bingo.utils.RoomUtils.roomNameAlreadyTaken;
+import static com.hmproductions.bingo.utils.TimeUtils.getEnumFromValue;
+import static com.hmproductions.bingo.utils.TimeUtils.getExactValueFromEnum;
+import static com.hmproductions.bingo.utils.TimeUtils.getValueFromEnum;
 
 public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionServiceImplBase {
 
@@ -116,7 +119,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
     public void hostRoom(HostRoomRequest request, StreamObserver<HostRoomResponse> responseObserver) {
 
         ArrayList<Player> playersArrayList = new ArrayList<>();
-        playersArrayList.add(new Player(request.getPlayerName(), request.getPlayerColor(), request.getPlayerId(), false, false));
+        playersArrayList.add(new Player(request.getPlayerName(), request.getPlayerColor(), request.getPlayerId(), false));
 
         if (!roomNameAlreadyTaken(request.getRoomName())) {
             int newRoomId = generateRoomId(request.getRoomName());
@@ -196,7 +199,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                     if (!colorAlreadyTaken(currentRoom.getRoomId(), currentPlayer.getColor())) {
 
                         currentRoom.getPlayersList().add(new Player(currentPlayer.getName(), currentPlayer.getColor(), currentPlayer.getId(),
-                                currentPlayer.getReady(), false));
+                                currentPlayer.getReady()));
 
                         currentRoom.setCount(currentRoom.getCount() + 1);
 
@@ -391,16 +394,19 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
             if (request.getCellClicked() == SKIPPED_TURN_CODE) {
                 System.out.println("Player with ID " + request.getPlayerId() + " skipped turn.\n");
-
-                boolean skippedTwice = currentRoom.setPlayerSkipped(request.getPlayerId());
-
-                if (skippedTwice) {
-                    // TODO : Does this work; Kick the player out of the room, if possible ban him from Bingo !
-                    TerminationFilter.forceQuitPlayer(currentRoom.getRoomId(), request.getPlayerId());
-                }
-            } else {
-                currentRoom.setPlayerNotSkipped(request.getPlayerId());
             }
+
+            // Force quit unresponsive player
+            if (currentRoom.isTimerStarted()) currentRoom.getTimer().cancel();
+
+            currentRoom.setTimer(new Timer());
+            currentRoom.getTimer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    TerminationFilter.forceQuitPlayer(currentRoom.getRoomId(), currentRoom.getCurrentPlayerId());
+                }
+            }, 2000 * getExactValueFromEnum(currentRoom.getTimeLimit()));
+            currentRoom.setTimerStarted(true);
 
             System.out.print("Cell clicked = " + request.getCellClicked() + "\n");
 

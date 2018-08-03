@@ -8,37 +8,12 @@ import com.hmproductions.bingo.actions.Unsubscribe;
 import com.hmproductions.bingo.models.Player;
 import com.hmproductions.bingo.services.BingoActionServiceImpl;
 
-import io.grpc.Attributes;
-import io.grpc.Grpc;
-import io.grpc.ServerTransportFilter;
 import io.grpc.stub.StreamObserver;
 
-import static com.hmproductions.bingo.BingoServer.connectionDataList;
 import static com.hmproductions.bingo.services.BingoActionServiceImpl.roomsList;
 import static com.hmproductions.bingo.utils.MiscellaneousUtils.getNameFromRoomId;
-import static com.hmproductions.bingo.utils.MiscellaneousUtils.getPlayerIdFromRemoteAddress;
-import static com.hmproductions.bingo.utils.MiscellaneousUtils.getRoomIdFromRemoteAddress;
 
-public class TerminationFilter extends ServerTransportFilter {
-
-    @Override
-    public void transportTerminated(Attributes transportAttrs) {
-        super.transportTerminated(transportAttrs);
-
-        // We can call unsubscribe and remove player on new instance since both of these service functions work on static data
-        if (transportAttrs != null && transportAttrs.get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR) != null) {
-
-            String remoteAddress = transportAttrs.get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString();
-            int playerId = getPlayerIdFromRemoteAddress(connectionDataList, remoteAddress);
-            int roomId = getRoomIdFromRemoteAddress(connectionDataList, remoteAddress);
-
-            System.out.println("Transport termination detected. Player name = " + getNameFromRoomId(roomsList, roomId, playerId) + " Room ID = " + roomId);
-
-            if (playerId != -1 && roomId != -1) {
-                forceQuitPlayer(roomId, playerId);
-            }
-        }
-    }
+public class TerminationFilter {
 
     public static void forceQuitPlayer(int roomId, int playerId) {
 

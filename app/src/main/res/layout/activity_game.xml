@@ -80,7 +80,7 @@
         android:layout_below="@+id/timeLimitProgressBar"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:visibility="visible">
 
         <TextView

@@ -33,7 +33,6 @@ public class BingoServer {
                 .addService(new BingoActionServiceImpl())
                 .addService(new BingoStreamServiceImpl())
                 .intercept(new ServerHeaderInterceptor())
-                .addTransportFilter(new TerminationFilter())
                 .useTransportSecurity(serverCertificateFile, serverKeyFile)
                 .handshakeTimeout(30, TimeUnit.SECONDS)
                 .addStreamTracerFactory(new StreamTerminationTracer())

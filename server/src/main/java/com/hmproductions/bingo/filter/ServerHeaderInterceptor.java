@@ -4,7 +4,6 @@ import com.hmproductions.bingo.data.ConnectionData;
 import com.hmproductions.bingo.data.GameEventSubscription;
 import com.hmproductions.bingo.data.Room;
 import com.hmproductions.bingo.data.RoomEventSubscription;
-import com.hmproductions.bingo.utils.RoomUtils;
 
 import io.grpc.Grpc;
 import io.grpc.Metadata;
@@ -55,9 +54,12 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             Metadata.Key<String> metadataRoomIdKey = Metadata.Key.of(ROOM_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
             String roomIdString = headers.get(metadataRoomIdKey);
 
+
             if (playerIdString != null && roomIdString != null && call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR) != null) {
+                String remoteAddress = call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString();
                 int playerId = Integer.parseInt(playerIdString);
                 int roomId = Integer.parseInt(roomIdString);
+
                 System.out.println("Adding " + playerId + " to connection data list. Room ID = " + roomId);
                 connectionDataList.add(new ConnectionData(sessionId, call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString(), playerId, roomId));
             }
@@ -90,7 +92,7 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             String playerIdString = headers.get(metadataPlayerIdKey);
 
             if (playerIdString != null)
-                removeExistingRoomStreamingSubscription(call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString(), Integer.valueOf(playerIdString));
+                removeExistingRoomStreamingSubscription(Integer.valueOf(playerIdString));
         }
 
         if (methodName.equals(GAME_STREAMING_METHOD) && call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR) != null) {
@@ -100,12 +102,12 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             String playerIdString = headers.get(metadataPlayerIdKey);
 
             if (playerIdString != null)
-                removeExistingGameStreamingSubscription(call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString(), Integer.valueOf(playerIdString));
+                removeExistingGameStreamingSubscription(Integer.valueOf(playerIdString));
         }
 
         if (methodName.equals(REMOVE_PLAYER_METHOD) || methodName.equals(QUIT_PLAYER_METHOD)) {
             removeSessionIdFromList(sessionId);
-            new Thread(new RoomUtils.RoomDestroyRunnable()).start(); // TODO : Does this actually work
+            //new Thread(new RoomUtils.RoomDestroyRunnable()).start(); // TODO : Does this actually work
         }
 
         return next.startCall(call, headers);
@@ -136,17 +138,16 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
             connectionDataList.remove(removalData);
     }
 
-    private void removeExistingRoomStreamingSubscription(String remoteIpAddress, int playerId) {
+    private void removeExistingRoomStreamingSubscription(int playerId) {
         for (ConnectionData connectionData : connectionDataList) {
             if (connectionData.getPlayerId() == playerId) {
-                connectionData.setRemoteAddress(remoteIpAddress);
                 Room currentRoom = getRoomFromId(connectionData.getRoomId());
                 if (currentRoom != null) {
                     RoomEventSubscription removalSubscription = null;
                     for (RoomEventSubscription subscription : currentRoom.getRoomEventSubscriptionArrayList()) {
                         if (subscription.getSubscription().getPlayerId() == playerId) {
                             removalSubscription = subscription;
-                            System.out.println("Removing room subscription for " + connectionData.getRemoteAddress() + " with ID " + connectionData.getPlayerId() + " temporarily");
+                            System.out.println("Removing room subscription for " + connectionData.getRemoteAddress() + " temporarily");
                             break;
                         }
                     }
@@ -157,17 +158,16 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
         }
     }
 
-    private void removeExistingGameStreamingSubscription(String remoteIpAddress, int playerId) {
+    private void removeExistingGameStreamingSubscription(int playerId) {
         for (ConnectionData connectionData : connectionDataList) {
             if (connectionData.getPlayerId() == playerId) {
-                connectionData.setRemoteAddress(remoteIpAddress);
                 Room currentRoom = getRoomFromId(connectionData.getRoomId());
                 if (currentRoom != null) {
                     GameEventSubscription removalSubscription = null;
                     for (GameEventSubscription subscription : currentRoom.getGameEventSubscriptionArrayList()) {
                         if (subscription.getGameSubscription().getPlayerId() == playerId) {
                             removalSubscription = subscription;
-                            System.out.println("Removing game subscription for " + connectionData.getRemoteAddress() + " with ID " + connectionData.getPlayerId() + " temporarily");
+                            System.out.println("Removing game subscription for " + connectionData.getRemoteAddress() + " temporarily");
                             break;
                         }
                     }

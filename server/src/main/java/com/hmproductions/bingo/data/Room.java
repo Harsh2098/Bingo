@@ -4,9 +4,10 @@ import com.hmproductions.bingo.models.GameSubscription;
 import com.hmproductions.bingo.services.BingoStreamServiceImpl;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 import static com.hmproductions.bingo.utils.Constants.CLEAR_GAME_SUBSCRIPTION;
-import static com.hmproductions.bingo.utils.RoomUtils.getValueFromEnum;
+import static com.hmproductions.bingo.utils.TimeUtils.getValueFromEnum;
 
 public class Room {
 
@@ -18,6 +19,8 @@ public class Room {
     private Status status;
     private String name;
     private TIME_LIMIT timeLimit;
+    private Timer timer;
+    private boolean timerStarted;
 
     private ArrayList<Player> playersList;
     private ArrayList<RoomEventSubscription> roomEventSubscriptionArrayList = new ArrayList<>();
@@ -33,6 +36,9 @@ public class Room {
         this.status = status;
         this.name = name;
         this.timeLimit = timeLimit;
+
+        timer = new Timer();
+        timerStarted = false;
     }
 
     public int getCurrentPlayerId() {
@@ -72,27 +78,6 @@ public class Room {
         }
 
         return -1;
-    }
-
-    public boolean setPlayerSkipped(int playerId) {
-        for(Player player : playersList) {
-            if (player.getId() == playerId) {
-                if(player.isSkipped())
-                    return true;
-                else {
-                    player.setSkipped(true);
-                    return false;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void setPlayerNotSkipped(int playerId) {
-        for (Player player : playersList)
-            if (player.getId() == playerId) {
-                player.setSkipped(false);
-            }
     }
 
     /* =========================== Getters and Setters =========================== */
@@ -163,5 +148,21 @@ public class Room {
 
     public TIME_LIMIT getTimeLimit() {
         return timeLimit;
+    }
+
+    public Timer getTimer() {
+        return timer;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+
+    public boolean isTimerStarted() {
+        return timerStarted;
+    }
+
+    public void setTimerStarted(boolean timerStarted) {
+        this.timerStarted = timerStarted;
     }
 }

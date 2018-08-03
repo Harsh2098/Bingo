@@ -7,7 +7,7 @@ public class ConnectionData {
 
     public ConnectionData(String sessionId, String remoteAddress, int playerId, int roomId) {
         this.sessionId = sessionId;
-        this.remoteAddress = remoteAddress;
+        this.remoteAddress = remoteAddress.substring(0, remoteAddress.length() - 6);
         this.playerId = playerId;
         this.roomId = roomId;
     }

@@ -18,6 +18,7 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.util.TypedValue
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.animation.GridLayoutAnimationController
@@ -158,7 +159,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         gameRecyclerView.isEnabled = false
                         myTurn = false
 
-                        bingoLinearLayout.visibility = View.GONE
+                        makeBingoLookSmaller();
                         leaderBoardRecyclerView.visibility = View.VISIBLE
                         nextRoundButton.show()
                         startNextRoundButtonTapTargetView()
@@ -220,7 +221,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         myTurn = currentPlayerId == playerId
 
-                        startGameTimer(myTurn)
+                        startGameTimer(myTurn) // TODO : Fix game timer and make bingo appear smaller after winning
 
                         if (myTurn) {
 
@@ -621,6 +622,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         findViewById<FloatingActionButton>(R.id.quitButton).show()
         findViewById<FloatingActionButton>(R.id.nextRoundButton).show()
         snackBar.dismiss()
+    }
+
+    private fun makeBingoLookSmaller() {
+        bLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+        iLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+        nLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+        gLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+        oLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
     }
 
     private fun subscribeToGameEventUpdates(playerId: Int, roomId: Int) {

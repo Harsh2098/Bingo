@@ -181,7 +181,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         if (currentPlayerId != -1) {
             getLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
-            getLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader);
+            new Handler().postDelayed(() -> getLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader), 1000);
         } else
             Toast.makeText(getContext(), "You have not joined", Toast.LENGTH_SHORT).show();
     }
