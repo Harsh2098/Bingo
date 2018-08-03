@@ -221,7 +221,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         myTurn = currentPlayerId == playerId
 
-                        startGameTimer(myTurn) // TODO : Fix game timer and make bingo appear smaller after winning
+                        startGameTimer(myTurn) // TODO : bingo appear smaller after winning
 
                         if (myTurn) {
 

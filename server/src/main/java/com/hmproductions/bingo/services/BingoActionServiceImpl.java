@@ -441,6 +441,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         // Checks if the room exists
         if (currentRoom != null) {
             com.hmproductions.bingo.models.Player player = request.getPlayer();
+            currentRoom.getTimer().cancel();
 
             for (Player currentPlayer : currentRoom.getPlayersList()) {
                 if (currentPlayer.getId() == player.getId()) {
