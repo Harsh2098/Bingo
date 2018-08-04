@@ -1,16 +1,12 @@
 package com.hmproductions.bingo.adapter
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.support.v7.widget.RecyclerView
-import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
 import com.hmproductions.bingo.R
 import com.hmproductions.bingo.data.Room
 import com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString
@@ -74,20 +70,6 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
                     maxCountTextView.text = "${room?.maxSize}"
                     timeLimitTextView.text = getTimeLimitString(room?.timeLimit)
                     roomIconTextView.text = room?.name?.get(0).toString().toUpperCase()
-
-                    val displayMetrics = DisplayMetrics()
-                    (this.context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-                    if(displayMetrics.widthPixels < 500) {
-                        val params = roomIconTextView.layoutParams as RelativeLayout.LayoutParams
-                        params.height = context.resources.getDimensionPixelSize(R.dimen.small_room_icon)
-                        params.width = context.resources.getDimensionPixelSize(R.dimen.small_room_icon)
-                        roomIconTextView.layoutParams = params
-
-                        roomNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
-                        timeLimitTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
-                        roomIconTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
-                    }
 
                     roomIconTextView.setBackgroundResource(R.drawable.cell_circle_foreground)
                     (roomIconTextView.background as GradientDrawable).setColor(Color.parseColor("#EEEEEE"))

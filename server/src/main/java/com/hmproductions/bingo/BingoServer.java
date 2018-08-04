@@ -3,7 +3,6 @@ package com.hmproductions.bingo;
 import com.hmproductions.bingo.data.ConnectionData;
 import com.hmproductions.bingo.filter.ServerHeaderInterceptor;
 import com.hmproductions.bingo.filter.StreamTerminationTracer;
-import com.hmproductions.bingo.filter.TerminationFilter;
 import com.hmproductions.bingo.services.BingoActionServiceImpl;
 import com.hmproductions.bingo.services.BingoStreamServiceImpl;
 import com.hmproductions.bingo.utils.Constants;

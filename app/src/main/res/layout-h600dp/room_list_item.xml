@@ -8,15 +8,15 @@
 
     <TextView
         android:id="@+id/roomIconTextView"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_centerVertical="true"
         android:background="@drawable/cell_circle_foreground"
         android:contentDescription="@string/room_image"
         android:gravity="center"
         android:padding="6dp"
         android:textColor="@android:color/background_dark"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/roomNameTextView"
@@ -28,7 +28,7 @@
         android:maxLength="20"
         android:maxLines="1"
         android:textColor="@android:color/background_dark"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:transitionName="@string/room_name_transition" />
 
     <ImageView
@@ -48,7 +48,7 @@
         android:layout_marginEnd="16dp"
         android:layout_toStartOf="@id/countLinearLayout"
         android:textColor="@android:color/background_dark"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
     <LinearLayout
         android:id="@+id/countLinearLayout"
@@ -64,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/background_dark"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
