@@ -122,7 +122,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         // Inflate the layout for this fragment
         View customView = inflater.inflate(R.layout.fragment_room, container, false);
 
-        DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
+        if (getContext() != null)
+            DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
         ButterKnife.bind(this, customView);
 
         playersRecyclerView = customView.findViewById(R.id.players_recyclerView);
@@ -200,13 +201,15 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         Metadata.Key<String> metadataKey = Metadata.Key.of(PLAYER_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
         metadata.put(metadataKey, String.valueOf(currentPlayerId));
 
-        MetadataUtils.attachHeaders(streamServiceStub, metadata).getRoomEventUpdates(RoomSubscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).build(), new StreamObserver<RoomEventUpdate>() {
+        MetadataUtils.attachHeaders(streamServiceStub, metadata).getRoomEventUpdates(RoomSubscription.newBuilder().setRoomId(roomId).setPlayerId(currentPlayerId).setDestroy(false).build(), new StreamObserver<RoomEventUpdate>() {
             @Override
             public void onNext(RoomEventUpdate value) {
 
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER ||
+                        if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ROOM_DESTROY) {
+                            exitRoom();
+                        } else if (value.getRoomEvent().getEventCode() == RoomEvent.EventCode.ADD_PLAYER ||
                                 value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_READY_CHANGED ||
                                 value.getRoomEvent().getEventCode() == RoomEvent.EventCode.PLAYER_STATE_CHANGED ||
                                 value.getRoomEvent().getEventCode() == RoomEvent.EventCode.REMOVE_PLAYER) {
@@ -379,10 +382,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             } else {
 
                 if (data.getStatusCode() == RemovePlayerResponse.StatusCode.OK) {
-                    currentPlayerId = currentRoomId = -1;
-                    playersList.clear();
-                    playersRecyclerAdapter.swapData(null);
-                    fragmentChangeRequest.changeFragment(null, -1, null);
+                    exitRoom();
                 }
             }
         }
@@ -446,6 +446,13 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         }
     };
 
+    private void exitRoom() {
+        currentPlayerId = currentRoomId = -1;
+        playersList.clear();
+        playersRecyclerAdapter.swapData(null);
+        fragmentChangeRequest.changeFragment(null, -1, null);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -456,5 +463,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     public void onPause() {
         super.onPause();
         connectivityManager.unregisterNetworkCallback(networkCallback);
+        this.getLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, null, setPlayerReadyLoader);
     }
 }

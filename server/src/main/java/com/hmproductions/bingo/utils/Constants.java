@@ -9,6 +9,7 @@ public class Constants {
     public static final String ROOM_ID_KEY = "roomid";
 
     public static final int SESSION_ID_LENGTH = 23;
+    public static final long MAX_ROOM_IDLE_TIME = 60000;
 
     public static final String GET_SESSION_ID_METHOD = "com.hmproductions.bingo.BingoActionService/GetSessionId";
     public static final String RECONNECT_METHOD = "com.hmproductions.bingo.BingoActionService/Reconnect";

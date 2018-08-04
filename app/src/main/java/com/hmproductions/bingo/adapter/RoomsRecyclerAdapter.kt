@@ -58,7 +58,7 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
                 }
 
             if (roomsFullPosition != -1) {
-                roomArrayList.add(roomsFullPosition, Room(HEADER_TYPE, 0, 0, "Full Rooms", TimeLimitUtils.TIME_LIMIT.MINUTE_1))
+                roomArrayList.add(roomsFullPosition, Room(HEADER_TYPE, 0, 0, "Full Rooms - In game", TimeLimitUtils.TIME_LIMIT.MINUTE_1))
             }
         }
     }

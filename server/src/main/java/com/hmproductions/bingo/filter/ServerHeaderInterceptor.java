@@ -56,7 +56,6 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
 
 
             if (playerIdString != null && roomIdString != null && call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR) != null) {
-                String remoteAddress = call.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString();
                 int playerId = Integer.parseInt(playerIdString);
                 int roomId = Integer.parseInt(roomIdString);
 
@@ -107,7 +106,6 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
 
         if (methodName.equals(REMOVE_PLAYER_METHOD) || methodName.equals(QUIT_PLAYER_METHOD)) {
             removeSessionIdFromList(sessionId);
-            //new Thread(new RoomUtils.RoomDestroyRunnable()).start(); // TODO : Does this actually work
         }
 
         return next.startCall(call, headers);

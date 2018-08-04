@@ -159,7 +159,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         gameRecyclerView.isEnabled = false
                         myTurn = false
 
-                        makeBingoLookSmaller();
+                        makeBingoLookSmaller()
                         leaderBoardRecyclerView.visibility = View.VISIBLE
                         nextRoundButton.show()
                         startNextRoundButtonTapTargetView()
@@ -221,7 +221,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         myTurn = currentPlayerId == playerId
 
-                        startGameTimer(myTurn) // TODO : bingo appear smaller after winning
+                        startGameTimer(myTurn) // TODO : Create separate layout for 4 inch phone
 
                         if (myTurn) {
 

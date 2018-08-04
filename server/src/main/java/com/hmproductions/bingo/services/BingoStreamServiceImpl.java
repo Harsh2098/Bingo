@@ -53,12 +53,19 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
                 System.out.println("Adding " + request.getPlayerId() + " to room " + request.getRoomId());
             }
 
-            RoomEvent roomEvent = RoomEvent.newBuilder().addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList()))
-                    .setEventCode(RoomEvent.EventCode.PLAYER_STATE_CHANGED).setMaxCount(currentRoom.getMaxSize()).build();
+            RoomEvent roomEvent;
+
+            if (request.getDestroy()) {
+                roomEvent = RoomEvent.newBuilder().setEventCode(RoomEvent.EventCode.ROOM_DESTROY)
+                        .setMaxCount(currentRoom.getMaxSize()).build();
+            } else {
+                roomEvent = RoomEvent.newBuilder().addAllPlayers(getArrayListFromPlayersList(currentRoom.getPlayersList()))
+                        .setEventCode(RoomEvent.EventCode.PLAYER_STATE_CHANGED).setMaxCount(currentRoom.getMaxSize()).build();
+            }
 
             responseObserver.onNext(RoomEventUpdate.newBuilder().setRoomEvent(roomEvent).build());
 
-            if (allPlayersReady(currentRoom.getPlayersList()) && currentRoom.getCount() == currentRoom.getMaxSize()) {
+            if (!request.getDestroy() && allPlayersReady(currentRoom.getPlayersList()) && currentRoom.getCount() == currentRoom.getMaxSize()) {
 
                 setupCurrentPlayerAndStartGame(currentRoom);
 
@@ -70,6 +77,8 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
                 for (Player player : currentRoom.getPlayersList()) {
                     player.setWinCount(0);
                 }
+
+                currentRoom.getTimer().cancel();
             }
         }
     }

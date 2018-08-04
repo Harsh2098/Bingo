@@ -351,12 +351,17 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onRoomClick(@NonNull View view, int position) {
 
-        Bundle bundle = new Bundle();
-        bundle.putInt(ROOM_ID_KEY, roomsArrayList.get(position).getRoomId());
+        if(roomsArrayList.get(position).getMaxSize() == roomsArrayList.get(position).getCount()) {
+            snackBarRequest.showSnackBar("Room is full", Snackbar.LENGTH_SHORT);
+            currentPlayerId = -1;
+        } else {
+            Bundle bundle = new Bundle();
+            bundle.putInt(ROOM_ID_KEY, roomsArrayList.get(position).getRoomId());
 
-        lastItemView = view;
+            lastItemView = view;
 
-        getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
+            getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
+        }
     }
 
     @Nullable

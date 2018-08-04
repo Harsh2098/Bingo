@@ -7,4 +7,5 @@ message RoomSubscription {
 
     uint32 room_id = 1;
     uint32 player_id = 2;
+    bool destroy = 3;
 }

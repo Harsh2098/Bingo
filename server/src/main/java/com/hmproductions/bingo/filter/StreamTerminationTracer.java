@@ -19,7 +19,7 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
     @Override
     public ServerStreamTracer newServerStreamTracer(String fullMethodName, Metadata headers) {
 
-        /* System.out.println("Stream tracer called with method name " + fullMethodName); */
+        System.out.println("Stream tracer called with method name " + fullMethodName);
 
         switch (fullMethodName) {
             case Constants.ROOM_STREAMING_METHOD:
@@ -46,7 +46,7 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
                             }
                         }
 
-                        System.out.println("Room streaming closed " + headers.toString());
+                        System.out.println("Room streaming closed");
                     }
                 };
 
@@ -55,7 +55,7 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
                     @Override
                     public void streamClosed(Status status) {
                         super.streamClosed(status);
-                        System.out.println("Game streaming closed" + status.toString());
+                        System.out.println("Game streaming closed");
                     }
                 };
 

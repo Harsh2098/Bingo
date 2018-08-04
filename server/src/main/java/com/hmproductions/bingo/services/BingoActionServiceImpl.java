@@ -34,6 +34,7 @@ import com.hmproductions.bingo.data.Room;
 import com.hmproductions.bingo.data.RoomEventSubscription;
 import com.hmproductions.bingo.filter.TerminationFilter;
 import com.hmproductions.bingo.models.GameSubscription;
+import com.hmproductions.bingo.models.RoomSubscription;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -44,6 +45,7 @@ import io.grpc.stub.StreamObserver;
 import static com.hmproductions.bingo.BingoServer.connectionDataList;
 import static com.hmproductions.bingo.data.Room.getRoomNameFromId;
 import static com.hmproductions.bingo.data.Room.getTimeLimitFromRoomId;
+import static com.hmproductions.bingo.utils.Constants.MAX_ROOM_IDLE_TIME;
 import static com.hmproductions.bingo.utils.Constants.NEXT_ROUND_CODE;
 import static com.hmproductions.bingo.utils.Constants.NO_WINNER_ID_CODE;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_QUIT_CODE;
@@ -132,6 +134,8 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 updateRoomId(request.getPlayerId(), newRoomId);
                 responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(newRoomId).setStatusCode(HostRoomResponse.StatusCode.OK)
                         .setStatusMessage("New room created").build());
+
+                startRoomDestructionTimer(newRoom);
             }
             else {
                 responseObserver.onNext(HostRoomResponse.newBuilder().setRoomId(-1).setStatusMessage("Could not create new room")
@@ -206,7 +210,9 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                         addPlayerResponse = AddPlayerResponse.newBuilder().setStatusCode(AddPlayerResponse.StatusCode.OK).setRoomId(request.getRoomId())
                                 .setStatusMessage("New room joined").build();
 
-                        sendRoomEventUpdate(request.getRoomId());
+                        sendRoomEventUpdate(request.getRoomId(), false);
+
+                        startRoomDestructionTimer(currentRoom);
 
                         // Server logs
                         System.out.println(request.getPlayer().getName() + " added to the game.");
@@ -276,8 +282,10 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                     System.out.print("Room with id " + currentRoom.getRoomId() + " destroyed.");
                     roomsList.remove(currentRoom);
                 } else {
-                    sendRoomEventUpdate(request.getRoomId());
+                    sendRoomEventUpdate(request.getRoomId(), false);
                 }
+
+                startRoomDestructionTimer(currentRoom);
 
                 //Server logs
                 System.out.println(request.getPlayer().getName() + " removed from the game.");
@@ -316,12 +324,13 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 // Server logs
                 System.out.println(request.getPlayerId() + " id set to " + request.getIsReady());
 
-                sendRoomEventUpdate(request.getRoomId());
+                sendRoomEventUpdate(request.getRoomId(), false);
 
                 responseObserver.onNext(
                         SetPlayerReadyResponse.newBuilder().setStatusCode(SetPlayerReadyResponse.StatusCode.OK).setIsReady(request.getIsReady())
                                 .setStatusMessage("Player set to " + request.getIsReady()).setPlayerId(request.getPlayerId()).build());
 
+                startRoomDestructionTimer(currentRoom);
             } else {
                 responseObserver.onNext(
                         SetPlayerReadyResponse.newBuilder().setStatusCode(SetPlayerReadyResponse.StatusCode.SERVER_ERROR)
@@ -578,15 +587,34 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         responseObserver.onCompleted();
     }
 
-    private void sendRoomEventUpdate(int roomId) {
+    private void sendRoomEventUpdate(int roomId, boolean destroy) {
         BingoStreamServiceImpl streamService = new BingoStreamServiceImpl();
 
         Room currentRoom = getRoomFromId(roomId);
         if (currentRoom != null) {
             for (RoomEventSubscription currentSubscription : currentRoom.getRoomEventSubscriptionArrayList()) {
-                streamService.getRoomEventUpdates(currentSubscription.getSubscription(), currentSubscription.getObserver());
+                RoomSubscription subscription = currentSubscription.getSubscription();
+                if (destroy) subscription = subscription.toBuilder().setDestroy(true).build();
+
+                streamService.getRoomEventUpdates(subscription, currentSubscription.getObserver());
             }
         }
+
+        if (destroy && currentRoom != null)
+            roomsList.remove(currentRoom);
+    }
+
+    private void startRoomDestructionTimer(Room currentRoom) {
+        if (currentRoom.isTimerStarted()) currentRoom.getTimer().cancel();
+
+        currentRoom.setTimer(new Timer());
+        currentRoom.getTimer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sendRoomEventUpdate(currentRoom.getRoomId(), true);
+            }
+        }, MAX_ROOM_IDLE_TIME);
+        currentRoom.setTimerStarted(true);
     }
 
     private void updateRoomId(int playerId, int roomId) {
