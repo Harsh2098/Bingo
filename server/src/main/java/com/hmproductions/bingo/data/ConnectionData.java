@@ -1,5 +1,7 @@
 package com.hmproductions.bingo.data;
 
+import java.util.ArrayList;
+
 public class ConnectionData {
 
     private String sessionId, remoteAddress;
@@ -32,7 +34,11 @@ public class ConnectionData {
         this.roomId = roomId;
     }
 
-    public void setRemoteAddress(String remoteAddress) {
-        this.remoteAddress = remoteAddress;
+    public static ConnectionData getConnectionDataFromSessionId(ArrayList<ConnectionData> list, String sessionId) {
+        for (ConnectionData data : list) {
+            if (data.getSessionId().equals(sessionId))
+                return data;
+        }
+        return null;
     }
 }

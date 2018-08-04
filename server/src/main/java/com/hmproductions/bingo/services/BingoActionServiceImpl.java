@@ -275,8 +275,9 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
                 if (currentRoom.getCount() == 0) {
                     System.out.print("Room with id " + currentRoom.getRoomId() + " destroyed.");
                     roomsList.remove(currentRoom);
-                } else
+                } else {
                     sendRoomEventUpdate(request.getRoomId());
+                }
 
                 //Server logs
                 System.out.println(request.getPlayer().getName() + " removed from the game.");
