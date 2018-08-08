@@ -2,7 +2,6 @@ package com.hmproductions.bingo.animations
 
 import android.view.animation.Animation
 import android.view.animation.Transformation
-
 import com.hmproductions.bingo.views.CircleView
 
 class GridCircleAnimation(private val circle: CircleView, newAngle: Int) : Animation() {

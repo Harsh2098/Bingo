@@ -22,6 +22,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.animation.GridLayoutAnimationController
+import android.widget.TextView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.getkeepsafe.taptargetview.TapTarget
@@ -35,6 +36,7 @@ import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellRequest
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse
 import com.hmproductions.bingo.adapter.GameGridRecyclerAdapter
 import com.hmproductions.bingo.adapter.LeaderboardRecyclerAdapter
+import com.hmproductions.bingo.animations.StrikeAnimation
 import com.hmproductions.bingo.dagger.ContextModule
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent
 import com.hmproductions.bingo.data.GridCell
@@ -52,6 +54,7 @@ import com.hmproductions.bingo.utils.Constants.*
 import com.hmproductions.bingo.utils.Miscellaneous.*
 import com.hmproductions.bingo.utils.TimeLimitUtils
 import com.hmproductions.bingo.utils.TimeLimitUtils.*
+import com.hmproductions.bingo.views.StrikeView
 import io.grpc.Metadata
 import io.grpc.stub.MetadataUtils
 import io.grpc.stub.StreamObserver
@@ -431,21 +434,46 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         if (counter > GRID_SIZE) counter = GRID_SIZE
 
-        var previousCount = 0
-        if (bLetterTextView.currentTextColor == Color.parseColor("#FF0000")) previousCount++
-        if (iLetterTextView.currentTextColor == Color.parseColor("#FF0000")) previousCount++
-        if (nLetterTextView.currentTextColor == Color.parseColor("#FF0000")) previousCount++
-        if (gLetterTextView.currentTextColor == Color.parseColor("#FF0000")) previousCount++
-        if (oLetterTextView.currentTextColor == Color.parseColor("#FF0000")) previousCount++
+        var playRowCompleted = false
 
-        if (counter > previousCount && preferences.getBoolean(getString(R.string.sound_preference_key), true))
+        if (counter >= GRID_SIZE) {
+            oLetterTextView.textColor = Color.parseColor("#FF0000")
+            val animation = StrikeAnimation(oStrikeView)
+            animation.duration = 1000
+            oStrikeView.startAnimation(animation)
+            playRowCompleted = true
+        }
+        if (counter >= 4 && !gStrikeView.finishedAnimation()) {
+            gLetterTextView.textColor = Color.parseColor("#FF0000")
+            val animation = StrikeAnimation(gStrikeView)
+            animation.duration = 1000
+            gStrikeView.startAnimation(animation)
+            playRowCompleted = true
+        }
+        if (counter >= 3 && !nStrikeView.finishedAnimation()) {
+            nLetterTextView.textColor = Color.parseColor("#FF0000")
+            val animation = StrikeAnimation(nStrikeView)
+            animation.duration = 1000
+            nStrikeView.startAnimation(animation)
+            playRowCompleted = true
+        }
+        if (counter >= 2 && !iStrikeView.finishedAnimation()) {
+            iLetterTextView.textColor = Color.parseColor("#FF0000")
+            val animation = StrikeAnimation(iStrikeView)
+            animation.duration = 1000
+            iStrikeView.startAnimation(animation)
+            playRowCompleted = true
+        }
+        if (counter >= 1 && !bStrikeView.finishedAnimation()) {
+            bLetterTextView.textColor = Color.parseColor("#FF0000")
+            val animation = StrikeAnimation(bStrikeView)
+            animation.duration = 1000
+            bStrikeView.startAnimation(animation)
+            playRowCompleted = true
+        }
+
+        if (playRowCompleted && preferences.getBoolean(getString(R.string.sound_preference_key), true))
             rowCompletedSound.start()
-
-        oLetterTextView.textColor = Color.parseColor(if (counter >= GRID_SIZE) "#FF0000" else "#000000")
-        gLetterTextView.textColor = Color.parseColor(if (counter >= 4) "#FF0000" else "#000000")
-        nLetterTextView.textColor = Color.parseColor(if (counter >= 3) "#FF0000" else "#000000")
-        iLetterTextView.textColor = Color.parseColor(if (counter >= 2) "#FF0000" else "#000000")
-        bLetterTextView.textColor = Color.parseColor(if (counter >= 1) "#FF0000" else "#000000")
 
         return counter
     }

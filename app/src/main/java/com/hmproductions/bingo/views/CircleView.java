@@ -39,6 +39,8 @@ public class CircleView extends View {
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
+
+        // Setting relative positions of left, right, top, bottom for rectangle; relative to the entire view
         rectF = new RectF(width * (1 - CELL_SCALING_FACTOR), height * (1 - CELL_SCALING_FACTOR), width * CELL_SCALING_FACTOR, height * CELL_SCALING_FACTOR);
     }
 

@@ -73,9 +73,9 @@
         android:indeterminate="false"
         android:progressDrawable="@drawable/progress_circle" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/bingoLinearLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/timeLimitProgressBar"
         android:layout_centerHorizontal="true"
@@ -85,70 +85,116 @@
 
         <TextView
             android:id="@+id/bLetterTextView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_weight="1"
+            android:layout_toStartOf="@+id/iLetterTextView"
             android:gravity="center"
             android:text="@string/b"
             android:textColor="@android:color/background_dark"
             android:textSize="44sp"
-            android:textStyle="normal" />
+            android:textStyle="normal"
+            tools:ignore="RelativeOverlap" />
+
+        <com.hmproductions.bingo.views.StrikeView
+            android:id="@+id/bStrikeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/bLetterTextView"
+            android:layout_alignEnd="@+id/bLetterTextView"
+            android:layout_alignStart="@+id/bLetterTextView"
+            android:layout_alignTop="@+id/bLetterTextView" />
 
         <TextView
             android:id="@+id/iLetterTextView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_weight="1"
+            android:layout_toStartOf="@+id/nLetterTextView"
             android:gravity="center"
             android:text="@string/i"
             android:textColor="@android:color/background_dark"
             android:textSize="44sp"
             android:textStyle="normal" />
 
+        <com.hmproductions.bingo.views.StrikeView
+            android:id="@+id/iStrikeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/iLetterTextView"
+            android:layout_alignEnd="@+id/iLetterTextView"
+            android:layout_alignStart="@+id/iLetterTextView"
+            android:layout_alignTop="@+id/iLetterTextView" />
+
         <TextView
             android:id="@+id/nLetterTextView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_weight="1"
             android:gravity="center"
             android:text="@string/n"
             android:textColor="@android:color/background_dark"
             android:textSize="44sp"
             android:textStyle="normal" />
 
+        <com.hmproductions.bingo.views.StrikeView
+            android:id="@+id/nStrikeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/nLetterTextView"
+            android:layout_alignEnd="@+id/nLetterTextView"
+            android:layout_alignStart="@+id/nLetterTextView"
+            android:layout_alignTop="@+id/nLetterTextView" />
+
         <TextView
             android:id="@+id/gLetterTextView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_weight="1"
+            android:layout_toEndOf="@+id/nLetterTextView"
             android:gravity="center"
             android:text="@string/g"
             android:textColor="@android:color/background_dark"
             android:textSize="44sp"
             android:textStyle="normal" />
 
+        <com.hmproductions.bingo.views.StrikeView
+            android:id="@+id/gStrikeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/gLetterTextView"
+            android:layout_alignEnd="@+id/gLetterTextView"
+            android:layout_alignStart="@+id/gLetterTextView"
+            android:layout_alignTop="@+id/gLetterTextView" />
+
         <TextView
             android:id="@+id/oLetterTextView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_weight="1"
+            android:layout_toEndOf="@+id/gLetterTextView"
             android:gravity="center"
             android:text="@string/o"
             android:textColor="@android:color/background_dark"
             android:textSize="44sp"
             android:textStyle="normal" />
 
-    </LinearLayout>
+        <com.hmproductions.bingo.views.StrikeView
+            android:id="@+id/oStrikeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/oLetterTextView"
+            android:layout_alignEnd="@+id/oLetterTextView"
+            android:layout_alignStart="@+id/oLetterTextView"
+            android:layout_alignTop="@+id/oLetterTextView" />
+
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/leaderBoardRecyclerView"
@@ -180,7 +226,9 @@
         android:layout_alignParentStart="true"
         android:layout_marginBottom="6dp"
         android:layout_marginStart="8dp"
-        android:backgroundTint="@android:color/holo_red_dark"
+        android:backgroundTint="@android:color/background_light"
+        android:elevation="2dp"
+        app:borderWidth="2dp"
         app:fabSize="auto"
         app:srcCompat="@drawable/exit_icon" />
 
