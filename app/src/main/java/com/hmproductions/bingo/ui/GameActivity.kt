@@ -22,7 +22,6 @@ import android.util.TypedValue
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.animation.GridLayoutAnimationController
-import android.widget.TextView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.getkeepsafe.taptargetview.TapTarget
@@ -54,7 +53,6 @@ import com.hmproductions.bingo.utils.Constants.*
 import com.hmproductions.bingo.utils.Miscellaneous.*
 import com.hmproductions.bingo.utils.TimeLimitUtils
 import com.hmproductions.bingo.utils.TimeLimitUtils.*
-import com.hmproductions.bingo.views.StrikeView
 import io.grpc.Metadata
 import io.grpc.stub.MetadataUtils
 import io.grpc.stub.StreamObserver
@@ -118,6 +116,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private var gameCompleted = false
     private var myTurn = false
     private var wasDisconnected = true
+    private var gameTimerStarted = false
 
     private var gameGridCellList = ArrayList<GridCell>()
     private var playersList = ArrayList<Player>()
@@ -346,25 +345,22 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                if (wasDisconnected) {
-                    subscribeToGameEventUpdates(playerId, roomId)
+                doAsync {
+                    val metadata = Metadata()
+                    val metadataKey: Metadata.Key<String> = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER)
+                    metadata.put(metadataKey, Constants.SESSION_ID)
 
-                    doAsync {
-                        val metadata = Metadata()
-                        val metadataKey: Metadata.Key<String> = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER)
-                        metadata.put(metadataKey, Constants.SESSION_ID)
-
-                        val data = MetadataUtils.attachHeaders(actionServiceBlockingStub, metadata).reconnect(ReconnectRequest.newBuilder().setSessionsId(Constants.SESSION_ID).build())
-
-                        uiThread {
-                            if (data.statusCode == ReconnectResponse.StatusCode.SESSION_ID_NOT_EXIST) {
-                                startActivity(Intent(this@GameActivity, SplashActivity::class.java))
-                                Constants.SESSION_ID = null
-                                finish()
-                            }
+                    val data = MetadataUtils.attachHeaders(actionServiceBlockingStub, metadata).reconnect(ReconnectRequest.newBuilder().setSessionsId(Constants.SESSION_ID).build())
+                    uiThread {
+                        if (data.statusCode == ReconnectResponse.StatusCode.SESSION_ID_NOT_EXIST) {
+                            startActivity(Intent(this@GameActivity, SplashActivity::class.java))
+                            Constants.SESSION_ID = null
+                            finish()
                         }
                     }
                 }
+                subscribeToGameEventUpdates(playerId, roomId)
+
                 runOnUiThread { showSnackBar(false) }
             }
 
@@ -382,7 +378,13 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         timeLimitProgressBar.progress = 0
         timeLimitProgressBar.max = totalTime
 
-        if (realTimer) gameTimer?.start()
+        if (realTimer) {
+            if (gameTimerStarted) {
+                gameTimer?.cancel()
+            }
+            gameTimer?.start()
+            gameTimerStarted = true
+        }
     }
 
     // Returns the number of lines completed
@@ -723,6 +725,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         celebrationSound.release()
         popSound.release()
         rowCompletedSound.release()
+
+        // TODO : Unsubscribe from game stream ?
     }
 
     // ================================== Speech Recognition Methods Implementations ==================================

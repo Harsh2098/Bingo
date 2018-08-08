@@ -413,6 +413,7 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
             currentRoom.getTimer().schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    removeSessionIdFromPlayerId(currentRoom.getCurrentPlayerId());
                     TerminationFilter.forceQuitPlayer(currentRoom.getRoomId(), currentRoom.getCurrentPlayerId());
                 }
             }, 2000 * getExactValueFromEnum(currentRoom.getTimeLimit()));
@@ -621,6 +622,23 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
         for (ConnectionData data : connectionDataList) {
             if (data.getPlayerId() == playerId)
                 data.setRoomId(roomId);
+        }
+    }
+
+    private void removeSessionIdFromPlayerId(int playerId) {
+
+        boolean found = false;
+        ConnectionData removalData = null;
+
+        for(ConnectionData data : connectionDataList) {
+            if (data.getPlayerId() == playerId) {
+                found = true;
+                removalData = data;
+            }
+        }
+
+        if (found) {
+            connectionDataList.remove(removalData);
         }
     }
 }

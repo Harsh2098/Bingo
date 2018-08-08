@@ -42,6 +42,7 @@ public class Room {
     }
 
     public int getCurrentPlayerId() {
+        if (playersList.size() == 0) return -1;
         return currentPlayerPosition != -1 ? playersList.get(currentPlayerPosition).getId() : -1;
     }
 
