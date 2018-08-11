@@ -100,6 +100,7 @@ dependencies {
     implementation 'nl.dionsegijn:konfetti:1.1.2'
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.11.0'
     implementation 'com.facebook.shimmer:shimmer:0.2.0'
+    implementation 'com.github.ybq:Android-SpinKit:1.1.0'
 
     // Testing-only dependencies
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

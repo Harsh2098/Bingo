@@ -361,13 +361,19 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 }
                 subscribeToGameEventUpdates(playerId, roomId)
 
-                runOnUiThread { showSnackBar(false) }
+                runOnUiThread {
+                    showSnackBar(false)
+                    doubleBounceProgressBar.visibility = View.INVISIBLE
+                }
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
                 if (!getConnectionInfo(this@GameActivity)) wasDisconnected = true
-                runOnUiThread { onNetworkDownError() }
+                runOnUiThread {
+                    doubleBounceProgressBar.visibility = View.VISIBLE
+                    onNetworkDownError()
+                }
             }
         }
     }
@@ -514,12 +520,16 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     // Click grid cell request 
     private fun clickCellAsynchronously(value: Int) {
+
+        doubleBounceProgressBar.visibility = View.VISIBLE
+
         doAsync {
             if (getConnectionInfo(this@GameActivity) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
                 val data = actionServiceBlockingStub.clickGridCell(ClickGridCellRequest.newBuilder().setRoomId(roomId)
                         .setPlayerId(playerId).setCellClicked(value).build())
 
                 uiThread {
+                    doubleBounceProgressBar.visibility = View.INVISIBLE
                     if (data.statusCode == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR || data.statusCode == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
                         toast(data.statusMessage)
                 }
@@ -725,8 +735,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         celebrationSound.release()
         popSound.release()
         rowCompletedSound.release()
-
-        // TODO : Unsubscribe from game stream ?
     }
 
     // ================================== Speech Recognition Methods Implementations ==================================
