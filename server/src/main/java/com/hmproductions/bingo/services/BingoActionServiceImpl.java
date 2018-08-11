@@ -593,7 +593,9 @@ public class BingoActionServiceImpl extends BingoActionServiceGrpc.BingoActionSe
 
         Room currentRoom = getRoomFromId(roomId);
         if (currentRoom != null) {
-            for (RoomEventSubscription currentSubscription : currentRoom.getRoomEventSubscriptionArrayList()) {
+            ArrayList<RoomEventSubscription> roomEventSubscriptionArrayList = currentRoom.getRoomEventSubscriptionArrayList();
+            for (int i = 0; i < roomEventSubscriptionArrayList.size(); i++) {
+                RoomEventSubscription currentSubscription = roomEventSubscriptionArrayList.get(i);
                 RoomSubscription subscription = currentSubscription.getSubscription();
                 if (destroy) subscription = subscription.toBuilder().setDestroy(true).build();
 

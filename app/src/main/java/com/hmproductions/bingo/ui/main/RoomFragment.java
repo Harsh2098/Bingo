@@ -67,6 +67,7 @@ import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
 
+    public static final String PLAYER_READY_BUNDLE_KEY = "player-ready-bundle-key";
     public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
     public static final String TIME_LIMIT_BUNDLE_KEY = "time-limit-bundle-key";
 
@@ -399,6 +400,10 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         public Loader<SetPlayerReadyResponse> onCreateLoader(int id, @Nullable Bundle args) {
 
             showQuitProgressBar(true);
+
+            if (args != null && !args.getBoolean(PLAYER_READY_BUNDLE_KEY))
+                return new SetReadyLoader(getContext(), actionServiceBlockingStub, currentPlayerId, false, currentRoomId);
+
             return new SetReadyLoader(getContext(), actionServiceBlockingStub, currentPlayerId, !getPlayerReady(currentPlayerId), currentRoomId);
         }
 
@@ -463,6 +468,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     public void onPause() {
         super.onPause();
         connectivityManager.unregisterNetworkCallback(networkCallback);
-        this.getLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, null, setPlayerReadyLoader);
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(PLAYER_READY_BUNDLE_KEY, false);
+        this.getLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, bundle, setPlayerReadyLoader);
     }
 }
