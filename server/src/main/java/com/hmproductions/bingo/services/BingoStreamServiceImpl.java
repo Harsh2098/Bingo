@@ -142,6 +142,10 @@ public class BingoStreamServiceImpl extends BingoStreamServiceGrpc.BingoStreamSe
                 }
             }
             responseObserver.onNext(GameEventUpdate.newBuilder().setGameEvent(gameEvent).build());
+
+            if (request.getCellClicked() == PLAYER_QUIT_CODE) {
+                responseObserver.onCompleted();
+            }
         }
     }
 
