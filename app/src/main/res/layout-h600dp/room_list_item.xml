@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- For larger screens, more than 600dp length -->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
@@ -24,21 +27,33 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
         android:layout_toEndOf="@+id/roomIconTextView"
-        android:maxLength="20"
+        android:maxLength="16"
         android:maxLines="1"
         android:textColor="@android:color/background_dark"
         android:textSize="18sp"
         android:transitionName="@string/room_name_transition" />
 
     <ImageView
+        android:id="@+id/privateRoom_imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/stopwatch_icon"
+        android:src="@drawable/private_icon"
+        android:visibility="gone"
+        android:contentDescription="@string/lock_symbol" />
+
+    <ImageView
+        android:id="@+id/stopwatch_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginEnd="4dp"
         android:layout_toStartOf="@id/timeLimitTextView"
-        android:src="@drawable/stopwatch_icon"
-        android:contentDescription="@string/stopwatch_image" />
+        android:contentDescription="@string/stopwatch_image"
+        android:src="@drawable/stopwatch_icon" />
 
     <TextView
         android:id="@+id/timeLimitTextView"

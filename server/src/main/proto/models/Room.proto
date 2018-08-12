@@ -18,4 +18,5 @@ message Room {
     uint32 count = 3;
     uint32 max_size = 4;
     TimeLimit time_limit = 5;
+    bool passwordExists = 6;
 }

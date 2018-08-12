@@ -53,8 +53,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/gameRecyclerView"
-        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
+        android:layout_toStartOf="@+id/currentTimeTextView"
         android:indeterminate="true"
         android:visibility="invisible"
         app:SpinKit_Color="@color/colorAccent" />

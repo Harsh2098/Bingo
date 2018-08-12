@@ -181,6 +181,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     @OnClick(R.id.leave_button)
     void onLeaveButtonClick() {
 
+        showQuitProgressBar(true);
+
         if (currentPlayerId != -1) {
             getLoaderManager().restartLoader(Constants.UNSUBSCRIBE_LOADER_ID, null, unsubscribeLoader);
             new Handler().postDelayed(() -> getLoaderManager().restartLoader(Constants.REMOVE_PLAYER_LOADER_ID, null, removePlayerLoader), 1000);

@@ -44,7 +44,7 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
             roomArrayList.sortWith(Comparator { (_, countA, maxSizeA), (_, countB, maxSizeB) -> Integer.compare(maxSizeB - countB, maxSizeA - countA) })
 
             if (roomArrayList[0].maxSize != roomArrayList[0].count)
-                roomArrayList.add(0, Room(HEADER_TYPE, 0, 0, "Available Rooms", TimeLimitUtils.TIME_LIMIT.MINUTE_1))
+                roomArrayList.add(0, Room(HEADER_TYPE, 0, 0, "Available Rooms", TimeLimitUtils.TIME_LIMIT.MINUTE_1, false))
 
             var roomsFullPosition = -1
             for (room in roomArrayList)
@@ -54,7 +54,7 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
                 }
 
             if (roomsFullPosition != -1) {
-                roomArrayList.add(roomsFullPosition, Room(HEADER_TYPE, 0, 0, "Full Rooms - In game", TimeLimitUtils.TIME_LIMIT.MINUTE_1))
+                roomArrayList.add(roomsFullPosition, Room(HEADER_TYPE, 0, 0, "Full Rooms - In game", TimeLimitUtils.TIME_LIMIT.MINUTE_1, false))
             }
         }
     }
@@ -70,6 +70,8 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
                     maxCountTextView.text = "${room?.maxSize}"
                     timeLimitTextView.text = getTimeLimitString(room?.timeLimit)
                     roomIconTextView.text = room?.name?.get(0).toString().toUpperCase()
+
+                    privateRoom_imageView.visibility = if (room?.passwordExists!!) View.VISIBLE else View.GONE
 
                     roomIconTextView.setBackgroundResource(R.drawable.cell_circle_foreground)
                     (roomIconTextView.background as GradientDrawable).setColor(Color.parseColor("#EEEEEE"))

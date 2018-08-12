@@ -1,9 +1,11 @@
 package com.hmproductions.bingo.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.hmproductions.bingo.data.GridCell;
 import com.hmproductions.bingo.data.Player;
@@ -24,6 +26,13 @@ public class Miscellaneous {
 
     public interface OnSnackBarRequest {
         void showSnackBar(String message, int duration);
+    }
+
+    public static void hideKeyboardFrom(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        if (imm != null)
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     // Returns an int[size][size] containing numbers 1 to 25 randomly placed

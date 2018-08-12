@@ -29,12 +29,14 @@ public class HostRoomLoader extends AsyncTaskLoader<HostRoomResponse> {
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
     private Room room;
     private Player player;
+    private String password;
 
-    public HostRoomLoader(@NonNull Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub, Room room, Player player) {
+    public HostRoomLoader(@NonNull Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub, Room room, Player player, String password) {
         super(context);
         this.actionServiceBlockingStub = actionServiceBlockingStub;
         this.room = room;
         this.player = player;
+        this.password = password;
     }
 
     @Override
@@ -61,7 +63,7 @@ public class HostRoomLoader extends AsyncTaskLoader<HostRoomResponse> {
             actionServiceBlockingStub = MetadataUtils.attachHeaders(actionServiceBlockingStub, metadata);
 
             return actionServiceBlockingStub.hostRoom(HostRoomRequest.newBuilder()
-                    .setRoomName(room.getName()).setMaxSize(room.getMaxSize()).setPlayerId(player.getId())
+                    .setRoomName(room.getName()).setMaxSize(room.getMaxSize()).setPlayerId(player.getId()).setPassword(password)
                     .setPlayerColor(player.getColor()).setTimeLimitValue(getValueFromEnum(room.getTimeLimit())).setPlayerName(player.getName()).build());
         } else {
             return null;

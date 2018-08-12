@@ -25,12 +25,14 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
     private BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
     private Player player;
     private int roomId;
+    private String password;
 
-    public AddPlayerLoader(Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, int roomId, Player player) {
+    public AddPlayerLoader(Context context, BingoActionServiceGrpc.BingoActionServiceBlockingStub stub, int roomId, Player player, String password) {
         super(context);
         this.actionServiceBlockingStub = stub;
         this.player = player;
         this.roomId = roomId;
+        this.password = password;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class AddPlayerLoader extends AsyncTaskLoader<AddPlayerResponse> {
 
             actionServiceBlockingStub = MetadataUtils.attachHeaders(actionServiceBlockingStub, metadata);
 
-            return actionServiceBlockingStub.addPlayer(AddPlayerRequest.newBuilder().setPlayer(player).setRoomId(roomId).build());
+            return actionServiceBlockingStub.addPlayer(AddPlayerRequest.newBuilder().setPlayer(player).setRoomId(roomId).setPassword(password).build());
         } else {
             return null;
         }

@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.ui.main;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -54,6 +56,7 @@ import static com.hmproductions.bingo.utils.Constants.GET_ROOMS_LOADER_ID;
 import static com.hmproductions.bingo.utils.Constants.HOST_ROOM_LOADER_ID;
 import static com.hmproductions.bingo.utils.Constants.MAX_PLAYERS;
 import static com.hmproductions.bingo.utils.Constants.MIN_PLAYERS;
+import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboardFrom;
 import static com.hmproductions.bingo.utils.Miscellaneous.nameToIdHash;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getValueFromEnum;
@@ -67,6 +70,7 @@ public class HomeFragment extends Fragment implements
     private static final String ROOM_NAME_KEY = "room-name-key";
     private static final String ROOM_SIZE_KEY = "room-size-key";
     private static final String ROOM_TIME_LIMIT_KEY = "room-time-limit-key";
+    private static final String ROOM_PASSWORD_KEY = "room-password-key";
 
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
@@ -76,6 +80,7 @@ public class HomeFragment extends Fragment implements
 
     FloatingActionButton hostFab;
     ProgressBar homeProgressBar;
+    AlertDialog hostRoomDialog;
 
     SwipeRefreshLayout roomSwipeRefreshLayout;
     RecyclerView roomsRecyclerView;
@@ -108,15 +113,15 @@ public class HomeFragment extends Fragment implements
             showHomeProgressBar(true);
             Player player = userDetails.getUserDetails();
 
-            if (player != null && args != null && getContext() != null) {
+            if (player != null && args != null && getContext() != null && args.getString(ROOM_NAME_KEY) != null && args.getString(ROOM_PASSWORD_KEY) != null) {
 
                 currentPlayerId = nameToIdHash(player.getName());
                 player.setId(currentPlayerId);
 
                 Room room = new Room(-1, -1, args.getInt(ROOM_SIZE_KEY), args.getString(ROOM_NAME_KEY),
-                        getEnumFromValue(args.getInt(ROOM_TIME_LIMIT_KEY)));
+                        getEnumFromValue(args.getInt(ROOM_TIME_LIMIT_KEY)), !args.getString(ROOM_PASSWORD_KEY).equals("-1"));
 
-                return new HostRoomLoader(getContext(), actionServiceBlockingStub, room, player);
+                return new HostRoomLoader(getContext(), actionServiceBlockingStub, room, player, args.getString(ROOM_PASSWORD_KEY));
             }
 
             return null;
@@ -166,11 +171,11 @@ public class HomeFragment extends Fragment implements
                 currentPlayerId = nameToIdHash(rawPlayer.getName());
 
                 return new AddPlayerLoader(getContext(), actionServiceBlockingStub, args.getInt(ROOM_ID_KEY),
-                        new Player(rawPlayer.getName(), rawPlayer.getColor(), currentPlayerId, false));
+                        new Player(rawPlayer.getName(), rawPlayer.getColor(), currentPlayerId, false), args.getString(ROOM_PASSWORD_KEY));
             }
 
             return new AddPlayerLoader(getContext(), actionServiceBlockingStub, -1,
-                    new Player("", "", -1, false));
+                    new Player("", "", -1, false), "-1");
         }
 
         @Override
@@ -230,7 +235,8 @@ public class HomeFragment extends Fragment implements
 
         View customView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
+        if (getContext() != null)
+            DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
         ButterKnife.bind(this, customView);
 
         hostFab = customView.findViewById(R.id.host_fab);
@@ -252,7 +258,9 @@ public class HomeFragment extends Fragment implements
     @OnClick(R.id.host_fab)
     void onHostButtonClick() {
         View hostRoomView = LayoutInflater.from(getContext()).inflate(R.layout.host_room_view, null);
+
         EditText roomNameEditText = hostRoomView.findViewById(R.id.roomName_editText);
+        EditText passwordEditText = hostRoomView.findViewById(R.id.password_editText);
 
         Player hostPlayer = userDetails.getUserDetails();
 
@@ -268,7 +276,7 @@ public class HomeFragment extends Fragment implements
         countPicker.setMaxValue(MAX_PLAYERS);
         countPicker.setValue(preferences.getInt(ROOM_SIZE_KEY, MIN_PLAYERS + 1));
         countPicker.setWrapSelectorWheel(false);
-        
+
         CustomPicker timeLimitPicker = hostRoomView.findViewById(R.id.timeLimit_picker);
         timeLimitPicker.setMinValue(0);
         timeLimitPicker.setMaxValue(getResources().getStringArray(R.array.timeLimitOptions).length - 1);
@@ -276,24 +284,46 @@ public class HomeFragment extends Fragment implements
         timeLimitPicker.setDisplayedValues(getResources().getStringArray(R.array.timeLimitOptions));
         timeLimitPicker.setWrapSelectorWheel(false);
 
-        if (getContext() != null)
-            new AlertDialog.Builder(getContext())
+        if (getContext() != null) {
+            hostRoomDialog = new AlertDialog.Builder(getContext())
                     .setView(hostRoomView)
                     .setNegativeButton("Cancel", (dI, i) -> dI.dismiss())
                     .setCancelable(true)
-                    .setPositiveButton("Host", ((dialogInterface, i) -> {
-                        Bundle bundle = new Bundle();
-                        bundle.putString(ROOM_NAME_KEY, roomNameEditText.getText().toString());
-                        bundle.putInt(ROOM_SIZE_KEY, countPicker.getValue());
-                        bundle.putInt(ROOM_TIME_LIMIT_KEY, timeLimitPicker.getValue());
+                    .setPositiveButton("Host", null)
+                    .create();
 
+            hostRoomDialog.setOnShowListener(dialogInterface -> {
+                Button positiveButton = hostRoomDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener((view) -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(ROOM_SIZE_KEY, countPicker.getValue());
+                    bundle.putInt(ROOM_TIME_LIMIT_KEY, timeLimitPicker.getValue());
+
+                    if (passwordEditText.getText().toString().isEmpty() || passwordEditText.getText().toString().equals("")) {
+                        bundle.putString(ROOM_PASSWORD_KEY, "-1");
+                    } else {
+                        bundle.putString(ROOM_PASSWORD_KEY, passwordEditText.getText().toString());
+                    }
+
+                    if (roomNameEditText.getText().toString().isEmpty() || roomNameEditText.getText().toString().equals("")) {
+                        roomNameEditText.setError("Room name empty");
+                    } else {
+                        bundle.putString(ROOM_NAME_KEY, roomNameEditText.getText().toString());
                         preferences.edit().putString(ROOM_NAME_KEY, roomNameEditText.getText().toString()).apply();
                         preferences.edit().putInt(ROOM_SIZE_KEY, countPicker.getValue()).apply();
                         preferences.edit().putInt(ROOM_TIME_LIMIT_KEY, timeLimitPicker.getValue()).apply();
 
                         getLoaderManager().restartLoader(HOST_ROOM_LOADER_ID, bundle, hostRoomLoader);
-                    }))
-                    .show();
+
+                        dialogInterface.dismiss();
+
+                        hideKeyboardFrom(getContext(), view);
+                    }
+                });
+            });
+
+            hostRoomDialog.show();
+        }
     }
 
     @NonNull
@@ -320,7 +350,7 @@ public class HomeFragment extends Fragment implements
                     roomsArrayList.clear();
                     for (com.hmproductions.bingo.models.Room currentRoom : data.getRoomsList()) {
                         roomsArrayList.add(new Room(currentRoom.getRoomId(), currentRoom.getCount(), currentRoom.getMaxSize(),
-                                currentRoom.getRoomName(), getEnumFromValue(currentRoom.getTimeLimitValue())));
+                                currentRoom.getRoomName(), getEnumFromValue(currentRoom.getTimeLimitValue()), currentRoom.getPasswordExists()));
                     }
 
                     if (getContext() != null)
@@ -351,14 +381,23 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onRoomClick(@NonNull View view, int position) {
 
-        if(roomsArrayList.get(position).getMaxSize() == roomsArrayList.get(position).getCount()) {
+        Room currentRoom = roomsArrayList.get(position);
+
+        if (currentRoom.getMaxSize() == currentRoom.getCount()) {
             snackBarRequest.showSnackBar("Room is full", Snackbar.LENGTH_SHORT);
             currentPlayerId = -1;
         } else {
             Bundle bundle = new Bundle();
-            bundle.putInt(ROOM_ID_KEY, roomsArrayList.get(position).getRoomId());
+            bundle.putInt(ROOM_ID_KEY, currentRoom.getRoomId());
 
             lastItemView = view;
+
+            if (currentRoom.getPasswordExists()) {
+                addFromDialog(bundle);
+                return;
+            }
+            else
+                bundle.putString(ROOM_PASSWORD_KEY, "-1");
 
             getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
         }
@@ -388,8 +427,40 @@ public class HomeFragment extends Fragment implements
     }
 
     private void showHomeProgressBar(boolean show) {
-        homeProgressBar.setVisibility(show? View.VISIBLE: View.GONE);
+        homeProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         if (show) hostFab.hide();
         else hostFab.show();
+    }
+
+    private void addFromDialog(Bundle bundle) {
+        if (getContext() != null) {
+
+            View passwordDialogView = LayoutInflater.from(getContext()).inflate(R.layout.password_dialog_view, null);
+
+            EditText passwordEditText = passwordDialogView.findViewById(R.id.password_editText);
+
+            final AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
+                    .setView(passwordDialogView)
+                    .setNegativeButton("Cancel", (dI, i) -> dI.dismiss())
+                    .setCancelable(true)
+                    .setPositiveButton("Join", null)
+                    .create();
+
+            passwordDialog.setOnShowListener(dI -> {
+                Button positiveButton = passwordDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener((view) -> {
+                    if (passwordEditText.getText().toString().isEmpty() || passwordEditText.getText().toString().equals("")) {
+                        passwordEditText.setError("Enter the password");
+                    } else {
+                        bundle.putString(ROOM_PASSWORD_KEY, passwordEditText.getText().toString());
+                        getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
+                        hideKeyboardFrom(getContext(), view);
+                        dI.dismiss();
+                    }
+                });
+            });
+
+            passwordDialog.show();
+        }
     }
 }

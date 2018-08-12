@@ -8,6 +8,7 @@ import "models/Player.proto";
 message AddPlayerRequest {
     models.Player player = 1;
     uint32 room_id = 2;
+    string password = 3;
 }
 
 message AddPlayerResponse {
@@ -18,7 +19,8 @@ message AddPlayerResponse {
          COLOR_TAKEN = 2;
          ALREADY_IN_GAME = 3;
          ROOM_NOT_EXIST = 4;
-         SERVER_ERROR = 5;
+         PASSWORD_MISMATCH = 5;
+         SERVER_ERROR = 6;
     }
 
     StatusCode status_code = 1;

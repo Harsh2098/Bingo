@@ -59,10 +59,7 @@ import io.grpc.stub.StreamObserver
 import kotlinx.android.synthetic.main.activity_game.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
+import org.jetbrains.anko.*
 import java.util.*
 import javax.inject.Inject
 
@@ -277,7 +274,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-        ButterKnife.bind(this)
+        ButterKnife.bind(this, contentView!!)
 
         DaggerBingoApplicationComponent.builder().contextModule(ContextModule(this)).build().inject(this)
 

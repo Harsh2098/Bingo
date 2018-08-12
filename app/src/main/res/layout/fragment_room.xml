@@ -3,6 +3,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginTop="12dp"
     android:orientation="vertical">
 
@@ -78,14 +79,18 @@
             android:text="@string/leave"
             android:textSize="20sp" />
 
-        <ProgressBar
+        <com.github.ybq.android.spinkit.SpinKitView
             android:id="@+id/quit_progressBar"
+            style="@style/SpinKitView.DoubleBounce"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:layout_weight="1"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:indeterminate="true"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            app:SpinKit_Color="@color/colorAccent" />
 
         <TextView
             android:id="@+id/count_textView"

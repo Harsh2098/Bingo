@@ -1,12 +1,8 @@
 package com.hmproductions.bingo.data;
 
-import com.hmproductions.bingo.models.GameSubscription;
-import com.hmproductions.bingo.services.BingoStreamServiceImpl;
-
 import java.util.ArrayList;
 import java.util.Timer;
 
-import static com.hmproductions.bingo.utils.Constants.CLEAR_GAME_SUBSCRIPTION;
 import static com.hmproductions.bingo.utils.TimeUtils.getValueFromEnum;
 
 public class Room {
@@ -17,7 +13,7 @@ public class Room {
 
     private int roomId, count, currentPlayerPosition, maxSize;
     private Status status;
-    private String name;
+    private String name, password;
     private TIME_LIMIT timeLimit;
     private Timer timer;
     private boolean timerStarted;
@@ -27,7 +23,7 @@ public class Room {
     private ArrayList<GameEventSubscription> gameEventSubscriptionArrayList = new ArrayList<>();
 
     /* Constructor */
-    public Room(int roomId, ArrayList<Player> playersList, int count, int currentPlayerPosition, int maxSize, Status status, String name, TIME_LIMIT timeLimit) {
+    public Room(int roomId, ArrayList<Player> playersList, int count, int currentPlayerPosition, int maxSize, Status status, String name, String password, TIME_LIMIT timeLimit) {
         this.roomId = roomId;
         this.playersList = playersList;
         this.count = count;
@@ -35,6 +31,7 @@ public class Room {
         this.maxSize = maxSize;
         this.status = status;
         this.name = name;
+        this.password = password;
         this.timeLimit = timeLimit;
 
         timer = new Timer();
@@ -70,6 +67,10 @@ public class Room {
         }
 
         return -1;
+    }
+
+    public static boolean passwordValid(String password) {
+        return password.equals("-1") || password.length() >= 3;
     }
 
     /* =========================== Getters and Setters =========================== */
@@ -156,5 +157,9 @@ public class Room {
 
     public void setTimerStarted(boolean timerStarted) {
         this.timerStarted = timerStarted;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

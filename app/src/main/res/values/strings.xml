@@ -147,5 +147,8 @@
     <string name="help_content">Objective:-\nComplete 5 straight lines. A line can either be any row, column or diagonal.</string>
     <string name="time_limit_per_turn">Time limit per Turn</string>
     <string name="stopwatch_image">Stopwatch Image</string>
+    <string name="password_optional">Password (Optional)</string>
+    <string name="lock_symbol">Lock Symbol</string>
+    <string name="password">Password</string>
 
 </resources>

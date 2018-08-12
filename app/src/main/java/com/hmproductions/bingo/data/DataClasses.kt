@@ -14,4 +14,4 @@ class Player(val name: String, val color: String, var id: Int, val isReady: Bool
 @Parcelize
 class LeaderboardPlayer(val name: String, val color: String, val winCount: Int) : Parcelable
 
-data class Room(val roomId: Int, val count: Int, val maxSize: Int, val name: String, val timeLimit: TimeLimitUtils.TIME_LIMIT)
+data class Room(val roomId: Int, val count: Int, val maxSize: Int, val name: String, val timeLimit: TimeLimitUtils.TIME_LIMIT, val passwordExists: Boolean)
