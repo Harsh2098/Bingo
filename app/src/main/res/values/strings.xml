@@ -150,5 +150,8 @@
     <string name="password_optional">Password (Optional)</string>
     <string name="lock_symbol">Lock Symbol</string>
     <string name="password">Password</string>
+    <string name="send">Send</string>
+    <string name="type_you_message_here">Type you message here</string>
+    <string name="chat_button">Chat button</string>
 
 </resources>

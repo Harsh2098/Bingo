@@ -12,16 +12,19 @@ import android.os.Handler
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.util.TypedValue
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.animation.GridLayoutAnimationController
+import android.widget.LinearLayout
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.getkeepsafe.taptargetview.TapTarget
@@ -33,6 +36,7 @@ import com.hmproductions.bingo.R
 import com.hmproductions.bingo.actions.*
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellRequest
 import com.hmproductions.bingo.actions.ClickGridCell.ClickGridCellResponse
+import com.hmproductions.bingo.adapter.ChatRecyclerAdapter
 import com.hmproductions.bingo.adapter.GameGridRecyclerAdapter
 import com.hmproductions.bingo.adapter.LeaderboardRecyclerAdapter
 import com.hmproductions.bingo.animations.StrikeAnimation
@@ -57,6 +61,7 @@ import io.grpc.Metadata
 import io.grpc.stub.MetadataUtils
 import io.grpc.stub.StreamObserver
 import kotlinx.android.synthetic.main.activity_game.*
+import kotlinx.android.synthetic.main.chat_layout.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import org.jetbrains.anko.*
@@ -103,6 +108,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private lateinit var rowCompletedSound: MediaPlayer
 
     private var gridRecyclerAdapter: GameGridRecyclerAdapter? = null
+    private var chatRecyclerAdapter: ChatRecyclerAdapter? = null
     private var gameTimer: CountDownTimer? = null
 
     private var playerId = -1
@@ -120,6 +126,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private lateinit var snackBar: Snackbar
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     private val gridCellReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -289,14 +296,22 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         createGameTimer()
         createNetworkCallback()
         snackBar = Snackbar.make(findViewById<View>(android.R.id.content), "Internet connection unavailable", Snackbar.LENGTH_INDEFINITE)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
 
         gridRecyclerAdapter = GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this)
+        chatRecyclerAdapter = ChatRecyclerAdapter(this, null)
 
         with(gameRecyclerView) {
             layoutManager = GridLayoutManager(this@GameActivity, GRID_SIZE)
             layoutAnimation = AnimationUtils.loadLayoutAnimation(this@GameActivity, R.anim.game_grid_animation) as GridLayoutAnimationController
             adapter = gridRecyclerAdapter
             setHasFixedSize(true)
+        }
+
+        with(chatRecyclerView) {
+            layoutManager = LinearLayoutManager(this@GameActivity)
+            adapter = chatRecyclerAdapter
+            setHasFixedSize(false)
         }
 
         speechRecognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -492,6 +507,11 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 .setPositiveButton(R.string.quit) { _, _ -> quitPlayerAsynchronously() }
                 .setNegativeButton(R.string.no) { dI, _ -> dI.dismiss() }
                 .show()
+    }
+
+    @OnClick(R.id.chatButton)
+    fun onChatButtonClick() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     @OnClick(R.id.nextRoundButton)
