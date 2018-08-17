@@ -39,6 +39,8 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
     }
 
     public void addMessage(Message message) {
+        if (messageArrayList == null) messageArrayList = new ArrayList<>();
+
         messageArrayList.add(message);
         notifyItemInserted(messageArrayList.size()-1);
     }

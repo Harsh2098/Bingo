@@ -1,48 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:id="@+id/bottomSheetLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/bingo_primary"
+    android:background="@color/default_background"
     android:elevation="8dp"
-    android:orientation="vertical"
-    android:padding="4dp"
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
+    app:cardCornerRadius="12dp"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/chatRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@color/bingo_primary"
+        android:padding="4dp">
 
-        <EditText
-            android:id="@+id/messageEditText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:hint="@string/type_you_message_here"
-            android:inputType="text" />
+        <ImageButton
+            android:id="@+id/hideChatButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/default_background"
+            android:contentDescription="@string/hide_chat_button"
+            android:src="@drawable/exit_icon" />
 
-        <Button
-            android:id="@+id/sendButton"
+        <TextView
+            android:id="@+id/chatDateTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="@color/colorAccent"
-            android:enabled="false"
-            android:padding="4dp"
-            android:text="@string/send"
-            android:textColor="@color/bingo_primary" />
+            android:layout_alignBottom="@+id/hideChatButton"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="4dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/dark_background"
+            android:textSize="16sp" />
 
-    </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chatRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="288dp"
+            android:layout_below="@+id/hideChatButton"
+            android:visibility="invisible" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/startConversationTextView"
+            android:layout_width="match_parent"
+            android:layout_height="288dp"
+            android:layout_below="@+id/hideChatButton"
+            android:gravity="center_horizontal"
+            android:paddingTop="60dp"
+            android:text="@string/start_new_conversation"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chatRecyclerView"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/messageEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:hint="@string/type_you_message_here"
+                android:inputType="text" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/sendButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_margin="8dp"
+                android:enabled="false"
+                android:src="@drawable/send_icon"
+                android:text="@string/send"
+                android:textAllCaps="true"
+                app:fabSize="auto" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

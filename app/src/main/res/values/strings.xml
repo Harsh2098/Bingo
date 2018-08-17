@@ -153,5 +153,7 @@
     <string name="send">Send</string>
     <string name="type_you_message_here">Type you message here</string>
     <string name="chat_button">Chat button</string>
+    <string name="start_new_conversation">Start new conversation…</string>
+    <string name="hide_chat_button">Hide chat button</string>
 
 </resources>

@@ -13,23 +13,30 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.support.design.widget.BottomSheetBehavior
-import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.CardView
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.animation.GridLayoutAnimationController
-import android.widget.LinearLayout
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.gms.common.util.NumberUtils
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.auth.FirebaseAuth.getInstance
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.*
 import com.hmproductions.bingo.BingoActionServiceGrpc
 import com.hmproductions.bingo.BingoStreamServiceGrpc
 import com.hmproductions.bingo.R
@@ -42,9 +49,7 @@ import com.hmproductions.bingo.adapter.LeaderboardRecyclerAdapter
 import com.hmproductions.bingo.animations.StrikeAnimation
 import com.hmproductions.bingo.dagger.ContextModule
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent
-import com.hmproductions.bingo.data.GridCell
-import com.hmproductions.bingo.data.LeaderboardPlayer
-import com.hmproductions.bingo.data.Player
+import com.hmproductions.bingo.data.*
 import com.hmproductions.bingo.datastreams.GameEventUpdate
 import com.hmproductions.bingo.models.GameEvent.EventCode.*
 import com.hmproductions.bingo.models.GameSubscription
@@ -65,11 +70,12 @@ import kotlinx.android.synthetic.main.chat_layout.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import org.jetbrains.anko.*
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, RecognitionListener {
-
+    // TODO : Smooth scroll to position, connect to room specific chat
     companion object {
         const val PLAYER_ID = "player-id"
         const val ROOM_ID = "room-id"
@@ -126,7 +132,13 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private lateinit var snackBar: Snackbar
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<CardView>
+
+    private var chatDatabaseReference: DatabaseReference? = null
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var firebaseAuthStateListener: AuthStateListener
+    private lateinit var firebaseChildEventListener: ChildEventListener
+    private var firebaseUser: FirebaseUser? = null
 
     private val gridCellReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -295,6 +307,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         createGameGridArrayList()
         createGameTimer()
         createNetworkCallback()
+
         snackBar = Snackbar.make(findViewById<View>(android.R.id.content), "Internet connection unavailable", Snackbar.LENGTH_INDEFINITE)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
 
@@ -308,17 +321,103 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             setHasFixedSize(true)
         }
 
-        with(chatRecyclerView) {
-            layoutManager = LinearLayoutManager(this@GameActivity)
-            adapter = chatRecyclerAdapter
-            setHasFixedSize(false)
-        }
+        setupFirebaseChatEventListener()
+        setupChatBottomSheet()
 
         speechRecognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         speechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         speechRecognizer.setRecognitionListener(this)
+    }
+
+    // Setting up bottom sheet
+    private fun setupChatBottomSheet() {
+
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        with(chatRecyclerView) {
+            val chatLinearLayout =  LinearLayoutManager(this@GameActivity)
+            chatLinearLayout.stackFromEnd = false
+
+            layoutManager = chatLinearLayout
+            adapter = chatRecyclerAdapter
+            setHasFixedSize(false)
+        }
+
+        messageEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {}
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                sendButton.isEnabled = charSequence.toString().trim { it <= ' ' }.isNotEmpty()
+            }
+        })
+
+        messageEditText.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT))
+
+        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED || newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    quitButton.show()
+                    if (gameCompleted) nextRoundButton.show()
+
+                    contentView?.hideKeyboard()
+                } else {
+                    quitButton.hide()
+                    nextRoundButton.hide()
+                }
+            }
+        })
+
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
+        chatDateTextView.text = SimpleDateFormat("dd MMM", Locale.US).format(calendar.time)
+    }
+
+    // Setting up auth state listener and child event listener for chat
+    private fun setupFirebaseChatEventListener() {
+
+        firebaseAuth = getInstance()
+        chatDatabaseReference = FirebaseDatabase.getInstance().reference.child("chats")
+
+        firebaseChildEventListener = object : ChildEventListener {
+            override fun onCancelled(p0: DatabaseError) {}
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
+            override fun onChildRemoved(p0: DataSnapshot) {}
+
+            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+                showChatRecyclerView(true)
+                chatRecyclerAdapter?.addMessage(dataSnapshot.getValue(Message::class.java))
+            }
+        }
+
+        firebaseAuthStateListener = FirebaseAuth.AuthStateListener {
+            if (firebaseAuth.currentUser != null) {
+                chatDatabaseReference?.addChildEventListener(firebaseChildEventListener)
+            } else {
+                firebaseAuth.signInAnonymously().addOnCompleteListener(this@GameActivity) {
+                    if (it.isSuccessful) {
+                        firebaseUser = firebaseAuth.currentUser
+                        chatDatabaseReference?.addChildEventListener(firebaseChildEventListener)
+                    } else {
+                        showChatRecyclerView(false)
+                        chatDatabaseReference?.removeEventListener(firebaseChildEventListener)
+                        snackBar.setText("Chat functionality suspended")
+                        showSnackBar(true)
+                        Handler().postDelayed({
+                            showSnackBar(false)
+                            snackBar.setText("Internet connection unavailable")
+                        }, 2000)
+                    }
+                }
+            }
+        }
     }
 
     // Creates an ArrayList of GridCell using int[][] made by CreateRandomGameArray()
@@ -530,6 +629,23 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             toast("Not your turn")
     }
 
+    @OnClick(R.id.sendButton)
+    fun onSendMessageClick() {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
+        val time = SimpleDateFormat("hh:mm a", Locale.US).format(calendar.time)
+
+        val newMessage = Message(messageEditText.text.toString(), getNameFromId(playersList, playerId), time)
+        chatDatabaseReference?.push()?.setValue(newMessage)
+
+        messageEditText.setText("")
+    }
+
+    @OnClick(R.id.hideChatButton)
+    fun onHideChatButtonClick() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
     override fun onGridCellClick(value: Int) {
         if (preferences.getBoolean(getString(R.string.tts_preference_key), false)) speechRecognizer.stopListening()
         if (myTurn && !valueClicked(gameGridCellList, value)) clickCellAsynchronously(value)
@@ -672,12 +788,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     }
 
     private fun showSnackBar(show: Boolean) = if (show) {
-        findViewById<FloatingActionButton>(R.id.quitButton).hide()
-        findViewById<FloatingActionButton>(R.id.nextRoundButton).hide()
+        quitButton.hide()
+        nextRoundButton.hide()
         snackBar.show()
     } else {
-        findViewById<FloatingActionButton>(R.id.quitButton).show()
-        findViewById<FloatingActionButton>(R.id.nextRoundButton).show()
+        quitButton.show()
+        nextRoundButton.show()
         snackBar.dismiss()
     }
 
@@ -727,8 +843,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         })
     }
 
+    private fun showChatRecyclerView(show: Boolean) {
+        chatRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        startConversationTextView.visibility = if (show) View.INVISIBLE else View.VISIBLE
+    }
+
     override fun onResume() {
         super.onResume()
+        firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
         LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
                 IntentFilter(Constants.GRID_CELL_CLICK_ACTION))
@@ -736,6 +858,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     override fun onPause() {
         super.onPause()
+        firebaseAuth.removeAuthStateListener(firebaseAuthStateListener)
         connectivityManager.unregisterNetworkCallback(networkCallback)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver)
     }

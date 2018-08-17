@@ -140,7 +140,9 @@ public class HomeFragment extends Fragment implements
 
                 } else if (data.getStatusCode() == HostRoomResponse.StatusCode.NAME_TAKEN) {
                     Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
-
+                    hostFab.callOnClick();
+                } else if (data.getStatusCode() == HostRoomResponse.StatusCode.PASSWORD_INVALID) {
+                    Toast.makeText(getActivity(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
                     hostFab.callOnClick();
                 } else {
                     snackBarRequest.showSnackBar(data.getStatusMessage(), Snackbar.LENGTH_SHORT);
@@ -395,8 +397,7 @@ public class HomeFragment extends Fragment implements
             if (currentRoom.getPasswordExists()) {
                 addFromDialog(bundle);
                 return;
-            }
-            else
+            } else
                 bundle.putString(ROOM_PASSWORD_KEY, "-1");
 
             getLoaderManager().restartLoader(ADD_PLAYER_LOADER_ID, bundle, addPlayerLoader);
