@@ -10,30 +10,46 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.actions.RemovePlayerResponse;
 import com.hmproductions.bingo.actions.SetPlayerReadyResponse;
 import com.hmproductions.bingo.actions.Unsubscribe;
+import com.hmproductions.bingo.adapter.ChatRecyclerAdapter;
 import com.hmproductions.bingo.adapter.PlayersRecyclerAdapter;
 import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
+import com.hmproductions.bingo.data.Message;
 import com.hmproductions.bingo.data.Player;
 import com.hmproductions.bingo.datastreams.RoomEventUpdate;
 import com.hmproductions.bingo.loaders.RemovePlayerLoader;
@@ -46,27 +62,35 @@ import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.Miscellaneous;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 import io.grpc.stub.StreamObserver;
 
+import static com.google.firebase.auth.FirebaseAuth.getInstance;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
+import static com.hmproductions.bingo.utils.Constants.DEFAULT_MSG_LENGTH_LIMIT;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
+import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
-
+    // TODO : Keyboard overlaps bottom sheet & show icon on new message
     public static final String PLAYER_READY_BUNDLE_KEY = "player-ready-bundle-key";
     public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
     public static final String TIME_LIMIT_BUNDLE_KEY = "time-limit-bundle-key";
@@ -86,19 +110,45 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     @Inject
     SharedPreferences preferences;
 
+    @BindView(R.id.chatRecyclerView)
+    RecyclerView chatRecyclerView;
+
+    @BindView(R.id.players_recyclerView)
+    RecyclerView playersRecyclerView;
+
+    @BindView(R.id.startConversationTextView)
+    TextView startConversationTextView;
+
+    @BindView(R.id.messageEditText)
+    EditText messageEditText;
+
+    @BindView(R.id.bottomSheetLayout)
+    CardView bottomSheetLayout;
+
+    @BindView(R.id.chatDateTextView)
+    TextView chatDateTextView;
+
+    @BindView(R.id.sendButton)
+    FloatingActionButton sendButton;
+
     private int maxCount = Constants.MIN_PLAYERS; // Setting minimum maximum count to minimum number of players (2) by default
 
     Button leaveButton;
     TextView countTextView;
     ProgressBar leaveProgressBar;
-    RecyclerView playersRecyclerView;
     LinearLayoutManager linearLayoutManager;
 
     ConnectionUtils.OnNetworkDownHandler networkDownHandler;
     Miscellaneous.OnFragmentChangeRequest fragmentChangeRequest;
     ConnectivityManager.NetworkCallback networkCallback;
 
+    private DatabaseReference chatDatabaseReference;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
+    private ChildEventListener firebaseChildEventListener;
+
     PlayersRecyclerAdapter playersRecyclerAdapter;
+    ChatRecyclerAdapter chatRecyclerAdapter;
 
     private Player fakePlayer = new Player("", "", -1, false);
     private boolean wasDisconnected = true;
@@ -127,7 +177,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(getContext())).build().inject(this);
         ButterKnife.bind(this, customView);
 
-        playersRecyclerView = customView.findViewById(R.id.players_recyclerView);
         countTextView = customView.findViewById(R.id.count_textView);
         leaveButton = customView.findViewById(R.id.leave_button);
         leaveProgressBar = customView.findViewById(R.id.quit_progressBar);
@@ -143,11 +192,104 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         linearLayoutManager = new LinearLayoutManager(getContext());
 
+        chatRecyclerAdapter = new ChatRecyclerAdapter(getContext(), null);
+        setupFirebaseChatEventListener();
+        setupChatBottomSheet();
+
         playersRecyclerView.setLayoutManager(linearLayoutManager);
         playersRecyclerView.setAdapter(playersRecyclerAdapter);
         playersRecyclerView.setHasFixedSize(false);
 
         return customView;
+    }
+
+    // Setting up bottom sheet
+    private void setupChatBottomSheet() {
+
+        BottomSheetBehavior<CardView> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
+
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        chatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        chatRecyclerView.setAdapter(chatRecyclerAdapter);
+        chatRecyclerView.setHasFixedSize(false);
+
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.toString().trim().length() > 0) {
+                    sendButton.setEnabled(true);
+                } else {
+                    sendButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+        messageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        chatDateTextView.setText(new SimpleDateFormat("dd MMM", Locale.US).format(calendar.getTime()));
+    }
+
+    // Setting up auth state listener and child event listener for chat
+    private void setupFirebaseChatEventListener() {
+
+        firebaseAuth = getInstance();
+        chatDatabaseReference = FirebaseDatabase.getInstance().getReference().child("chats").child(String.valueOf(currentRoomId));
+
+        firebaseChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Log.v(CLASSIC_TAG, "New data snapshot received");
+                showChatRecyclerView(true);
+                chatRecyclerAdapter.addMessage(dataSnapshot.getValue(Message.class));
+                chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter.getItemCount() - 1);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot p0, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot p0) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot p0, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        firebaseAuthStateListener = firebaseAuth -> {
+            if (firebaseAuth.getCurrentUser() != null) {
+                chatDatabaseReference.addChildEventListener(firebaseChildEventListener);
+            } else {
+                firebaseAuth.signInAnonymously().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        chatDatabaseReference.addChildEventListener(firebaseChildEventListener);
+                    } else {
+                        showChatRecyclerView(false);
+                        chatDatabaseReference.removeEventListener(firebaseChildEventListener);
+                    }
+                });
+            }
+        };
     }
 
     boolean getPlayerReady(int playerId) {
@@ -195,6 +337,34 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         if (playersList.get(position).getId() == currentPlayerId) {
             this.getLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, null, setPlayerReadyLoader);
         }
+    }
+
+    @OnClick(R.id.chatButton)
+    void onChatButtonClick() {
+        BottomSheetBehavior<CardView> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
+    @OnClick(R.id.sendButton)
+    void onSendMessageClick() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+
+        String name = getNameFromId(playersList, currentPlayerId);
+        if (name != null) {
+            Message newMessage = new Message(messageEditText.getText().toString(), name,
+                    new SimpleDateFormat("hh:mm a", Locale.US).format(calendar.getTime()));
+
+            chatDatabaseReference.push().setValue(newMessage);
+        }
+
+        messageEditText.setText("");
+    }
+
+    @OnClick(R.id.hideChatButton)
+    void onHideChatButtonClick() {
+        BottomSheetBehavior<CardView> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     private void subscribeToRoomEventsUpdate(int roomId) {
@@ -460,15 +630,27 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         fragmentChangeRequest.changeFragment(null, -1, null);
     }
 
+    private void showChatRecyclerView(boolean show) {
+        if (show) {
+            startConversationTextView.setVisibility(View.INVISIBLE);
+            chatRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            startConversationTextView.setVisibility(View.VISIBLE);
+            chatRecyclerView.setVisibility(View.INVISIBLE);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        firebaseAuth.addAuthStateListener(firebaseAuthStateListener);
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        firebaseAuth.removeAuthStateListener(firebaseAuthStateListener);
         connectivityManager.unregisterNetworkCallback(networkCallback);
 
         Bundle bundle = new Bundle();

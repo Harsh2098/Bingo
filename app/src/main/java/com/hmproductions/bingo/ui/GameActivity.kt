@@ -337,9 +337,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         with(chatRecyclerView) {
-            val chatLinearLayout =  LinearLayoutManager(this@GameActivity)
-
-            layoutManager = chatLinearLayout
+            layoutManager = LinearLayoutManager(this@GameActivity)
             adapter = chatRecyclerAdapter
             setHasFixedSize(false)
         }
@@ -791,10 +789,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private fun showSnackBar(show: Boolean) = if (show) {
         quitButton.hide()
         nextRoundButton.hide()
+        sendButton.hide()
         snackBar.show()
     } else {
         quitButton.show()
         nextRoundButton.show()
+        sendButton.show()
         snackBar.dismiss()
     }
 
