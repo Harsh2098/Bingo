@@ -120,6 +120,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private var playerId = -1
     private var roomId = -1
     private var currentRoomName = ""
+    private var messageCount = 0
     private var currentTimeLimit: TimeLimitUtils.TIME_LIMIT = TimeLimitUtils.TIME_LIMIT.MINUTE_1
 
     private var gameCompleted = false
@@ -362,12 +363,15 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED || newState == BottomSheetBehavior.STATE_HIDDEN) {
                     quitButton.show()
                     if (gameCompleted) nextRoundButton.show()
-
                     contentView?.hideKeyboard()
+
                 } else {
                     quitButton.hide()
                     nextRoundButton.hide()
                 }
+
+                messageCount = 0
+                notificationBubbleTextView.visibility = View.GONE
             }
         })
 
@@ -391,8 +395,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
                 showChatRecyclerView(true)
                 chatRecyclerAdapter?.addMessage(dataSnapshot.getValue(Message::class.java))
+                messageCount++;
 
-                chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter?.itemCount?:1 - 1)
+                if (!((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) || (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)))
+                    chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter?.itemCount?:1 - 1)
+                else {
+                    notificationBubbleTextView.visibility = View.VISIBLE
+                    notificationBubbleTextView.text = if (messageCount > 9) "9+" else messageCount.toString()
+                }
             }
         }
 

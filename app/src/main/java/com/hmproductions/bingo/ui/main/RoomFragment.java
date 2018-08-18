@@ -90,7 +90,7 @@ import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
-    // TODO : Keyboard overlaps bottom sheet & show icon on new message
+    // TODO : Sizeable bottom sheet & show icon on new message in lobby
     public static final String PLAYER_READY_BUNDLE_KEY = "player-ready-bundle-key";
     public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
     public static final String TIME_LIMIT_BUNDLE_KEY = "time-limit-bundle-key";
