@@ -9,6 +9,8 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import static java.lang.StrictMath.abs;
+
 public class MiscellaneousUtils {
 
     private static final String randomStringGenerationString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789=";
@@ -42,8 +44,8 @@ public class MiscellaneousUtils {
     }
 
     public static int generateRoomId(String name) {
-        return ((int)name.charAt(0) * (int)name.charAt(name.length()/2) * (int)name.charAt(name.length() - 1) *
-                (int)(System.currentTimeMillis() % 100) * 97) % 101;
+        return abs(((int)name.charAt(0) * (int)name.charAt(name.length()/2) * (int)name.charAt(name.length() - 1) *
+                (int)(System.currentTimeMillis() % 100) * 97) % 10001);
     }
 
     public static void removeConnectionData(ArrayList<ConnectionData> data, int playerId) {

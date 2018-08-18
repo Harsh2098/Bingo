@@ -7,7 +7,7 @@ public class Constants {
     public static final int GRID_SIZE = 5;
     public static final float GRID_SCALING_FACTOR = 0.95f;
     public static final float CELL_SCALING_FACTOR = 0.92f;
-    public static final int DEFAULT_MSG_LENGTH_LIMIT = 50;
+    public static final int DEFAULT_MSG_LENGTH_LIMIT = 500;
 
     public static final int LEADERBOARD_COL_SPAN = 2;
     public static final int TURN_SKIPPED_CODE = 123;

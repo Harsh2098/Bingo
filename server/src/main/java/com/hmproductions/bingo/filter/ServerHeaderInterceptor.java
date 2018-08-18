@@ -37,7 +37,7 @@ public class ServerHeaderInterceptor implements ServerInterceptor {
         Metadata.Key<String> metadataSessionIdKey = Metadata.Key.of(SESSION_ID_KEY, Metadata.ASCII_STRING_MARSHALLER);
         String sessionId = headers.get(metadataSessionIdKey);
 
-        // TODO (Release) : Add this -- System.out.println("Call with session id : " + sessionId);
+        System.out.println("Call with session id : " + sessionId);
 
         if (methodName.equals(GET_SESSION_ID_METHOD)) {
             return next.startCall(call, headers);

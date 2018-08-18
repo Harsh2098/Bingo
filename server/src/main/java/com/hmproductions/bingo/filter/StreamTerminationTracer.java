@@ -19,7 +19,7 @@ public class StreamTerminationTracer extends ServerStreamTracer.Factory {
     @Override
     public ServerStreamTracer newServerStreamTracer(String fullMethodName, Metadata headers) {
 
-        // TODO (Release) : Add this -- System.out.println("Stream tracer called with method name " + fullMethodName);
+        System.out.println("Stream tracer called with method name " + fullMethodName);
 
         switch (fullMethodName) {
             case Constants.ROOM_STREAMING_METHOD:

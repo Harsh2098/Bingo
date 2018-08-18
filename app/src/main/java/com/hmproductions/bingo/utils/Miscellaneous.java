@@ -28,6 +28,7 @@ public class Miscellaneous {
         void showSnackBar(String message, int duration);
     }
 
+    // For java classes, otherwise kotlin has view extensions for hiding keyboard
     public static void hideKeyboardFrom(Context context, View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
 

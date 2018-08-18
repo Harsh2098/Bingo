@@ -75,7 +75,7 @@ import java.util.*
 import javax.inject.Inject
 
 class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, RecognitionListener {
-    // TODO : Smooth scroll to position, connect to room specific chat
+
     companion object {
         const val PLAYER_ID = "player-id"
         const val ROOM_ID = "room-id"
@@ -338,7 +338,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         with(chatRecyclerView) {
             val chatLinearLayout =  LinearLayoutManager(this@GameActivity)
-            chatLinearLayout.stackFromEnd = false
 
             layoutManager = chatLinearLayout
             adapter = chatRecyclerAdapter
@@ -383,7 +382,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private fun setupFirebaseChatEventListener() {
 
         firebaseAuth = getInstance()
-        chatDatabaseReference = FirebaseDatabase.getInstance().reference.child("chats")
+        chatDatabaseReference = FirebaseDatabase.getInstance().reference.child("chats").child(roomId.toString())
 
         firebaseChildEventListener = object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {}
@@ -394,6 +393,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
                 showChatRecyclerView(true)
                 chatRecyclerAdapter?.addMessage(dataSnapshot.getValue(Message::class.java))
+
+                chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter?.itemCount?:1 - 1)
             }
         }
 
