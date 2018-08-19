@@ -21,7 +21,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,16 +80,16 @@ import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.DEFAULT_MSG_LENGTH_LIMIT;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
+import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboardFrom;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
-    // TODO : Sizeable bottom sheet & show icon on new message in lobby
+    // TODO : Size able bottom sheet & keyboard overlap bottom sheet
     public static final String PLAYER_READY_BUNDLE_KEY = "player-ready-bundle-key";
     public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
     public static final String TIME_LIMIT_BUNDLE_KEY = "time-limit-bundle-key";
@@ -131,6 +130,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     @BindView(R.id.sendButton)
     FloatingActionButton sendButton;
 
+    @BindView(R.id.notificationBubbleTextView)
+    TextView messageCountTextView;
+
     private int maxCount = Constants.MIN_PLAYERS; // Setting minimum maximum count to minimum number of players (2) by default
 
     Button leaveButton;
@@ -152,6 +154,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     private Player fakePlayer = new Player("", "", -1, false);
     private boolean wasDisconnected = true;
+    private int messageCount = 0;
+
+    private BottomSheetBehavior<CardView> bottomSheetBehavior;
 
     public RoomFragment() {
         // Required empty public constructor
@@ -193,8 +198,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         linearLayoutManager = new LinearLayoutManager(getContext());
 
         chatRecyclerAdapter = new ChatRecyclerAdapter(getContext(), null);
-        setupFirebaseChatEventListener();
+
         setupChatBottomSheet();
+        setupFirebaseChatEventListener();
 
         playersRecyclerView.setLayoutManager(linearLayoutManager);
         playersRecyclerView.setAdapter(playersRecyclerAdapter);
@@ -206,9 +212,24 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     // Setting up bottom sheet
     private void setupChatBottomSheet() {
 
-        BottomSheetBehavior<CardView> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED || newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    hideKeyboardFrom(getContext(), getView());
+                }
+                messageCount = 0;
+                messageCountTextView.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
 
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         chatRecyclerView.setAdapter(chatRecyclerAdapter);
@@ -249,10 +270,16 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         firebaseChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Log.v(CLASSIC_TAG, "New data snapshot received");
                 showChatRecyclerView(true);
                 chatRecyclerAdapter.addMessage(dataSnapshot.getValue(Message.class));
                 chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter.getItemCount() - 1);
+                messageCount++;
+
+                if (((bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) ||
+                        (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED))) {
+                    messageCountTextView.setVisibility(View.VISIBLE);
+                    messageCountTextView.setText(messageCount > 9 ? "9+" : String.valueOf(messageCount));
+                }
             }
 
             @Override

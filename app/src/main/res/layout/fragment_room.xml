@@ -91,16 +91,35 @@
             android:visibility="invisible"
             app:SpinKit_Color="@color/colorAccent" />
 
-        <ImageButton
-            android:id="@+id/chatButton"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="4dp"
-            android:background="@android:color/background_light"
-            android:contentDescription="@string/chat_button"
-            android:scaleType="fitXY"
-            android:src="@drawable/chat_icon" />
+            android:layout_marginEnd="4dp">
+
+            <ImageButton
+                android:id="@+id/chatButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/background_light"
+                android:contentDescription="@string/chat_button"
+                android:scaleType="fitXY"
+                android:src="@drawable/chat_icon" />
+
+            <TextView
+                android:id="@+id/notificationBubbleTextView"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignEnd="@+id/chatButton"
+                android:layout_alignTop="@+id/chatButton"
+                android:background="@drawable/notification_bubble"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:textColor="@color/bingo_primary"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/count_textView"

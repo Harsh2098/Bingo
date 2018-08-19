@@ -395,11 +395,11 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
                 showChatRecyclerView(true)
                 chatRecyclerAdapter?.addMessage(dataSnapshot.getValue(Message::class.java))
+                chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter?.itemCount ?: 1-1)
                 messageCount++;
 
-                if (!((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) || (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)))
-                    chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter?.itemCount?:1 - 1)
-                else {
+                if (((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) ||
+                                (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED))) {
                     notificationBubbleTextView.visibility = View.VISIBLE
                     notificationBubbleTextView.text = if (messageCount > 9) "9+" else messageCount.toString()
                 }
