@@ -294,7 +294,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-        ButterKnife.bind(this, contentView!!)
+        ButterKnife.bind(this)
 
         DaggerBingoApplicationComponent.builder().contextModule(ContextModule(this)).build().inject(this)
 

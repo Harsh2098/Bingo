@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottomSheetLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@color/default_background"
     android:elevation="8dp"
     app:behavior_hideable="true"
@@ -21,11 +21,12 @@
 
         <ImageButton
             android:id="@+id/hideChatButton"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:background="@color/default_background"
             android:contentDescription="@string/hide_chat_button"
+            android:padding="6dp"
             android:src="@drawable/exit_icon" />
 
         <TextView
@@ -51,7 +52,8 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chatRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="288dp"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/senderBar"
             android:layout_below="@+id/divider"
             android:layout_marginTop="2dp"
             android:visibility="invisible" />
@@ -59,17 +61,20 @@
         <TextView
             android:id="@+id/startConversationTextView"
             android:layout_width="match_parent"
-            android:layout_height="288dp"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/chatRecyclerView"
+            android:layout_alignTop="@+id/chatRecyclerView"
             android:layout_below="@+id/hideChatButton"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:paddingTop="60dp"
             android:text="@string/start_new_conversation"
             android:textSize="16sp" />
 
         <LinearLayout
+            android:id="@+id/senderBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/chatRecyclerView"
+            android:layout_alignParentBottom="true"
             android:orientation="horizontal">
 
             <EditText

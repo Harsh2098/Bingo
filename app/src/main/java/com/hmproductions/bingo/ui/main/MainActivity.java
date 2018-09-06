@@ -15,8 +15,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -172,10 +174,16 @@ public class MainActivity extends AppCompatActivity implements
     public void changeFragment(String roomName, int timeLimit, View view) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
+        RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+
         if (currentFragment instanceof RoomFragment) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, getHomeFragment(false)).commit();
             playerNameEditText.setEnabled(true);
             colorPicker.setEnabled(true);
+
+            params.addRule(RelativeLayout.BELOW, R.id.color_picker);
+            findViewById(R.id.fragment_container).setLayoutParams(params);
+            colorPicker.setVisibility(View.VISIBLE);
 
         } else {
             RoomFragment roomFragment = new RoomFragment();
@@ -193,6 +201,10 @@ public class MainActivity extends AppCompatActivity implements
             } else {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, roomFragment).commit();
             }
+
+            params.addRule(RelativeLayout.BELOW, R.id.nameTextInputLayout);
+            findViewById(R.id.fragment_container).setLayoutParams(params);
+            colorPicker.setVisibility(View.GONE);
 
             playerNameEditText.setEnabled(false);
             colorPicker.setEnabled(false);

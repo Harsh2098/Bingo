@@ -680,8 +680,10 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         firebaseAuth.removeAuthStateListener(firebaseAuthStateListener);
         connectivityManager.unregisterNetworkCallback(networkCallback);
 
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(PLAYER_READY_BUNDLE_KEY, false);
-        this.getLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, bundle, setPlayerReadyLoader);
+        if(currentPlayerId != -1) {
+            Bundle bundle = new Bundle();
+            bundle.putBoolean(PLAYER_READY_BUNDLE_KEY, false);
+            this.getLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, bundle, setPlayerReadyLoader);
+        }
     }
 }
