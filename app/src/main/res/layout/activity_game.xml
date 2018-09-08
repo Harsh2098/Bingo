@@ -120,6 +120,7 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
         android:layout_marginTop="12dp"
+        android:layout_toStartOf="@+id/chatButton"
         android:visibility="visible">
 
         <TextView
@@ -251,10 +252,10 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="6dp"
         android:layout_marginEnd="8dp"
-        android:backgroundTint="@android:color/holo_orange_dark"
+        android:backgroundTint="@color/primaryColor"
+        android:src="@drawable/next_icon"
         android:visibility="gone"
         app:fabSize="auto"
-        app:srcCompat="@drawable/next_icon"
         tools:ignore="RelativeOverlap" />
 
     <android.support.design.widget.FloatingActionButton
@@ -267,9 +268,9 @@
         android:layout_marginStart="8dp"
         android:backgroundTint="@android:color/background_light"
         android:elevation="2dp"
+        android:src="@drawable/exit_icon"
         app:borderWidth="2dp"
-        app:fabSize="auto"
-        app:srcCompat="@drawable/exit_icon" />
+        app:fabSize="auto" />
 
     <ImageButton
         android:id="@+id/talkToSpeakImageButton"
