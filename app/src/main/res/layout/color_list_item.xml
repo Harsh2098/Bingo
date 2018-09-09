@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/color_imageView"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:contentDescription="@string/color_item"
+        android:padding="4dp"
+        android:src="@drawable/color_view" />
+
+    <ImageView
+        android:id="@+id/selected_imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/color_imageView"
+        android:layout_alignEnd="@+id/color_imageView"
+        android:layout_alignStart="@+id/color_imageView"
+        android:layout_alignTop="@+id/color_imageView"
+        android:layout_centerInParent="true"
+        android:contentDescription="@string/color_selected_tick"
+        android:padding="8dp"
+        android:src="@drawable/color_selection_icon"
+        android:visibility="visible" />
+
+</RelativeLayout>

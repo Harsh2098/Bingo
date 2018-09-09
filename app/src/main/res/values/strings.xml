@@ -39,7 +39,7 @@
         <item>#00DDFF</item>
         <item>#FF8800</item>
         <item>#FF00FF</item>
-        <item>#FFFF00</item>
+        <item>#8692E1</item>
         <item>#111111</item>
         <item>#0077FF</item>
     </string-array>
@@ -155,5 +155,7 @@
     <string name="chat_button">Chat button</string>
     <string name="start_new_conversation">Start new conversation…</string>
     <string name="hide_chat_button">Hide chat button</string>
+    <string name="color_item">Color item</string>
+    <string name="color_selected_tick">Color selected tick</string>
 
 </resources>

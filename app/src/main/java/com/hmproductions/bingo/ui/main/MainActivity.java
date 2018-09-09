@@ -11,6 +11,8 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +29,7 @@ import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
+import com.hmproductions.bingo.adapter.ColorRecyclerAdapter;
 import com.hmproductions.bingo.dagger.ContextModule;
 import com.hmproductions.bingo.dagger.DaggerBingoApplicationComponent;
 import com.hmproductions.bingo.data.Player;
@@ -36,7 +39,6 @@ import com.hmproductions.bingo.ui.settings.SettingsActivity;
 import com.hmproductions.bingo.utils.ConnectionUtils;
 import com.hmproductions.bingo.utils.Constants;
 import com.hmproductions.bingo.utils.Miscellaneous;
-import com.hmproductions.bingo.views.CustomPicker;
 
 import java.util.ArrayList;
 
@@ -53,12 +55,14 @@ public class MainActivity extends AppCompatActivity implements
         ConnectionUtils.OnNetworkDownHandler,
         Miscellaneous.OnFragmentChangeRequest,
         HomeFragment.GetDetails,
-        Miscellaneous.OnSnackBarRequest {
+        Miscellaneous.OnSnackBarRequest,
+        ColorRecyclerAdapter.OnColorSelected {
 
     public static final String PLAYER_LEFT_KEY = "player-left-key";
-
     private static final String PLAYER_NAME_KEY = "player-name-key";
     private static final String PLAYER_COLOR_KEY = "player-color-key";
+
+    private static final int COLOR_ROW_SPAN = 4;
 
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;
@@ -72,8 +76,8 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.playerName_editText)
     EditText playerNameEditText;
 
-    @BindView(R.id.color_picker)
-    CustomPicker colorPicker;
+    @BindView(R.id.color_recyclerView)
+    RecyclerView colorRecyclerView;
 
     @BindView(R.id.main_toolbar)
     Toolbar mainToolbar;
@@ -81,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements
     static int currentPlayerId = -1, currentRoomId = -1;
     static ArrayList<Player> playersList = new ArrayList<>();
 
+    ColorRecyclerAdapter colorRecyclerAdapter;
     AlertDialog helpDialog;
 
     @Override
@@ -90,8 +95,6 @@ public class MainActivity extends AppCompatActivity implements
 
         ButterKnife.bind(this);
         DaggerBingoApplicationComponent.builder().contextModule(new ContextModule(this)).build().inject(this);
-
-        setupColorPicker();
 
         mainToolbar.setTitle("");
         setSupportActionBar(mainToolbar);
@@ -117,16 +120,18 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         currentPlayerId = currentRoomId = -1;
+        setupColorRecyclerView();
 
         startTapTargetSequence();
         preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
     }
 
-    private void setupColorPicker() {
-        colorPicker.setMinValue(0);
-        colorPicker.setMaxValue(getResources().getStringArray(R.array.colorsName).length - 1);
-        colorPicker.setDisplayedValues(getResources().getStringArray(R.array.colorsName));
-        colorPicker.setWrapSelectorWheel(true);
+    private void setupColorRecyclerView() {
+        colorRecyclerAdapter = new ColorRecyclerAdapter(this, getResources().getStringArray(R.array.colorsHex), this);
+
+        colorRecyclerView.setLayoutManager(new GridLayoutManager(this, COLOR_ROW_SPAN));
+        colorRecyclerView.setAdapter(colorRecyclerAdapter);
+        colorRecyclerView.setHasFixedSize(true);
     }
 
     @Override
@@ -158,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         playerNameEditText.setText(preferences.getString(PLAYER_NAME_KEY, ""));
-        colorPicker.setValue(preferences.getInt(PLAYER_COLOR_KEY, 0));
+        colorRecyclerAdapter.setSelected(preferences.getInt(PLAYER_COLOR_KEY, 0));
     }
 
     @Override
@@ -166,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onPause();
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(PLAYER_NAME_KEY, playerNameEditText.getText().toString());
-        editor.putInt(PLAYER_COLOR_KEY, colorPicker.getValue());
+        editor.putInt(PLAYER_COLOR_KEY, colorRecyclerAdapter.getSelectedPosition());
         editor.apply();
     }
 
@@ -174,16 +179,15 @@ public class MainActivity extends AppCompatActivity implements
     public void changeFragment(String roomName, int timeLimit, View view) {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-        RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         if (currentFragment instanceof RoomFragment) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, getHomeFragment(false)).commit();
             playerNameEditText.setEnabled(true);
-            colorPicker.setEnabled(true);
 
-            params.addRule(RelativeLayout.BELOW, R.id.color_picker);
+            params.addRule(RelativeLayout.BELOW, R.id.color_recyclerView);
             findViewById(R.id.fragment_container).setLayoutParams(params);
-            colorPicker.setVisibility(View.VISIBLE);
+            colorRecyclerView.setVisibility(View.VISIBLE);
 
         } else {
             RoomFragment roomFragment = new RoomFragment();
@@ -204,10 +208,9 @@ public class MainActivity extends AppCompatActivity implements
 
             params.addRule(RelativeLayout.BELOW, R.id.nameTextInputLayout);
             findViewById(R.id.fragment_container).setLayoutParams(params);
-            colorPicker.setVisibility(View.GONE);
+            colorRecyclerView.setVisibility(View.GONE);
 
             playerNameEditText.setEnabled(false);
-            colorPicker.setEnabled(false);
 
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         }
@@ -241,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return new Player(playerNameEditText.getText().toString(),
-                getResources().getStringArray(R.array.colorsName)[colorPicker.getValue()], -1, false);
+                getResources().getStringArray(R.array.colorsName)[colorRecyclerAdapter.getSelectedPosition()], -1, false);
     }
 
     private HomeFragment getHomeFragment(boolean showSnackbar) {
@@ -322,6 +325,11 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         snackbar.show();
+    }
+
+    @Override
+    public void onColorClick(int position) {
+        colorRecyclerAdapter.setSelected(position);
     }
 
     /* Copyright 2016 Keepsafe Software Inc.

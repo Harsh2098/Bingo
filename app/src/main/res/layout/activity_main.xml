@@ -49,18 +49,18 @@
 
     </android.support.design.widget.TextInputLayout>
 
-    <com.hmproductions.bingo.views.CustomPicker
-        android:id="@+id/color_picker"
-        android:layout_width="240dp"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/color_recyclerView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nameTextInputLayout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="-8dp" />
+        android:layout_marginTop="4dp" />
 
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/color_picker"/>
+        android:layout_below="@+id/color_recyclerView" />
 
 </RelativeLayout>
