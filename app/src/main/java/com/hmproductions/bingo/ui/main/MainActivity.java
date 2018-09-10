@@ -112,7 +112,14 @@ public class MainActivity extends AppCompatActivity implements
                 Bundle bundle = new Bundle();
                 bundle.putInt(TIME_LIMIT_BUNDLE_KEY, getIntent().getIntExtra(TIME_LIMIT_BUNDLE_KEY, 2));
                 bundle.putString(ROOM_NAME_BUNDLE_KEY, getIntent().getStringExtra(GameActivity.ROOM_NAME_EXTRA_KEY));
-                roomFragment.setArguments(bundle);
+                roomFragment.setArguments(bundle);//TODO
+
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                params.addRule(RelativeLayout.BELOW, R.id.nameTextInputLayout);
+                findViewById(R.id.fragment_container).setLayoutParams(params);
+                colorRecyclerView.setVisibility(View.GONE);
+
+                playerNameEditText.setEnabled(false);
 
                 getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, roomFragment).commit();
                 return;
