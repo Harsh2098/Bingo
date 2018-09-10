@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         currentPlayerId = currentRoomId = -1;
-        setupColorRecyclerView();
 
         startTapTargetSequence();
         preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
@@ -162,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        setupColorRecyclerView();
+
         playerNameEditText.setText(preferences.getString(PLAYER_NAME_KEY, ""));
         colorRecyclerAdapter.setSelected(preferences.getInt(PLAYER_COLOR_KEY, 0));
     }
