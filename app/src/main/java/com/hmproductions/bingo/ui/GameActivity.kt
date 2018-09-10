@@ -888,6 +888,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         rowCompletedSound.release()
     }
 
+    override fun onBackPressed() = onQuitButtonClick()
+
     // ================================== Speech Recognition Methods Implementations ==================================
 
     override fun onReadyForSpeech(bundle: Bundle) {}

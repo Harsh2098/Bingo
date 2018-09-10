@@ -340,6 +340,11 @@ public class MainActivity extends AppCompatActivity implements
         colorRecyclerAdapter.setSelected(position);
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
     /* Copyright 2016 Keepsafe Software Inc.
 
      * Licensed under the Apache License, Version 2.0 (the "License");
