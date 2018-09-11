@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -287,7 +288,7 @@ public class HomeFragment extends Fragment implements
         timeLimitPicker.setWrapSelectorWheel(false);
 
         if (getContext() != null) {
-            hostRoomDialog = new AlertDialog.Builder(getContext())
+            hostRoomDialog = new AlertDialog.Builder(getContext(), R.style.CustomAlertDialog)
                     .setView(hostRoomView)
                     .setNegativeButton("Cancel", (dI, i) -> dI.dismiss())
                     .setCancelable(true)
@@ -322,8 +323,12 @@ public class HomeFragment extends Fragment implements
                         hideKeyboardFrom(getContext(), view);
                     }
                 });
-            });
 
+                if (getContext() != null) {
+                    hostRoomDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(getContext(), R.color.neon_green));
+                    hostRoomDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getContext(), R.color.player_not_ready));
+                }
+            });
             hostRoomDialog.show();
         }
     }
@@ -440,7 +445,7 @@ public class HomeFragment extends Fragment implements
 
             EditText passwordEditText = passwordDialogView.findViewById(R.id.password_editText);
 
-            final AlertDialog passwordDialog = new AlertDialog.Builder(getContext())
+            final AlertDialog passwordDialog = new AlertDialog.Builder(getContext(), R.style.CustomAlertDialog)
                     .setView(passwordDialogView)
                     .setNegativeButton("Cancel", (dI, i) -> dI.dismiss())
                     .setCancelable(true)

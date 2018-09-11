@@ -29,30 +29,30 @@
         <item>Obnoxious Orange</item>
         <item>Vibrant Violet</item>
         <item>Yakkaty Yellow</item>
-        <item>Benzoic Black</item>
-        <item>Deep Blue</item>
+        <item>Wacky White</item>
+        <item>Poppy Purple</item>
     </string-array>
 
     <string-array name="colorsHex">
-        <item>#CC0000</item>
-        <item>#99CC00</item>
+        <item>#FF0000</item>
+        <item>#39FF14</item>
         <item>#00DDFF</item>
-        <item>#FF8800</item>
+        <item>#FF6939</item>
         <item>#FF00FF</item>
-        <item>#8692E1</item>
-        <item>#111111</item>
-        <item>#0077FF</item>
+        <item>#FFFF00</item>
+        <item>#FFFFFF</item>
+        <item>#9D00FF</item>
     </string-array>
 
     <string-array name="colorsRim">
-        <item>#CC0000</item>
-        <item>#669900</item>
-        <item>#0099CC</item>
-        <item>#FF6600</item>
-        <item>#AA66CC</item>
-        <item>#8692FF</item>
-        <item>#000000</item>
-        <item>#0033FF</item>
+        <item>#FF0000</item>
+        <item>#39FF14</item>
+        <item>#00DDFF</item>
+        <item>#FF6939</item>
+        <item>#FF00FF</item>
+        <item>#FFFF00</item>
+        <item>#FFFFFF</item>
+        <item>#9D00FF</item>
     </string-array>
     <string name="title_activity_settings">Settings</string>
 
@@ -87,5 +87,6 @@
     <string name="hide_chat_button">Hide chat button</string>
     <string name="color_item">Color item</string>
     <string name="color_selected_tick">Color selected tick</string>
+    <string name="app_title">App title</string>
 
 </resources>

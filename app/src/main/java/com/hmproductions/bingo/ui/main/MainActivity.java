@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements
                 Bundle bundle = new Bundle();
                 bundle.putInt(TIME_LIMIT_BUNDLE_KEY, getIntent().getIntExtra(TIME_LIMIT_BUNDLE_KEY, 2));
                 bundle.putString(ROOM_NAME_BUNDLE_KEY, getIntent().getStringExtra(GameActivity.ROOM_NAME_EXTRA_KEY));
-                roomFragment.setArguments(bundle);//TODO
+                roomFragment.setArguments(bundle);
 
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 params.addRule(RelativeLayout.BELOW, R.id.nameTextInputLayout);
@@ -318,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements
     public void showSnackBar(String message, int duration) {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, duration);
 
+        snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.dark_blue_background));
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         if (message.equals("No rooms available"))

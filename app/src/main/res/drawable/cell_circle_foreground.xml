@@ -1,7 +1,7 @@
 <shape android:shape="oval"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <solid android:color="@android:color/background_light" />
+    <solid android:color="@color/dark_blue_background" />
 
     <size
         android:width="24dp"
@@ -9,7 +9,7 @@
 
     <stroke
         android:width="2dp"
-        android:color="#000000" />
+        android:color="@color/primaryTextColor" />
 
 
 </shape>

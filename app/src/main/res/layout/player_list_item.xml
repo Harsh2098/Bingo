@@ -14,7 +14,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/grid_cell_background">
 
         <View
             android:id="@+id/color_view"
@@ -31,7 +32,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="12dp"
             android:maxLength="20"
-            android:textColor="@android:color/black"
+            android:textColor="@color/primaryTextColor"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -43,7 +44,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="24dp"
             android:elevation="2dp"
-            app:cardBackgroundColor="@android:color/holo_green_dark"
+            app:cardBackgroundColor="@color/neon_green"
             app:cardCornerRadius="8dp" />
 
     </RelativeLayout>

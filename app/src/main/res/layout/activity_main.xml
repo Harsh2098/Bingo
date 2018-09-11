@@ -2,25 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/default_background">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
-        android:background="@color/primaryColor"
+        android:background="@color/toolbar_color"
         android:theme="@style/Base.ThemeOverlay.AppCompat.Dark">
 
-        <TextView
+        <ImageView
             android:id="@+id/toolbarName_textView"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/app_name"
-            android:textAllCaps="true"
-            android:textColor="@color/bingo_primary"
-            android:textSize="22sp"
-            android:textStyle="bold"
+            android:src="@raw/title"
             android:transitionName="@string/bingo_app_name_transition" />
 
     </android.support.v7.widget.Toolbar>
@@ -35,7 +32,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
         android:hint="@string/player_name"
-        android:textColorHint="@android:color/darker_gray">
+        android:textColorHint="@color/primaryTextColor">
 
         <EditText
             android:id="@+id/playerName_editText"
@@ -44,7 +41,7 @@
             android:inputType="text"
             android:maxLength="16"
             android:maxLines="1"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="18sp" />
 
     </android.support.design.widget.TextInputLayout>

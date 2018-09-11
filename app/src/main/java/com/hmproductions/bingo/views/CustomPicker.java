@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.views;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -39,6 +40,7 @@ public class CustomPicker extends NumberPicker {
         if(view instanceof EditText){
             ((EditText) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
             ((EditText) view).setTypeface(ResourcesCompat.getFont(getContext(), R.font.default_bingo_font));
+            ((EditText) view).setTextColor(getResources().getColor(R.color.primaryTextColor));
         }
     }
 

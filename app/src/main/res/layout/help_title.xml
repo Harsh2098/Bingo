@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#EEEEEE"
+    android:background="@color/dark_blue_background"
     android:paddingBottom="10dp"
     android:paddingTop="10dp">
 
@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:text="@string/help"
         android:textAllCaps="true"
-        android:textColor="@color/primaryColor"
+        android:textColor="@color/neon_blue"
         android:textSize="28sp"
         android:textStyle="bold" />
 </LinearLayout>

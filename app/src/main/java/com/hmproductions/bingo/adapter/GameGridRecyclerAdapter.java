@@ -90,7 +90,7 @@ public class GameGridRecyclerAdapter extends RecyclerView.Adapter<GameGridRecycl
         } else {
 
             holder.value_textView.setTypeface(holder.value_textView.getTypeface(), Typeface.NORMAL);
-            holder.value_textView.setTextColor(Color.parseColor("#000000"));
+            holder.value_textView.setTextColor(context.getResources().getColor(R.color.primaryTextColor));
 
             holder.value_textView.setBackground(null);
         }

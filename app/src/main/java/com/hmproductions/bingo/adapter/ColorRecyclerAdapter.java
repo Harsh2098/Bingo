@@ -39,7 +39,7 @@ public class ColorRecyclerAdapter extends RecyclerView.Adapter<ColorRecyclerAdap
     @Override
     public void onBindViewHolder(@NonNull ColorViewHolder holder, int position) {
         holder.colorSelectedImageView.setVisibility(selectedPosition == position ? View.VISIBLE : View.GONE);
-        holder.colorImageView.setColorFilter(Color.parseColor(colorsHex[position]), PorterDuff.Mode.MULTIPLY);
+        holder.colorImageView.setColorFilter(Color.parseColor(colorsHex[position]), PorterDuff.Mode.DARKEN);
     }
 
     @Override

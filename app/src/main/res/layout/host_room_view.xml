@@ -3,6 +3,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/default_background"
     android:orientation="vertical">
 
     <android.support.design.widget.TextInputLayout
@@ -11,7 +12,7 @@
         android:layout_marginTop="12dp"
         android:gravity="center"
         android:hint="@string/room_name"
-        android:textColorHint="@android:color/darker_gray">
+        android:textColorHint="@color/primaryTextColor">
 
         <EditText
             android:id="@+id/roomName_editText"
@@ -20,7 +21,7 @@
             android:inputType="text"
             android:maxLength="16"
             android:maxLines="1"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/neon_green"
             android:textSize="18sp" />
 
     </android.support.design.widget.TextInputLayout>
@@ -32,7 +33,7 @@
         android:fontFamily="@font/default_bingo_font"
         android:gravity="center"
         android:hint="@string/password_optional"
-        android:textColorHint="@android:color/darker_gray">
+        android:textColorHint="@color/primaryTextColor">
 
         <EditText
             android:id="@+id/password_editText"
@@ -41,7 +42,7 @@
             android:inputType="textPassword"
             android:maxLength="10"
             android:maxLines="1"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/neon_orange"
             android:textSize="18sp" />
 
     </android.support.design.widget.TextInputLayout>
@@ -64,10 +65,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginBottom="2dp"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:text="@string/number_of_players"
-                android:textColor="#666666"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="16sp" />
 
             <com.hmproductions.bingo.views.CustomPicker
@@ -88,10 +90,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginBottom="2dp"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:text="@string/time_limit_per_turn"
-                android:textColor="#666666"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="16sp" />
 
             <com.hmproductions.bingo.views.CustomPicker

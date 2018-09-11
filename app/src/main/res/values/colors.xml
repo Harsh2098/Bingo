@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primaryColor">#5e35b1</color>
-    <color name="colorAccent">#9162e4</color>
+    <color name="primaryColor">#1b1c1e</color>
+    <color name="colorAccent">#FFFFFF</color>
 
-    <color name="bingo_primary">#FFFFFF</color>
-    <color name="default_background">#FFE7FF</color>
-    <color name="dark_background">#000000</color>
+    <color name="primaryTextColor">#FFFFFF</color>
+    <color name="default_background">#30303C</color>
+    <color name="black_background">#000000</color>
+    <color name="dark_blue_background">#00202F</color>
 
-    <color name="grid_cell_background">#FFFFFF</color>
+    <color name="grid_cell_background">#40404C</color>
 
-    <color name="player_ready">#99CC00</color>
-    <color name="player_not_ready">#CC0000</color>
+    <color name="player_ready">#39FF14</color>
+    <color name="player_not_ready">#FF0000</color>
 
     <color name="gold_shimmer">#FFD700</color>
+
+    <!-- Dark theme colors -->
+
+    <color name="toolbar_color">#20202C</color>
+    <color name="neon_green">#39FF14</color>
+    <color name="neon_orange">#FF6939</color>
+    <color name="neon_blue">#00ddff</color>
 
 </resources>

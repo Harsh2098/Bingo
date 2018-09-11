@@ -25,7 +25,7 @@ public class StrikeView extends View {
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(10);
-        paint.setColor(ContextCompat.getColor(getContext(), R.color.player_not_ready));
+        paint.setColor(ContextCompat.getColor(getContext(), R.color.neon_green));
     }
 
     @Override

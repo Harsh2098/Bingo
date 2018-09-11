@@ -4,34 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/default_background">
+    android:background="@color/toolbar_color">
 
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/bingoShimmerFrameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <ImageView
+        android:id="@+id/appNameTextView"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/centeringView"
-        app:shimmer_auto_start="true"
-        app:shimmer_base_alpha="1"
-        app:shimmer_base_color="@color/primaryColor"
-        app:shimmer_colored="true"
-        app:shimmer_duration="2000"
-        app:shimmer_highlight_alpha="0.4"
-        app:shimmer_highlight_color="@color/gold_shimmer">
-
-        <TextView
-            android:id="@+id/appNameTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:paddingBottom="24dp"
-            android:text="@string/splash_app_name"
-            android:textColor="@color/primaryColor"
-            android:textSize="64sp"
-            android:textStyle="bold"
-            android:transitionName="@string/bingo_app_name_transition" />
-
-    </com.facebook.shimmer.ShimmerFrameLayout>
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="bottom|center_horizontal"
+        android:contentDescription="@string/app_title"
+        android:paddingBottom="24dp"
+        android:src="@raw/title"
+        android:transitionName="@string/bingo_app_name_transition" />
 
     <View
         android:id="@+id/centeringView"
@@ -39,16 +24,32 @@
         android:layout_height="1dp"
         android:layout_centerInParent="true" />
 
-    <TextView
-        android:id="@+id/loadingTextView"
-        android:layout_width="match_parent"
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/bingoShimmerFrameLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/centeringView"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
-        android:gravity="center"
-        android:text="@string/starting"
-        android:textAllCaps="true"
-        android:textColor="@android:color/background_dark"
-        android:textSize="22sp" />
+        app:shimmer_auto_start="true"
+        app:shimmer_base_alpha="1"
+        app:shimmer_base_color="@color/black_background"
+        app:shimmer_colored="true"
+        app:shimmer_duration="1250"
+        app:shimmer_highlight_alpha="0.4"
+        app:shimmer_highlight_color="@color/gold_shimmer"
+        app:shimmer_repeat_mode="reverse">
+
+        <TextView
+            android:id="@+id/loadingTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/starting"
+            android:textAllCaps="true"
+            android:textColor="@color/black_background"
+            android:textSize="22sp" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
 </RelativeLayout>

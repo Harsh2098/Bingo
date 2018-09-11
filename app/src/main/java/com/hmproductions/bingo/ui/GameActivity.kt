@@ -1,7 +1,6 @@
 package com.hmproductions.bingo.ui
 
 import android.content.*
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.ConnectivityManager
 import android.net.Network
@@ -14,6 +13,7 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -164,7 +164,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                                 celebrationSound.start()
 
                             konfettiView.build()
-                                    .addColors(Color.parseColor("#9162e4"), Color.YELLOW, Color.RED)
+                                    .addColors(ContextCompat.getColor(this@GameActivity, R.color.player_not_ready), ContextCompat.getColor(this@GameActivity, R.color.gold_shimmer),
+                                            ContextCompat.getColor(this@GameActivity, R.color.neon_blue), ContextCompat.getColor(this@GameActivity, R.color.neon_orange), ContextCompat.getColor(this@GameActivity, R.color.neon_green))
                                     .setDirection(0.0, 359.0)
                                     .setSpeed(3f, 6f)
                                     .setFadeOutEnabled(true)
@@ -240,7 +241,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         myTurn = currentPlayerId == playerId
 
-                        startGameTimer(myTurn) // TODO : Create separate layout for 4 inch phone
+                        startGameTimer(myTurn)
 
                         if (myTurn) {
 
@@ -310,6 +311,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         createNetworkCallback()
 
         snackBar = Snackbar.make(findViewById<View>(android.R.id.content), "Internet connection unavailable", Snackbar.LENGTH_INDEFINITE)
+        snackBar.view.backgroundColor = ContextCompat.getColor(this@GameActivity, R.color.dark_blue_background)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
 
         gridRecyclerAdapter = GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this)
@@ -565,35 +567,30 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         var playRowCompleted = false
 
         if (counter >= GRID_SIZE) {
-            oLetterTextView.textColor = Color.parseColor("#FF0000")
             val animation = StrikeAnimation(oStrikeView)
             animation.duration = 1000
             oStrikeView.startAnimation(animation)
             playRowCompleted = true
         }
         if (counter >= 4 && !gStrikeView.finishedAnimation()) {
-            gLetterTextView.textColor = Color.parseColor("#FF0000")
             val animation = StrikeAnimation(gStrikeView)
             animation.duration = 1000
             gStrikeView.startAnimation(animation)
             playRowCompleted = true
         }
         if (counter >= 3 && !nStrikeView.finishedAnimation()) {
-            nLetterTextView.textColor = Color.parseColor("#FF0000")
             val animation = StrikeAnimation(nStrikeView)
             animation.duration = 1000
             nStrikeView.startAnimation(animation)
             playRowCompleted = true
         }
         if (counter >= 2 && !iStrikeView.finishedAnimation()) {
-            iLetterTextView.textColor = Color.parseColor("#FF0000")
             val animation = StrikeAnimation(iStrikeView)
             animation.duration = 1000
             iStrikeView.startAnimation(animation)
             playRowCompleted = true
         }
         if (counter >= 1 && !bStrikeView.finishedAnimation()) {
-            bLetterTextView.textColor = Color.parseColor("#FF0000")
             val animation = StrikeAnimation(bStrikeView)
             animation.duration = 1000
             bStrikeView.startAnimation(animation)
@@ -608,7 +605,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     @OnClick(R.id.quitButton)
     fun onQuitButtonClick() {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.CustomAlertDialog)
                 .setCancelable(false)
                 .setTitle("Confirm Quit")
                 .setMessage("Game will be cancelled. Do you want to forfeit ?")
@@ -793,7 +790,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 Constants.SESSION_ID = null
                 finish()
             }
-        }, 30000) // TODO : What if after 30 secs the user has lost connection 2nd time
+        }, 30000)
     }
 
     private fun showSnackBar(show: Boolean) = if (show) {

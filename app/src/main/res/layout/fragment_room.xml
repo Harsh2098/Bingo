@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="12dp">
+    android:background="@color/default_background"
+    android:paddingTop="12dp">
 
     <TextView
         android:id="@+id/roomName_textView"
@@ -16,6 +17,7 @@
         android:paddingEnd="20dp"
         android:paddingStart="20dp"
         android:textAllCaps="true"
+        android:textColor="@color/primaryTextColor"
         android:textSize="16sp"
         android:textStyle="bold"
         android:transitionName="@string/room_name_transition" />
@@ -41,7 +43,7 @@
         android:layout_marginTop="2dp"
         android:layout_toStartOf="@id/countLinearLayout"
         android:gravity="center"
-        android:textColor="@android:color/background_dark"
+        android:textColor="@color/primaryTextColor"
         android:textSize="16sp" />
 
     <View
@@ -49,8 +51,8 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_below="@+id/roomName_textView"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@android:color/darker_gray" />
 
@@ -76,6 +78,7 @@
             android:layout_weight="2"
             android:gravity="center"
             android:text="@string/leave"
+            android:textColor="@color/neon_orange"
             android:textSize="20sp" />
 
         <com.github.ybq.android.spinkit.SpinKitView
@@ -100,7 +103,7 @@
                 android:id="@+id/chatButton"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@android:color/background_light"
+                android:background="@color/default_background"
                 android:contentDescription="@string/chat_button"
                 android:scaleType="fitXY"
                 android:src="@drawable/chat_icon" />
@@ -114,7 +117,7 @@
                 android:background="@drawable/notification_bubble"
                 android:fontFamily="sans-serif"
                 android:gravity="center"
-                android:textColor="@color/bingo_primary"
+                android:textColor="@color/primaryTextColor"
                 android:textSize="12sp"
                 android:visibility="gone" />
 
@@ -127,7 +130,7 @@
             android:layout_marginEnd="20dp"
             android:layout_weight="2"
             android:gravity="end"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="20sp"
             android:textStyle="bold" />
 

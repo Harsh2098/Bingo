@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityOptionsCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -27,6 +28,7 @@ import io.grpc.Metadata
 import io.grpc.stub.MetadataUtils
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import javax.inject.Inject
@@ -73,15 +75,15 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun startMainActivity() {
-
-
         if (!getConnectionInfo(this)) {
             loadingTextView!!.setText(R.string.internet_unavailable)
             Handler().postDelayed({
-                Snackbar
+                val snackBar = Snackbar
                         .make(findViewById<View>(android.R.id.content), "Please check internet connection", Snackbar.LENGTH_INDEFINITE)
                         .setAction("RETRY") { _ -> startMainActivity() }
-                        .show()
+
+                snackBar.view.backgroundColor = ContextCompat.getColor(this@SplashActivity, R.color.dark_blue_background)
+                snackBar.show()
             }, 500)
             return
         }
@@ -164,10 +166,12 @@ class SplashActivity : AppCompatActivity() {
         loadingTextView.setText(R.string.server_unreachable)
 
         Handler().postDelayed({
-            Snackbar
+            val snackBar = Snackbar
                     .make(findViewById<View>(android.R.id.content), "Couldn't connect to server", Snackbar.LENGTH_INDEFINITE)
                     .setAction("RETRY") { _ -> startMainActivity() }
-                    .show()
+
+            snackBar.view.backgroundColor = ContextCompat.getColor(this@SplashActivity, R.color.dark_blue_background)
+            snackBar.show()
         }, 500)
     }
 

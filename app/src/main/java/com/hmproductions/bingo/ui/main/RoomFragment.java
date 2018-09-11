@@ -89,7 +89,7 @@ import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboardFrom;
 import static com.hmproductions.bingo.utils.TimeLimitUtils.getEnumFromValue;
 
 public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnPlayerClickListener {
-    // TODO : Size able bottom sheet & keyboard overlap bottom sheet
+
     public static final String PLAYER_READY_BUNDLE_KEY = "player-ready-bundle-key";
     public static final String ROOM_NAME_BUNDLE_KEY = "room-name-bundle-key";
     public static final String TIME_LIMIT_BUNDLE_KEY = "time-limit-bundle-key";

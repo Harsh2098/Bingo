@@ -8,13 +8,13 @@
     android:layout_width="match_parent"
     android:layout_height="40dp"
     android:layout_margin="12dp"
-    android:background="@color/bingo_primary"
     android:elevation="8dp"
     app:cardCornerRadius="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/grid_cell_background"
         android:orientation="horizontal">
 
         <View
@@ -31,7 +31,7 @@
             android:gravity="center_vertical"
             android:maxLength="20"
             android:textAllCaps="true"
-            android:textColor="@android:color/black"
+            android:textColor="@color/primaryTextColor"
             android:textSize="16sp" />
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_marginEnd="12dp"
             android:gravity="center_vertical|end"
             android:maxLength="4"
-            android:textColor="@android:color/black"
+            android:textColor="@color/primaryTextColor"
             android:textSize="20sp"
             android:textStyle="bold" />
 

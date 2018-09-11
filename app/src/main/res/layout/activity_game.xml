@@ -29,7 +29,7 @@
         android:layout_marginTop="16dp"
         app:shimmer_auto_start="true"
         app:shimmer_base_alpha="1"
-        app:shimmer_base_color="@color/dark_background"
+        app:shimmer_base_color="@color/black_background"
         app:shimmer_colored="true"
         app:shimmer_duration="450"
         app:shimmer_highlight_alpha="0.4"
@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -82,7 +82,7 @@
         android:background="@drawable/notification_bubble"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:textColor="@color/bingo_primary"
+        android:textColor="@color/primaryTextColor"
         android:textSize="12sp"
         android:visibility="gone" />
 
@@ -96,7 +96,7 @@
         android:layout_alignTop="@+id/timeLimitProgressBar"
         android:layout_below="@+id/gameRecyclerView"
         android:gravity="center"
-        android:textColor="@android:color/background_dark"
+        android:textColor="@color/primaryTextColor"
         android:textSize="18sp" />
 
     <ProgressBar
@@ -132,7 +132,7 @@
             android:layout_toStartOf="@+id/iLetterTextView"
             android:gravity="center"
             android:text="@string/b"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="44sp"
             android:textStyle="normal"
             tools:ignore="RelativeOverlap" />
@@ -155,7 +155,7 @@
             android:layout_toStartOf="@+id/nLetterTextView"
             android:gravity="center"
             android:text="@string/i"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="44sp"
             android:textStyle="normal" />
 
@@ -177,7 +177,7 @@
             android:layout_marginStart="8dp"
             android:gravity="center"
             android:text="@string/n"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="44sp"
             android:textStyle="normal" />
 
@@ -199,7 +199,7 @@
             android:layout_toEndOf="@+id/nLetterTextView"
             android:gravity="center"
             android:text="@string/g"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="44sp"
             android:textStyle="normal" />
 
@@ -221,7 +221,7 @@
             android:layout_toEndOf="@+id/gLetterTextView"
             android:gravity="center"
             android:text="@string/o"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="44sp"
             android:textStyle="normal" />
 
@@ -252,8 +252,9 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="6dp"
         android:layout_marginEnd="8dp"
-        android:backgroundTint="@color/primaryColor"
+        android:backgroundTint="@color/grid_cell_background"
         android:src="@drawable/next_icon"
+        android:tint="@color/neon_green"
         android:visibility="gone"
         app:fabSize="auto"
         tools:ignore="RelativeOverlap" />
@@ -266,7 +267,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginBottom="6dp"
         android:layout_marginStart="8dp"
-        android:backgroundTint="@android:color/background_light"
+        android:backgroundTint="@color/grid_cell_background"
         android:elevation="2dp"
         android:src="@drawable/exit_icon"
         app:borderWidth="2dp"
@@ -280,7 +281,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="6dp"
         android:layout_marginStart="12dp"
-        android:background="@drawable/green_rounded_button"
+        android:background="@drawable/blue_rounded_button"
         android:contentDescription="@string/talk_to_speak_button"
         android:padding="8dp"
         android:src="@drawable/mic_icon_white" />

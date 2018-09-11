@@ -3,6 +3,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="72dp"
+    android:background="@color/grid_cell_background"
     android:paddingEnd="6dp"
     android:paddingStart="8dp">
 
@@ -15,7 +16,7 @@
         android:contentDescription="@string/room_image"
         android:gravity="center"
         android:padding="6dp"
-        android:textColor="@android:color/background_dark"
+        android:textColor="@color/primaryTextColor"
         android:textSize="16sp" />
 
     <TextView
@@ -27,7 +28,7 @@
         android:layout_toEndOf="@+id/roomIconTextView"
         android:maxLength="20"
         android:maxLines="1"
-        android:textColor="@android:color/background_dark"
+        android:textColor="@color/primaryTextColor"
         android:textSize="16sp"
         android:transitionName="@string/room_name_transition" />
 
@@ -58,7 +59,7 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="16dp"
         android:layout_toStartOf="@id/countLinearLayout"
-        android:textColor="@android:color/background_dark"
+        android:textColor="@color/primaryTextColor"
         android:textSize="16sp" />
 
     <LinearLayout
@@ -74,7 +75,7 @@
             android:id="@+id/countTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -82,14 +83,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/slash"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/maxCountTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/background_dark"
+            android:textColor="@color/primaryTextColor"
             android:textSize="16sp"
             android:textStyle="bold" />
 
