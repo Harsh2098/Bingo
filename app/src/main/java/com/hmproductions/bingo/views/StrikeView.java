@@ -48,6 +48,6 @@ public class StrikeView extends View {
     }
 
     public boolean finishedAnimation() {
-        return currentWidth == width;
+        return currentWidth != 0;
     }
 }
