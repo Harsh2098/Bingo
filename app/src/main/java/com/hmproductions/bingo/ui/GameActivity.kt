@@ -75,7 +75,7 @@ import java.util.*
 import javax.inject.Inject
 
 class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, RecognitionListener {
-
+    // TODO: Change chat button position in game layout
     companion object {
         const val PLAYER_ID = "player-id"
         const val ROOM_ID = "room-id"
@@ -89,6 +89,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         const val WON_ID = "won-id"
         const val CURRENT_PLAYER_ID = "current-player-id"
         const val EVENT_CODE_ID = "event-code-id"
+
+        const val PREVIOUS_MESSAGE_COUNT_KEY = "previous-message-count-key"
     }
 
     @Inject
@@ -121,6 +123,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private var roomId = -1
     private var currentRoomName = ""
     private var messageCount = 0
+    private var previousCount = 0
     private var currentTimeLimit: TimeLimitUtils.TIME_LIMIT = TimeLimitUtils.TIME_LIMIT.MINUTE_1
 
     private var gameCompleted = false
@@ -284,7 +287,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         }
                     }
 
-                    NEXT_ROUND_VALUE -> recreate()
+                    NEXT_ROUND_VALUE -> {
+                        val recreateIntent = getIntent()
+                        recreateIntent.putExtra(PREVIOUS_MESSAGE_COUNT_KEY, messageCount)
+                        finish()
+                        startActivity(recreateIntent)
+                    }
 
                     else -> toast("Internal server error")
                 }
@@ -304,6 +312,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         currentTimeLimit = getEnumFromValue(intent.getIntExtra(TIME_LIMIT_ID, 2))
         currentRoomName = intent.getStringExtra(ROOM_NAME_EXTRA_KEY)
         playersList = intent.getParcelableArrayListExtra(PLAYERS_LIST_ID)
+        previousCount = intent.getIntExtra(PREVIOUS_MESSAGE_COUNT_KEY, 0)
 
         // Creates an ArrayList made up of random values
         createGameGridArrayList()
@@ -398,17 +407,17 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 showChatRecyclerView(true)
                 chatRecyclerAdapter?.addMessage(dataSnapshot.getValue(Message::class.java))
                 chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter?.itemCount ?: 1-1)
-                messageCount++;
+                messageCount++
 
                 if (((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) ||
-                                (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED))) {
+                                (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount != previousCount) {
                     notificationBubbleTextView.visibility = View.VISIBLE
-                    notificationBubbleTextView.text = if (messageCount > 9) "9+" else messageCount.toString()
+                    notificationBubbleTextView.text = if (messageCount - previousCount > 9) "9+" else (messageCount - previousCount).toString()
                 }
             }
         }
 
-        firebaseAuthStateListener = FirebaseAuth.AuthStateListener {
+        firebaseAuthStateListener = FirebaseAuth.AuthStateListener { _ ->
             if (firebaseAuth.currentUser != null) {
                 chatDatabaseReference?.addChildEventListener(firebaseChildEventListener)
             } else {
@@ -806,11 +815,16 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     }
 
     private fun makeBingoLookSmaller() {
-        bLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
-        iLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
-        nLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
-        gLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
-        oLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+
+        if(resources.configuration.screenHeightDp >= 600) {
+            bLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+            iLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+            nLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+            gLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+            oLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
+        } else {
+            bingoLinearLayout.visibility = View.GONE
+        }
     }
 
     private fun subscribeToGameEventUpdates(playerId: Int, roomId: Int) {

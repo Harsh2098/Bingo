@@ -3,7 +3,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:background="@color/grid_cell_background"
+    android:background="@color/default_background"
     android:paddingEnd="6dp"
     android:paddingStart="8dp">
 
@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/primaryTextColor"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView

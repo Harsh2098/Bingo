@@ -468,6 +468,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                             Intent gameIntent = new Intent(getContext(), GameActivity.class);
                             gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
                             gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);
+                            gameIntent.putExtra(GameActivity.PREVIOUS_MESSAGE_COUNT_KEY, messageCount);
                             gameIntent.putExtra(GameActivity.ROOM_NAME_EXTRA_KEY, ((TextView) getView().findViewById(R.id.roomName_textView)).getText().toString());
 
                             if (getArguments() != null)

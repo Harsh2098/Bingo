@@ -95,11 +95,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_margin="8dp"
-                android:backgroundTint="@color/dark_blue_background"
                 android:enabled="false"
                 android:src="@drawable/send_icon"
                 android:text="@string/send"
                 android:textAllCaps="true"
+                app:backgroundTint="@color/dark_blue_background"
                 app:fabSize="auto" />
 
         </LinearLayout>

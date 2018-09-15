@@ -14,10 +14,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="12dp"
-        android:backgroundTint="@color/dark_blue_background"
         android:elevation="12dp"
         android:scaleType="fitXY"
         android:src="@drawable/add_icon"
+        app:backgroundTint="@color/dark_blue_background"
         app:fabSize="auto" />
 
     <ProgressBar

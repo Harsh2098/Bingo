@@ -73,8 +73,6 @@ class RoomsRecyclerAdapter(private val context: Context, private var roomArrayLi
 
                     privateRoom_imageView.visibility = if (room?.passwordExists!!) View.VISIBLE else View.GONE
 
-                    roomIconTextView.setBackgroundResource(R.drawable.cell_circle_foreground)
-                    (roomIconTextView.background as GradientDrawable).setColor(Color.parseColor("#EEEEEE"))
                     setOnClickListener { listener.onRoomClick(itemView, adapterPosition) }
                 }
             }
