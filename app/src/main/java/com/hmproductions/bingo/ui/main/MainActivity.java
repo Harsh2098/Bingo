@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String PLAYER_NAME_KEY = "player-name-key";
     private static final String PLAYER_COLOR_KEY = "player-color-key";
 
-    private static final int COLOR_ROW_SPAN = 4;
+    private static final int COLOR_ROW_SPAN = 3;
 
     @Inject
     BingoActionServiceGrpc.BingoActionServiceBlockingStub actionServiceBlockingStub;

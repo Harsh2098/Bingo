@@ -26,33 +26,27 @@
         <item>Ravaging Red</item>
         <item>Gorgeous Green</item>
         <item>Blazing Blue</item>
-        <item>Obnoxious Orange</item>
         <item>Vibrant Violet</item>
         <item>Yakkaty Yellow</item>
-        <item>Wacky White</item>
-        <item>Poppy Purple</item>
+        <item>Obnoxious Orange</item>
     </string-array>
 
     <string-array name="colorsHex">
         <item>#FF0000</item>
         <item>#39FF14</item>
         <item>#00DDFF</item>
-        <item>#FF6939</item>
-        <item>#FF00FF</item>
+        <item>#FF8300</item>
         <item>#FFFF00</item>
-        <item>#FFFFFF</item>
-        <item>#9D00FF</item>
+        <item>#FF00FF</item>
     </string-array>
 
     <string-array name="colorsRim">
         <item>#FF0000</item>
         <item>#39FF14</item>
         <item>#00DDFF</item>
-        <item>#FF6939</item>
-        <item>#FF00FF</item>
+        <item>#FF8300</item>
         <item>#FFFF00</item>
-        <item>#FFFFFF</item>
-        <item>#9D00FF</item>
+        <item>#FF00FF</item>
     </string-array>
     <string name="title_activity_settings">Settings</string>
 
@@ -74,7 +68,7 @@
     <string name="tutorial_preference_key">tutorial key</string>
     <string name="number_of_players">Number of Players</string>
     <string name="help">Help</string>
-    <string name="help_content">Objective:-\n\nComplete 5 straight lines.\n\nLines can be any combination of rows, columns or the 2 diagonals with all of its 5 numbers circled. The color of the circle does not matter.\n\nAll players will have numbers randomly placed in their respective grids (1 to 25). Each player selects/calls out a number turn wise. The number selected is then circled on every player\'s device after each turn.\n\nFirst player to complete any 5 lines wins the round.</string>
+    <string name="help_content">Objective:-\n\nComplete 5 straight lines.\n\nThe 5 lines can be any combination of rows, columns or the 2 diagonals. A line should have all its 5 numbers circled. The color of the circle indicates which player called out that number.\n\nAll players will have numbers randomly placed in their respective grids (1 to 25). Each player selects/calls out a number turn wise. The number selected is then circled on every player\'s device after each turn.\n\nFirst player to complete any 5 lines wins the round.</string>
     <string name="time_limit_per_turn">Time limit per Turn</string>
     <string name="stopwatch_image">Stopwatch Image</string>
     <string name="password_optional">Password (Optional)</string>
