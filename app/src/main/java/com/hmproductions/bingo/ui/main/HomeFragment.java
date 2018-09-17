@@ -320,7 +320,7 @@ public class HomeFragment extends Fragment implements
 
                         dialogInterface.dismiss();
 
-                        hideKeyboardFrom(getContext(), view);
+                        hideKeyboardFrom(getContext(), hostRoomView);
                     }
                 });
 

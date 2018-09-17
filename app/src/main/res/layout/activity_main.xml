@@ -16,7 +16,7 @@
             android:id="@+id/toolbarName_textView"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal"
             android:src="@raw/title"
             android:transitionName="@string/bingo_app_name_transition" />
 

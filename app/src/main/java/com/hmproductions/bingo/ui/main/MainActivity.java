@@ -51,6 +51,7 @@ import butterknife.ButterKnife;
 import static com.hmproductions.bingo.ui.main.RoomFragment.ROOM_NAME_BUNDLE_KEY;
 import static com.hmproductions.bingo.ui.main.RoomFragment.TIME_LIMIT_BUNDLE_KEY;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_OPENED_KEY;
+import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboard;
 
 public class MainActivity extends AppCompatActivity implements
         ConnectionUtils.OnNetworkDownHandler,

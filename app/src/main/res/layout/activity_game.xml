@@ -60,6 +60,22 @@
         android:visibility="invisible"
         app:SpinKit_Color="@color/colorAccent" />
 
+    <ImageButton
+        android:id="@+id/chatButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/doubleBounceProgressBar"
+        android:layout_alignEnd="@+id/doubleBounceProgressBar"
+        android:layout_alignStart="@+id/doubleBounceProgressBar"
+        android:layout_alignTop="@+id/doubleBounceProgressBar"
+        android:layout_below="@+id/currentTimeTextView"
+        android:background="@color/default_background"
+        android:contentDescription="@string/chat_button"
+        android:padding="4dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/chat_icon"
+        android:visibility="visible" />
+
     <TextView
         android:id="@+id/notificationBubbleTextView"
         android:layout_width="20dp"
@@ -107,7 +123,6 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
         android:layout_marginTop="12dp"
-        android:layout_toStartOf="@+id/chatButton"
         android:visibility="visible">
 
         <TextView
@@ -239,10 +254,10 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="6dp"
         android:layout_marginEnd="8dp"
-        app:backgroundTint="@color/dark_blue_background"
         android:src="@drawable/next_icon"
         android:tint="@color/neon_green"
         android:visibility="gone"
+        app:backgroundTint="@color/dark_blue_background"
         app:fabSize="auto"
         tools:ignore="RelativeOverlap" />
 
@@ -254,24 +269,11 @@
         android:layout_alignParentStart="true"
         android:layout_marginBottom="6dp"
         android:layout_marginStart="8dp"
-        app:backgroundTint="@color/dark_blue_background"
         android:elevation="2dp"
         android:src="@drawable/exit_icon"
+        app:backgroundTint="@color/dark_blue_background"
         app:borderWidth="2dp"
         app:fabSize="auto" />
-
-    <ImageButton
-        android:id="@+id/chatButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/currentTimeTextView"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="12dp"
-        android:background="@color/default_background"
-        android:contentDescription="@string/chat_button"
-        android:scaleType="fitXY"
-        android:src="@drawable/chat_icon" />
 
     <ImageButton
         android:id="@+id/talkToSpeakImageButton"

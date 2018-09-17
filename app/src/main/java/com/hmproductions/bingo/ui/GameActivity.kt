@@ -75,7 +75,7 @@ import java.util.*
 import javax.inject.Inject
 
 class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickListener, RecognitionListener {
-    // TODO: Change chat button position in game layout
+
     companion object {
         const val PLAYER_ID = "player-id"
         const val ROOM_ID = "room-id"
@@ -495,6 +495,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 runOnUiThread {
                     showSnackBar(false)
                     doubleBounceProgressBar.visibility = View.INVISIBLE
+                    chatButton.visibility = View.VISIBLE
                 }
             }
 
@@ -503,6 +504,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 if (!getConnectionInfo(this@GameActivity)) wasDisconnected = true
                 runOnUiThread {
                     doubleBounceProgressBar.visibility = View.VISIBLE
+                    chatButton.visibility = View.GONE
                     onNetworkDownError()
                 }
             }
@@ -670,6 +672,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private fun clickCellAsynchronously(value: Int) {
 
         doubleBounceProgressBar.visibility = View.VISIBLE
+        chatButton.visibility = View.GONE
 
         doAsync {
             if (getConnectionInfo(this@GameActivity) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
@@ -678,6 +681,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                 uiThread {
                     doubleBounceProgressBar.visibility = View.INVISIBLE
+                    chatButton.visibility = View.VISIBLE
+
                     if (data.statusCode == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR || data.statusCode == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
                         toast(data.statusMessage)
                 }
@@ -816,7 +821,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     private fun makeBingoLookSmaller() {
 
-        if(resources.configuration.screenHeightDp >= 600) {
+        if (resources.configuration.screenHeightDp >= 600) {
             bLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
             iLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
             nLetterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32F)
