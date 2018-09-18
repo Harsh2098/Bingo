@@ -83,4 +83,10 @@
     <string name="color_selected_tick">Color selected tick</string>
     <string name="app_title">App title</string>
 
+    <string name="sample_app_id_admob">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="sample_interstitial_ad_id">ca-app-pub-3940256099942544/1033173712</string>
+
+    <string name="bingo_app_id_admob">ca-app-pub-1911680405944713~3289508287</string>
+    <string name="game_interstitial_ad_id">ca-app-pub-1911680405944713/7765430605</string>
+
 </resources>

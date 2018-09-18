@@ -23,6 +23,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -31,6 +32,10 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.common.util.NumberUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
@@ -143,6 +148,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private lateinit var firebaseAuthStateListener: AuthStateListener
     private lateinit var firebaseChildEventListener: ChildEventListener
     private var firebaseUser: FirebaseUser? = null
+
+    private lateinit var afterGameInterstitialAd: InterstitialAd
 
     private val gridCellReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -288,10 +295,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     }
 
                     NEXT_ROUND_VALUE -> {
-                        val recreateIntent = getIntent()
-                        recreateIntent.putExtra(PREVIOUS_MESSAGE_COUNT_KEY, messageCount)
-                        finish()
-                        startActivity(recreateIntent)
+                        with(afterGameInterstitialAd) {
+                            if (isLoaded) {
+                                show()
+                            } else {
+                                Log.v(CLASSIC_TAG, "Did not load !")
+                                adListener.onAdClosed()
+                            }
+                        }
                     }
 
                     else -> toast("Internal server error")
@@ -341,6 +352,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         speechRecognizer.setRecognitionListener(this)
+
+        setupAds()
     }
 
     // Setting up bottom sheet
@@ -526,6 +539,24 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         }
     }
 
+    private fun setupAds() {
+
+        // TODO (Release): Change Admob App ID and Ad Unit ID
+        MobileAds.initialize(this, getString(R.string.sample_app_id_admob))
+        afterGameInterstitialAd = InterstitialAd(this)
+
+        afterGameInterstitialAd.adUnitId = getString(R.string.sample_interstitial_ad_id)
+        afterGameInterstitialAd.loadAd(AdRequest.Builder().build())
+        afterGameInterstitialAd.adListener = object : AdListener() {
+            override fun onAdClosed() {
+                val recreateIntent = intent
+                recreateIntent.putExtra(PREVIOUS_MESSAGE_COUNT_KEY, messageCount)
+                finish()
+                startActivity(recreateIntent)
+            }
+        }
+    }
+
     // Returns the number of lines completed
     fun numberOfLinesCompleted(): Int {
 
@@ -670,9 +701,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     // Click grid cell request 
     private fun clickCellAsynchronously(value: Int) {
+        var hide = true
 
-        doubleBounceProgressBar.visibility = View.VISIBLE
-        chatButton.visibility = View.GONE
+        Handler().postDelayed({
+            if (hide) {
+                doubleBounceProgressBar.visibility = View.VISIBLE
+                chatButton.visibility = View.GONE
+            }
+        }, 500)
 
         doAsync {
             if (getConnectionInfo(this@GameActivity) && isReachableByTcp(SERVER_ADDRESS, SERVER_PORT)) {
@@ -680,6 +716,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         .setPlayerId(playerId).setCellClicked(value).build())
 
                 uiThread {
+                    hide = false
                     doubleBounceProgressBar.visibility = View.INVISIBLE
                     chatButton.visibility = View.VISIBLE
 
