@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.google.android.gms.ads.MobileAds;
 import com.hmproductions.bingo.BingoActionServiceGrpc;
 import com.hmproductions.bingo.BingoStreamServiceGrpc;
 import com.hmproductions.bingo.R;
@@ -51,7 +52,6 @@ import butterknife.ButterKnife;
 import static com.hmproductions.bingo.ui.main.RoomFragment.ROOM_NAME_BUNDLE_KEY;
 import static com.hmproductions.bingo.ui.main.RoomFragment.TIME_LIMIT_BUNDLE_KEY;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_OPENED_KEY;
-import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboard;
 
 public class MainActivity extends AppCompatActivity implements
         ConnectionUtils.OnNetworkDownHandler,
@@ -132,6 +132,9 @@ public class MainActivity extends AppCompatActivity implements
 
         startTapTargetSequence();
         preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
+
+        // TODO (Release): Change AdMob App ID
+        MobileAds.initialize(this, getString(R.string.sample_app_id_admob));
     }
 
     private void setupColorRecyclerView() {

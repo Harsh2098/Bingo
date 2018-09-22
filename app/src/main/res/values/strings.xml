@@ -85,6 +85,7 @@
 
     <string name="sample_app_id_admob">ca-app-pub-3940256099942544~3347511713</string>
     <string name="sample_interstitial_ad_id">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="sample_banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
     <string name="bingo_app_id_admob">ca-app-pub-1911680405944713~3289508287</string>
     <string name="game_interstitial_ad_id">ca-app-pub-1911680405944713/7765430605</string>

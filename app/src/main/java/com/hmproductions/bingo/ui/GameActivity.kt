@@ -541,8 +541,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     private fun setupAds() {
 
-        // TODO (Release): Change Admob App ID and Ad Unit ID
-        MobileAds.initialize(this, getString(R.string.sample_app_id_admob))
+        // TODO (Release): Ad Unit ID
         afterGameInterstitialAd = InterstitialAd(this)
 
         afterGameInterstitialAd.adUnitId = getString(R.string.sample_interstitial_ad_id)

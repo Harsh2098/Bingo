@@ -21,17 +21,25 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -80,9 +88,11 @@ import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
+import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.DEFAULT_MSG_LENGTH_LIMIT;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
+import static com.hmproductions.bingo.utils.Miscellaneous.convertDpToPixel;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
 import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboardFrom;
@@ -133,6 +143,9 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     @BindView(R.id.notificationBubbleTextView)
     TextView messageCountTextView;
 
+    @BindView(R.id.bottom_linearLayout)
+    LinearLayout bottomLinearLayout;
+
     private int maxCount = Constants.MIN_PLAYERS; // Setting minimum maximum count to minimum number of players (2) by default
 
     Button leaveButton;
@@ -155,6 +168,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     private Player fakePlayer = new Player("", "", -1, false);
     private boolean wasDisconnected = true;
     private int messageCount = 0;
+
+    private AdView roomBannerAdView;
 
     private BottomSheetBehavior<CardView> bottomSheetBehavior;
 
@@ -207,6 +222,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         playersRecyclerView.setHasFixedSize(false);
 
         return customView;
+    }
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        setupAds();
     }
 
     // Setting up bottom sheet
@@ -325,6 +346,28 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                 return currentPlayer.isReady();
         }
         return true;
+    }
+
+    private void setupAds() {
+        if (getView() != null && getContext() != null) {
+            // TODO (Release): Change App ID
+            LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(0, 0, 0, (int) convertDpToPixel(getContext(), 50));
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+
+            roomBannerAdView = getView().findViewById(R.id.room_fragment_banner);
+
+            roomBannerAdView.setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    Log.v(CLASSIC_TAG, "Loaded");
+                    roomBannerAdView.setVisibility(View.VISIBLE);
+                    bottomLinearLayout.setLayoutParams(layoutParams);
+                }
+            });
+
+            roomBannerAdView.loadAd(new AdRequest.Builder().build());
+        }
     }
 
     private void setupNetworkCallback() {
@@ -681,7 +724,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         firebaseAuth.removeAuthStateListener(firebaseAuthStateListener);
         connectivityManager.unregisterNetworkCallback(networkCallback);
 
-        if(currentPlayerId != -1) {
+        if (currentPlayerId != -1) {
             Bundle bundle = new Bundle();
             bundle.putBoolean(PLAYER_READY_BUNDLE_KEY, false);
             this.getLoaderManager().restartLoader(Constants.READY_PLAYER_LOADER_ID, bundle, setPlayerReadyLoader);
