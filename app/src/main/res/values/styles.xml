@@ -9,16 +9,17 @@
         <item name="android:fontFamily">@font/default_bingo_font</item>
     </style>
 
-    <style name="PreferenceTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <style name="PreferenceTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/black_background</item>
-        <item name="colorPrimaryDark">@color/dark_blue_background</item>
+        <item name="colorPrimary">@color/dark_blue_background</item>
+        <item name="colorPrimaryDark">@color/black_background</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
         <item name="android:fontFamily">@font/default_bingo_font</item>
         <item name="android:background">@color/default_background</item>
         <item name="android:textColor">@color/neon_green</item>
         <item name="android:textColorSecondary">@color/primaryTextColor</item>
+        <item name="android:weekSeparatorLineColor">@color/primaryTextColor</item>
     </style>
 
     <style name="CustomAlertDialog" parent="Theme.AppCompat.Dialog.Alert">
