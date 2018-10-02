@@ -38,7 +38,7 @@
         <item>#00DDFF</item>
         <item>#FF8300</item>
         <item>#FFFF00</item>
-        <item>#FF00FF</item>
+        <item>#FF12FF</item>
     </string-array>
 
     <string-array name="colorsRim">
@@ -47,7 +47,7 @@
         <item>#00DDFF</item>
         <item>#FF8300</item>
         <item>#FFFF00</item>
-        <item>#FF00FF</item>
+        <item>#FF12FF</item>
     </string-array>
     <string name="title_activity_settings">Settings</string>
 

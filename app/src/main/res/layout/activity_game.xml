@@ -99,6 +99,7 @@
         android:layout_alignTop="@+id/timeLimitProgressBar"
         android:layout_below="@+id/gameRecyclerView"
         android:gravity="center"
+        android:text="4"
         android:textColor="@color/primaryTextColor"
         android:textSize="18sp" />
 

@@ -86,8 +86,8 @@
                 android:layout_weight="1"
                 android:hint="@string/type_you_message_here"
                 android:inputType="text"
-                android:textColor="@color/neon_orange"
-                android:textColorHint="@color/primaryTextColor" />
+                android:textColor="@color/primaryTextColor"
+                android:textColorHint="@android:color/darker_gray" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/sendButton"
