@@ -294,14 +294,10 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     }
 
                     NEXT_ROUND_VALUE -> {
-                        with(afterGameInterstitialAd) {
-                            if (isLoaded) {
-                                show()
-                            } else {
-                                Log.v(CLASSIC_TAG, "Did not load !")
-                                adListener.onAdClosed()
-                            }
-                        }
+                        val recreateIntent = getIntent()
+                        recreateIntent.putExtra(PREVIOUS_MESSAGE_COUNT_KEY, messageCount)
+                        finish()
+                        startActivity(recreateIntent)
                     }
 
                     else -> toast("Internal server error")
@@ -547,10 +543,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         afterGameInterstitialAd.loadAd(AdRequest.Builder().build())
         afterGameInterstitialAd.adListener = object : AdListener() {
             override fun onAdClosed() {
-                val recreateIntent = intent
-                recreateIntent.putExtra(PREVIOUS_MESSAGE_COUNT_KEY, messageCount)
-                finish()
-                startActivity(recreateIntent)
+                toast("Waiting for other players")
+                Handler().postDelayed( { startNextRoundAsynchronously() }, 500)
             }
         }
     }
@@ -661,8 +655,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     @OnClick(R.id.nextRoundButton)
     fun onNextRoundButtonClick() {
-        toast("Waiting for other players")
-        startNextRoundAsynchronously()
+        with(afterGameInterstitialAd) {
+            if (isLoaded) {
+                show()
+            } else {
+                Log.v(CLASSIC_TAG, "Did not load !")
+                adListener.onAdClosed()
+            }
+        }
     }
 
     @OnClick(R.id.talkToSpeakImageButton)

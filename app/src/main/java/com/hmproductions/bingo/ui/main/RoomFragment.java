@@ -21,7 +21,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,7 +86,6 @@ import static com.hmproductions.bingo.ui.main.MainActivity.currentPlayerId;
 import static com.hmproductions.bingo.ui.main.MainActivity.currentRoomId;
 import static com.hmproductions.bingo.ui.main.MainActivity.playersList;
 import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
-import static com.hmproductions.bingo.utils.Constants.CLASSIC_TAG;
 import static com.hmproductions.bingo.utils.Constants.DEFAULT_MSG_LENGTH_LIMIT;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
@@ -359,7 +357,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
             roomBannerAdView.setAdListener(new AdListener() {
                 @Override
                 public void onAdLoaded() {
-                    Log.v(CLASSIC_TAG, "Loaded");
                     roomBannerAdView.setVisibility(View.VISIBLE);
                     bottomLinearLayout.setLayoutParams(layoutParams);
                 }
