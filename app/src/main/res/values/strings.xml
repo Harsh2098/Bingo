@@ -10,6 +10,7 @@
     <string name="leave">Leave</string>
     <string name="processing_request">Processing request…</string>
     <string name="player_name">Player Name</string>
+    <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="bingo_splash_image">Bingo splash image</string>
     <string name="internet_unavailable">Internet Unavailable</string>
@@ -89,5 +90,7 @@
 
     <string name="bingo_app_id_admob">ca-app-pub-1911680405944713~3289508287</string>
     <string name="game_interstitial_ad_id">ca-app-pub-1911680405944713/7765430605</string>
+    <string name="tutorial">Tutorial</string>
+    <string name="skip_tutorial">Skip</string>
 
 </resources>

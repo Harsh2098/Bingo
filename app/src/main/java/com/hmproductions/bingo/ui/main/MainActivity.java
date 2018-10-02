@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements
 
         currentPlayerId = currentRoomId = -1;
 
-        startTapTargetSequence();
+        new Handler().postDelayed(this::startTapTargetSequence, 500);
         preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
 
         // TODO (Release): Change AdMob App ID

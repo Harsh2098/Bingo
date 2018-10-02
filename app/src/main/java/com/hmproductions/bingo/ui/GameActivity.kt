@@ -35,7 +35,6 @@ import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
-import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.common.util.NumberUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
@@ -338,9 +337,9 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         chatRecyclerAdapter = ChatRecyclerAdapter(this, null)
 
         with(gameRecyclerView) {
+            adapter = gridRecyclerAdapter
             layoutManager = GridLayoutManager(this@GameActivity, GRID_SIZE)
             layoutAnimation = AnimationUtils.loadLayoutAnimation(this@GameActivity, R.anim.game_grid_animation) as GridLayoutAnimationController
-            adapter = gridRecyclerAdapter
             setHasFixedSize(true)
         }
 

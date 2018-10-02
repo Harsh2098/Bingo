@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.ui
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
@@ -41,6 +42,9 @@ class SplashActivity : AppCompatActivity() {
 
     @Inject
     lateinit var channel: ManagedChannel
+
+    @Inject
+    lateinit var preferences: SharedPreferences
 
     private lateinit var flybySound: MediaPlayer
 
@@ -103,12 +107,17 @@ class SplashActivity : AppCompatActivity() {
                 uiThread {
                     Constants.SESSION_ID = data?.sessionId
 
-                    val mainActivityIntent = Intent(this@SplashActivity, MainActivity::class.java)
-                    mainActivityIntent.putExtra(SHOW_SNACKBAR_KEY, true)
+                    if(preferences.getBoolean(Constants.FIRST_TIME_OPENED_KEY, true)) {
+                        startActivity(Intent(this@SplashActivity, TutorialActivity::class.java))
+                        finish()
+                    } else {
+                        val mainActivityIntent = Intent(this@SplashActivity, MainActivity::class.java)
+                        mainActivityIntent.putExtra(SHOW_SNACKBAR_KEY, true)
 
-                    startActivity(mainActivityIntent, ActivityOptionsCompat
-                            .makeSceneTransitionAnimation(this@SplashActivity, appNameTextView, appNameTextView.transitionName).toBundle())
-                    finish()
+                        startActivity(mainActivityIntent, ActivityOptionsCompat
+                                .makeSceneTransitionAnimation(this@SplashActivity, appNameTextView, appNameTextView.transitionName).toBundle())
+                        finish()
+                    }
                 }
 
             } else {

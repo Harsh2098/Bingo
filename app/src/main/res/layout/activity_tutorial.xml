@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/default_background">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tutorial_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:background="@color/toolbar_color"
+        android:theme="@style/Base.ThemeOverlay.AppCompat.Dark">
+
+        <TextView
+            android:id="@+id/toolbarName_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/tutorial"
+            android:textAllCaps="true"
+            android:textColor="@color/neon_green"
+            android:textSize="22sp" />
+
+    </android.support.v7.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/skipTutorialTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/tutorial_toolbar"
+        android:layout_margin="4dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/skip_tutorial"
+        android:textAllCaps="true"
+        android:textColor="@color/neon_orange"
+        android:textSize="16sp" />
+
+    <com.hmproductions.bingo.views.GridRecyclerView
+        android:id="@+id/tutorialRecyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tutorial_toolbar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:layoutAnimation="@anim/game_grid_animation" />
+
+    <RelativeLayout
+        android:id="@+id/bingoLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tutorialRecyclerView"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/bLetterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toStartOf="@+id/iLetterTextView"
+            android:gravity="center"
+            android:text="@string/b"
+            android:textColor="@color/gold_shimmer"
+            android:textSize="44sp"
+            android:textStyle="normal"
+            tools:ignore="RelativeOverlap" />
+
+        <com.hmproductions.bingo.views.StrikeView
+            android:id="@+id/tutorialStrikeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/bLetterTextView"
+            android:layout_alignEnd="@+id/bLetterTextView"
+            android:layout_alignStart="@+id/bLetterTextView"
+            android:layout_alignTop="@+id/bLetterTextView" />
+
+        <TextView
+            android:id="@+id/iLetterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toStartOf="@+id/nLetterTextView"
+            android:gravity="center"
+            android:text="@string/i"
+            android:textColor="@color/gold_shimmer"
+            android:textSize="44sp"
+            android:textStyle="normal" />
+
+        <com.hmproductions.bingo.views.StrikeView
+            android:id="@+id/iStrikeView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/iLetterTextView"
+            android:layout_alignEnd="@+id/iLetterTextView"
+            android:layout_alignStart="@+id/iLetterTextView"
+            android:layout_alignTop="@+id/iLetterTextView" />
+
+        <TextView
+            android:id="@+id/nLetterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:gravity="center"
+            android:text="@string/n"
+            android:textColor="@color/gold_shimmer"
+            android:textSize="44sp"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/gLetterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/nLetterTextView"
+            android:gravity="center"
+            android:text="@string/g"
+            android:textColor="@color/gold_shimmer"
+            android:textSize="44sp"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/oLetterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/gLetterTextView"
+            android:gravity="center"
+            android:text="@string/o"
+            android:textColor="@color/gold_shimmer"
+            android:textSize="44sp"
+            android:textStyle="normal" />
+
+    </RelativeLayout>
+
+    <TextSwitcher
+        android:id="@+id/tutorialHelperTextSwitcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/bingoLinearLayout"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="12dp"
+        android:inAnimation="@android:anim/slide_in_left"
+        android:outAnimation="@android:anim/slide_out_right" />
+
+</RelativeLayout>

@@ -15,17 +15,14 @@
         android:roundIcon="@mipmap/ic_launcher2"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".ui.GameActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-
         <activity
             android:name=".ui.main.MainActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.SplashActivity"
             android:screenOrientation="portrait">
@@ -40,11 +37,14 @@
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.main.MainActivity" />
-
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             tools:replace="android:theme" />
+
+        <activity
+            android:name=".ui.TutorialActivity"
+            android:screenOrientation="portrait"/>
 
     </application>
 
