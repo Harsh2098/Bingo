@@ -214,8 +214,8 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         setupChatBottomSheet();
         setupFirebaseChatEventListener();
 
-        playersRecyclerView.setLayoutManager(linearLayoutManager);
         playersRecyclerView.setAdapter(playersRecyclerAdapter);
+        playersRecyclerView.setLayoutManager(linearLayoutManager);
         playersRecyclerView.setHasFixedSize(false);
 
         return customView;

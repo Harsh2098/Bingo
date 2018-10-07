@@ -46,6 +46,10 @@
             android:name=".ui.TutorialActivity"
             android:screenOrientation="portrait"/>
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/sample_app_id_admob"/>
+
     </application>
 
 </manifest>
