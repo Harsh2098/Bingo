@@ -35,7 +35,6 @@ import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
-import com.google.android.gms.common.util.NumberUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.google.firebase.auth.FirebaseAuth.getInstance
@@ -968,9 +967,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         if (speechResult != null) {
             for (currentWord in speechResult) {
-                if (NumberUtils.isNumeric(currentWord) && Integer.parseInt(currentWord) >= 1 && Integer.parseInt(currentWord) <= GRID_SIZE * GRID_SIZE) {
-                    onGridCellClick(Integer.parseInt(currentWord))
-                    foundMatch = true
+                try {
+                    val currentWordInt = currentWord.toInt()
+                    if (currentWordInt >= 1 && currentWordInt <= GRID_SIZE * GRID_SIZE) {
+                        onGridCellClick(currentWordInt)
+                        foundMatch = true
+                    }
+                } catch (e: NumberFormatException) {
+
                 }
             }
         }
