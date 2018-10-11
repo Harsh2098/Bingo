@@ -10,7 +10,7 @@
 
         <gradient
             android:angle="0"
-            android:endColor="@color/neon_pink"
+            android:endColor="@color/player_not_ready"
             android:startColor="@color/neon_pink"
             android:type="sweep"
             android:useLevel="false" />

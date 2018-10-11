@@ -89,6 +89,7 @@ import static com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo;
 import static com.hmproductions.bingo.utils.Constants.DEFAULT_MSG_LENGTH_LIMIT;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
+import static com.hmproductions.bingo.utils.Constants.READ_COUNT;
 import static com.hmproductions.bingo.utils.Miscellaneous.convertDpToPixel;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
@@ -239,7 +240,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED || newState == BottomSheetBehavior.STATE_HIDDEN) {
                     hideKeyboardFrom(getContext(), getView());
                 }
-                messageCount = 0;
                 messageCountTextView.setVisibility(View.GONE);
             }
 
@@ -294,9 +294,12 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                 messageCount++;
 
                 if (((bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) ||
-                        (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED))) {
+                        (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount > READ_COUNT) {
                     messageCountTextView.setVisibility(View.VISIBLE);
-                    messageCountTextView.setText(messageCount > 9 ? "9+" : String.valueOf(messageCount));
+                    messageCountTextView.setText(messageCount - READ_COUNT > 9 ? "9+" : String.valueOf(messageCount - READ_COUNT));
+                } else {
+                    if(READ_COUNT < messageCount)
+                        READ_COUNT = messageCount;
                 }
             }
 
@@ -409,6 +412,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     void onChatButtonClick() {
         BottomSheetBehavior<CardView> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        READ_COUNT = messageCount;
     }
 
     @OnClick(R.id.sendButton)
@@ -507,7 +511,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                             Intent gameIntent = new Intent(getContext(), GameActivity.class);
                             gameIntent.putExtra(GameActivity.PLAYER_ID, currentPlayerId);
                             gameIntent.putExtra(GameActivity.ROOM_ID, currentRoomId);
-                            gameIntent.putExtra(GameActivity.PREVIOUS_MESSAGE_COUNT_KEY, messageCount);
                             gameIntent.putExtra(GameActivity.ROOM_NAME_EXTRA_KEY, ((TextView) getView().findViewById(R.id.roomName_textView)).getText().toString());
 
                             if (getArguments() != null)

@@ -92,8 +92,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         const val WON_ID = "won-id"
         const val CURRENT_PLAYER_ID = "current-player-id"
         const val EVENT_CODE_ID = "event-code-id"
-
-        const val PREVIOUS_MESSAGE_COUNT_KEY = "previous-message-count-key"
     }
 
     @Inject
@@ -126,7 +124,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private var roomId = -1
     private var currentRoomName = ""
     private var messageCount = 0
-    private var previousCount = 0
     private var currentTimeLimit: TimeLimitUtils.TIME_LIMIT = TimeLimitUtils.TIME_LIMIT.MINUTE_1
 
     private var gameCompleted = false
@@ -226,6 +223,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         quitIntent.putExtra(ROOM_ID, roomId)
 
                         gameTimer?.cancel()
+                        toast(getNameFromId(playersList, winnerId) + " left")
                         startActivity(quitIntent)
                         finish()
                     }
@@ -292,12 +290,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         }
                     }
 
-                    NEXT_ROUND_VALUE -> {
-                        val recreateIntent = getIntent()
-                        recreateIntent.putExtra(PREVIOUS_MESSAGE_COUNT_KEY, messageCount)
-                        finish()
-                        startActivity(recreateIntent)
-                    }
+                    NEXT_ROUND_VALUE -> recreate()
 
                     else -> toast("Internal server error")
                 }
@@ -317,7 +310,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         currentTimeLimit = getEnumFromValue(intent.getIntExtra(TIME_LIMIT_ID, 2))
         currentRoomName = intent.getStringExtra(ROOM_NAME_EXTRA_KEY)
         playersList = intent.getParcelableArrayListExtra(PLAYERS_LIST_ID)
-        previousCount = intent.getIntExtra(PREVIOUS_MESSAGE_COUNT_KEY, 0)
 
         // Creates an ArrayList made up of random values
         createGameGridArrayList()
@@ -388,7 +380,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     nextRoundButton.hide()
                 }
 
-                messageCount = 0
                 notificationBubbleTextView.visibility = View.GONE
             }
         })
@@ -417,9 +408,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 messageCount++
 
                 if (((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) ||
-                                (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount != previousCount) {
+                                (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount > READ_COUNT) {
                     notificationBubbleTextView.visibility = View.VISIBLE
-                    notificationBubbleTextView.text = if (messageCount - previousCount > 9) "9+" else (messageCount - previousCount).toString()
+                    notificationBubbleTextView.text = if (messageCount - READ_COUNT > 9) "9+" else (messageCount - READ_COUNT).toString()
+                } else {
+                    if(READ_COUNT < messageCount)
+                        READ_COUNT = messageCount
                 }
             }
         }
@@ -650,6 +644,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     @OnClick(R.id.chatButton)
     fun onChatButtonClick() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        READ_COUNT = messageCount
     }
 
     @OnClick(R.id.nextRoundButton)

@@ -32,7 +32,7 @@ class TutorialActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellCl
             "Lines can be any combination of rows, columns or the 2 diagonals\n\nTap to continue",
             "All players will have different grids. Line is considered complete irrespective of the colors of numbers in it.\n\nTap to continue.",
             "The game has just started and looks like one of the diagonals is almost complete. \n\nTap on 18 to complete it.",
-            "Awesome! You completed 1 line.\n\nTap to finish")
+            "Awesome! You completed 1 line. In actual game you have complete 5 lines to win.\n\nTap to complete tutorial.")
 
     private var counter = -1
 

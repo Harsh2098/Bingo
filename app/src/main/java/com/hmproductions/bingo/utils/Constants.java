@@ -38,6 +38,7 @@ public class Constants {
     public static final String RECONNECT_ACTION = "reconnect-action";
 
     public static String SESSION_ID = null;
+    public static int READ_COUNT = 0;
     public static final String SESSION_ID_KEY = "sessionid";
     public static final String PLAYER_ID_KEY = "playerid";
     public static final String ROOM_ID_KEY = "roomid";

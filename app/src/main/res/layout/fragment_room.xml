@@ -3,6 +3,7 @@
 
     xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/default_background"
@@ -21,7 +22,8 @@
         android:textColor="@color/primaryTextColor"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:transitionName="@string/room_name_transition" />
+        android:transitionName="@string/room_name_transition"
+        tools:ignore="RelativeOverlap" />
 
     <ImageView
         android:id="@+id/roomClock_imageView"
@@ -114,8 +116,8 @@
 
             <TextView
                 android:id="@+id/notificationBubbleTextView"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_alignTop="@+id/chatButton"
                 android:layout_alignEnd="@+id/chatButton"
                 android:background="@drawable/notification_bubble"
@@ -142,7 +144,9 @@
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/bottom_linearLayout"
+        android:layout_marginBottom="2dp">
 
         <include layout="@layout/chat_layout" />
 
