@@ -35,9 +35,10 @@
         app:shimmer_base_alpha="1"
         app:shimmer_base_color="@color/black_background"
         app:shimmer_colored="true"
-        app:shimmer_duration="1250"
+        app:shimmer_duration="2000"
         app:shimmer_highlight_alpha="0.4"
         app:shimmer_highlight_color="@color/gold_shimmer"
+        app:shimmer_repeat_delay="0"
         app:shimmer_repeat_mode="reverse">
 
         <TextView

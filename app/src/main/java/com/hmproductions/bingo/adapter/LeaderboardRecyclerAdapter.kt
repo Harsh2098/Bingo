@@ -10,6 +10,7 @@ import android.view.ViewGroup
 
 import com.hmproductions.bingo.R
 import com.hmproductions.bingo.data.LeaderboardPlayer
+import com.hmproductions.bingo.utils.Miscellaneous.shortenName
 import kotlinx.android.synthetic.main.leaderboard_list_item.view.*
 
 import java.util.ArrayList
@@ -26,7 +27,7 @@ class LeaderboardRecyclerAdapter(private val context: Context, private val leade
         val colorPosition = Arrays.asList(*context.resources.getStringArray(R.array.colorsName)).indexOf(currentPlayer.color)
 
         with(holder.itemView) {
-            playerNameTextView.text = currentPlayer.name
+            playerNameTextView.text = shortenName(currentPlayer.name, 12)
             winCountTextView.text = "${currentPlayer.winCount}"
             val backgroundDrawable = colorView.background as GradientDrawable
 

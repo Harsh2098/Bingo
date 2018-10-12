@@ -154,4 +154,16 @@ public class Miscellaneous {
                 return "";
         }
     }
+
+    public static String shortenName(String name, int limit) {
+
+        if(name.length() > limit) {
+            StringBuilder builder = new StringBuilder(name);
+            builder.delete(limit-2, name.length());
+            builder.append("...");
+            name = builder.toString();
+        }
+
+        return name;
+    }
 }

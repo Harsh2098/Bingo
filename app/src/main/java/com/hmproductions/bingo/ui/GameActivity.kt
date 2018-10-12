@@ -201,6 +201,10 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                             val winnerTextBuilder = StringBuilder(turnOrderTextView.text.toString())
                             winnerTextBuilder.insert(winnerTextBuilder.lastIndexOf(" "), ", ${getNameFromId(playersList, winnerId)!!}")
                             turnOrderTextView.text = winnerTextBuilder.toString()
+
+                            if(turnOrderTextView.text.toString().length > 27) {
+                                turnOrderTextView.text = shortenName(turnOrderTextView.text.toString(), 27)
+                            }
                         } else {
                             turnOrderTextView.text = if (winnerId == playerId) "You won" else "${getNameFromId(playersList, winnerId)!!} won"
                             gameCompleted = true

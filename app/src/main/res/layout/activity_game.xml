@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
-            android:textColor="@color/primaryTextColor"
+            android:textColor="@color/black_background"
             android:textSize="18sp"
             android:textStyle="bold" />
 
