@@ -15,14 +15,14 @@ public class TimeLimitUtils {
         }
     }
 
-    public static int getExactValueFromEnum(TIME_LIMIT timeLimit) {
+    public static long getExactValueFromEnum(TIME_LIMIT timeLimit) {
         switch (timeLimit) {
             case SECONDS_3:
-                return 3;
+                return 3000;
             case SECONDS_10:
-                return 10;
+                return 10000;
             case MINUTE_1:
-                return 60;
+                return 60000;
             default:
                 return -1;
         }

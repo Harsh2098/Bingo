@@ -1,6 +1,8 @@
 package com.hmproductions.bingo.ui
 
+import android.Manifest
 import android.content.*
+import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.net.ConnectivityManager
 import android.net.Network
@@ -13,6 +15,7 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
@@ -58,6 +61,7 @@ import com.hmproductions.bingo.models.GameEvent.EventCode.*
 import com.hmproductions.bingo.models.GameSubscription
 import com.hmproductions.bingo.ui.main.MainActivity
 import com.hmproductions.bingo.ui.main.RoomFragment
+import com.hmproductions.bingo.ui.settings.SettingsFragment
 import com.hmproductions.bingo.utils.ConnectionUtils.getConnectionInfo
 import com.hmproductions.bingo.utils.ConnectionUtils.isReachableByTcp
 import com.hmproductions.bingo.utils.Constants
@@ -455,16 +459,16 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private fun createGameTimer() {
         val totalTime = getExactValueFromEnum(currentTimeLimit)
 
-        gameTimer = object : CountDownTimer(((totalTime + 1) * 1000).toLong(), 1000) {
+        gameTimer = object : CountDownTimer((totalTime + 1000), 10) {
 
             override fun onTick(millisUntilFinished: Long) {
-                timeLimitProgressBar.progress = (totalTime - millisUntilFinished / 1000).toInt()
+                timeLimitProgressBar.progress = (totalTime - millisUntilFinished).toInt()
                 currentTimeTextView.text = "${millisUntilFinished / 1000}"
             }
 
             override fun onFinish() {
                 timeLimitProgressBar.progress = timeLimitProgressBar.max
-                currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit)}"
+                currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit)/1000}"
 
                 clickCellAsynchronously(TURN_SKIPPED_CODE)
             }
@@ -516,7 +520,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         timeLimitProgressBar.isIndeterminate = false
         val totalTime = getExactValueFromEnum(currentTimeLimit)
         timeLimitProgressBar.progress = 0
-        timeLimitProgressBar.max = totalTime
+        timeLimitProgressBar.max = totalTime.toInt()
 
         if (realTimer) {
             if (gameTimerStarted) {
@@ -664,7 +668,14 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         if (myTurn && preferences.getBoolean(getString(R.string.tts_preference_key), false))
             speechRecognizer.startListening(speechRecognitionIntent)
         else if (myTurn && !preferences.getBoolean(getString(R.string.tts_preference_key), false))
-            toast("Mic is disabled")
+            AlertDialog.Builder(this, R.style.CustomAlertDialog)
+                    .setCancelable(true)
+                    .setTitle("Mic is disabled")
+                    .setMessage("Do you want to enable text to speech feature ?")
+                    .setPositiveButton(R.string.enable) { _, _ -> ActivityCompat.requestPermissions(
+                            this, arrayOf(Manifest.permission.RECORD_AUDIO), SettingsFragment.RECORD_AUDIO_RC) }
+                    .setNegativeButton(R.string.no) { dI, _ -> dI.dismiss() }
+                    .show()
         else
             toast("Not your turn")
     }
@@ -691,7 +702,16 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         if (myTurn && !valueClicked(gameGridCellList, value)) clickCellAsynchronously(value)
     }
 
-    // Click grid cell request 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if(requestCode == SettingsFragment.RECORD_AUDIO_RC && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            preferences.edit().putBoolean(getString(R.string.tts_preference_key), true).apply()
+            onImageButtonClick()
+        } else {
+            toast("Permission required for TTS")
+        }
+    }
+
+    // Click grid cell request
     private fun clickCellAsynchronously(value: Int) {
         var hide = true
 

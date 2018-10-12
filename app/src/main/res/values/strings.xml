@@ -92,5 +92,6 @@
     <string name="game_interstitial_ad_id">ca-app-pub-1911680405944713/7765430605</string>
     <string name="tutorial">Tutorial</string>
     <string name="skip_tutorial">Skip</string>
+    <string name="enable">Enable</string>
 
 </resources>

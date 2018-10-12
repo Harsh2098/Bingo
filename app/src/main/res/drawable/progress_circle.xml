@@ -11,7 +11,7 @@
         <gradient
             android:angle="0"
             android:endColor="@color/player_not_ready"
-            android:startColor="@color/neon_pink"
+            android:startColor="@color/player_ready"
             android:type="sweep"
             android:useLevel="false" />
     </shape>
