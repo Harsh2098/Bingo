@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="8dp"
-    android:background="@color/default_background">
+    android:background="@color/default_background"
+    android:paddingBottom="8dp">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/tutorial_toolbar"
@@ -24,6 +25,17 @@
             android:textColor="@color/neon_green"
             android:textSize="22sp" />
 
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/doubleBounceProgressBar"
+            style="@style/SpinKitView.DoubleBounce"
+            android:layout_width="@dimen/toolbar_height"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:indeterminate="true"
+            android:padding="4dp"
+            android:visibility="invisible"
+            app:SpinKit_Color="@color/colorAccent" />
+
     </android.support.v7.widget.Toolbar>
 
     <TextView
@@ -34,6 +46,7 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="4dp"
         android:layout_marginBottom="4dp"
+        android:padding="4dp"
         android:text="@string/skip_tutorial"
         android:textAllCaps="true"
         android:textColor="@color/neon_orange"
@@ -59,7 +72,7 @@
         android:contentDescription="@string/indications"
         android:scaleType="fitXY"
         android:src="@raw/tutorial_indication"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/bingoLinearLayout"

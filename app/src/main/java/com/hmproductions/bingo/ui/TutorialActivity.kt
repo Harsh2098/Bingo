@@ -140,15 +140,16 @@ class TutorialActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellCl
 
     private fun switchText() {
 
-        if(counter == 4) {
-            val mainActivityIntent = Intent(this, MainActivity::class.java)
-            mainActivityIntent.putExtra(SplashActivity.SHOW_SNACKBAR_KEY, true)
-            startActivity(mainActivityIntent)
-            finish()
-        }
-
-        if(counter == 2) {
-            indicationsImageView.visibility = View.GONE
+        when (counter) {
+            4 -> {
+                doubleBounceProgressBar.visibility = View.VISIBLE
+                val mainActivityIntent = Intent(this, MainActivity::class.java)
+                mainActivityIntent.putExtra(SplashActivity.SHOW_SNACKBAR_KEY, true)
+                startActivity(mainActivityIntent)
+                finish()
+            }
+            0 -> indicationsImageView.visibility = View.VISIBLE
+            2 -> indicationsImageView.visibility = View.GONE
         }
 
         if (counter < helperText.size - 2) {
