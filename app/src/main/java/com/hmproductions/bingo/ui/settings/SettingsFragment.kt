@@ -48,6 +48,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     companion object {
-        public const val RECORD_AUDIO_RC = 17
+        const val RECORD_AUDIO_RC = 17
     }
 }
