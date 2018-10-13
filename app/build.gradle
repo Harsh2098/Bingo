@@ -39,7 +39,6 @@ android {
         release.java.srcDirs += 'build/generated/source/proto/release/grpc'
         release.java.srcDirs += 'build/generated/source/proto/release/javalite'
         main.proto.srcDirs += 'src/main/proto'
-        main.kotlin.srcDirs 'build/generated/source/proto'
     }
 }
 
