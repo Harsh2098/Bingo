@@ -193,8 +193,9 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         nextRoundButton.show()
                         startNextRoundButtonTapTargetView()
 
-                        leaderBoardRecyclerView.layoutManager = GridLayoutManager(this@GameActivity, LEADERBOARD_COL_SPAN)
                         leaderBoardRecyclerView.adapter = LeaderboardRecyclerAdapter(this@GameActivity, intent.getParcelableArrayListExtra(LEADER_BOARD_LIST_KEY))
+                        leaderBoardRecyclerView.layoutManager = GridLayoutManager(this@GameActivity,
+                                if(isTablet(this@GameActivity)) LEADERBOARD_TAB_COL_SPAN else LEADERBOARD_COL_SPAN)
                         leaderBoardRecyclerView.setHasFixedSize(true)
 
                         if (gameCompleted) {

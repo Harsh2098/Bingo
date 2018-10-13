@@ -166,4 +166,14 @@ public class Miscellaneous {
 
         return name;
     }
+
+    public static boolean isTablet(Activity activity) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        float yInches= metrics.heightPixels/metrics.ydpi;
+        float xInches= metrics.widthPixels/metrics.xdpi;
+        double diagonalInches = Math.sqrt(xInches*xInches + yInches*yInches);
+        return diagonalInches >= 6.5;
+    }
 }

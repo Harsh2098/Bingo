@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="8dp"
     android:background="@color/default_background">
 
     <android.support.v7.widget.Toolbar
@@ -29,8 +30,8 @@
         android:id="@+id/skipTutorialTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_below="@+id/tutorial_toolbar"
+        android:layout_alignParentEnd="true"
         android:layout_margin="4dp"
         android:layout_marginBottom="4dp"
         android:text="@string/skip_tutorial"
@@ -47,6 +48,19 @@
         android:layout_marginTop="28dp"
         android:layoutAnimation="@anim/game_grid_animation" />
 
+    <ImageView
+        android:id="@+id/indicationsImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/tutorialRecyclerView"
+        android:layout_alignTop="@+id/tutorialRecyclerView"
+        android:layout_alignEnd="@+id/tutorialRecyclerView"
+        android:layout_alignBottom="@+id/tutorialRecyclerView"
+        android:contentDescription="@string/indications"
+        android:scaleType="fitXY"
+        android:src="@raw/tutorial_indication"
+        android:visibility="visible" />
+
     <RelativeLayout
         android:id="@+id/bingoLinearLayout"
         android:layout_width="match_parent"
@@ -61,8 +75,8 @@
             android:id="@+id/bLetterTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_toStartOf="@+id/iLetterTextView"
             android:gravity="center"
             android:text="@string/b"
@@ -75,17 +89,17 @@
             android:id="@+id/tutorialStrikeView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/bLetterTextView"
-            android:layout_alignEnd="@+id/bLetterTextView"
             android:layout_alignStart="@+id/bLetterTextView"
-            android:layout_alignTop="@+id/bLetterTextView" />
+            android:layout_alignTop="@+id/bLetterTextView"
+            android:layout_alignEnd="@+id/bLetterTextView"
+            android:layout_alignBottom="@+id/bLetterTextView" />
 
         <TextView
             android:id="@+id/iLetterTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_toStartOf="@+id/nLetterTextView"
             android:gravity="center"
             android:text="@string/i"
@@ -97,18 +111,18 @@
             android:id="@+id/iStrikeView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/iLetterTextView"
-            android:layout_alignEnd="@+id/iLetterTextView"
             android:layout_alignStart="@+id/iLetterTextView"
-            android:layout_alignTop="@+id/iLetterTextView" />
+            android:layout_alignTop="@+id/iLetterTextView"
+            android:layout_alignEnd="@+id/iLetterTextView"
+            android:layout_alignBottom="@+id/iLetterTextView" />
 
         <TextView
             android:id="@+id/nLetterTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:gravity="center"
             android:text="@string/n"
             android:textColor="@color/gold_shimmer"
@@ -119,8 +133,8 @@
             android:id="@+id/gLetterTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_toEndOf="@+id/nLetterTextView"
             android:gravity="center"
             android:text="@string/g"
@@ -132,8 +146,8 @@
             android:id="@+id/oLetterTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_toEndOf="@+id/gLetterTextView"
             android:gravity="center"
             android:text="@string/o"
@@ -148,8 +162,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/bingoLinearLayout"
-        android:layout_marginEnd="12dp"
         android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:inAnimation="@android:anim/slide_in_left"
         android:outAnimation="@android:anim/slide_out_right" />
 

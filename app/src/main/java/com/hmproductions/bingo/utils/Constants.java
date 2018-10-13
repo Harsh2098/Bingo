@@ -10,6 +10,7 @@ public class Constants {
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 500;
 
     public static final int LEADERBOARD_COL_SPAN = 2;
+    public static final int LEADERBOARD_TAB_COL_SPAN = 4;
     public static final int TURN_SKIPPED_CODE = 123;
 
     // First time keys

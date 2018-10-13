@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.view.Gravity
+import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.animation.GridLayoutAnimationController
 import android.widget.TextView
@@ -28,7 +29,7 @@ class TutorialActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellCl
     private lateinit var popSound: MediaPlayer
     private lateinit var rowCompletedSound: MediaPlayer
 
-    private val helperText = arrayOf("Complete any 5 lines to Win! \n\nTap to continue",
+    private val helperText = arrayOf("Complete any 5 lines to Win! \n\nTap here to continue",
             "Lines can be any combination of rows, columns or the 2 diagonals\n\nTap to continue",
             "All players will have different grids. Line is considered complete irrespective of the colors of numbers in it.\n\nTap to continue.",
             "The game has just started and looks like one of the diagonals is almost complete. \n\nTap on 18 to complete it.",
@@ -144,6 +145,10 @@ class TutorialActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellCl
             mainActivityIntent.putExtra(SplashActivity.SHOW_SNACKBAR_KEY, true)
             startActivity(mainActivityIntent)
             finish()
+        }
+
+        if(counter == 2) {
+            indicationsImageView.visibility = View.GONE
         }
 
         if (counter < helperText.size - 2) {

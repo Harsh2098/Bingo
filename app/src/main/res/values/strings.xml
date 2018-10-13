@@ -93,5 +93,6 @@
     <string name="tutorial">Tutorial</string>
     <string name="skip_tutorial">Skip</string>
     <string name="enable">Enable</string>
+    <string name="indications">Indications</string>
 
 </resources>
