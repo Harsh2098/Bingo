@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(PLAYER_NAME_KEY, playerNameEditText.getText().toString());
+        editor.putString(PLAYER_NAME_KEY, playerNameEditText.getText().toString().trim());
         editor.putInt(PLAYER_COLOR_KEY, colorRecyclerAdapter.getSelectedPosition());
         editor.apply();
     }
@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public Player getUserDetails() {
 
-        if (playerNameEditText.getText().toString().isEmpty() || playerNameEditText.getText().toString().equals("")) {
+        if (playerNameEditText.getText().toString().trim().isEmpty() || playerNameEditText.getText().toString().trim().equals("")) {
             playerNameEditText.setError("A-Z, 0-9");
             Toast.makeText(this, "Please enter the name", Toast.LENGTH_SHORT).show();
             return null;
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements
             return null;
         }
 
-        return new Player(playerNameEditText.getText().toString(),
+        return new Player(playerNameEditText.getText().toString().trim(),
                 getResources().getStringArray(R.array.colorsName)[colorRecyclerAdapter.getSelectedPosition()], -1, false);
     }
 
