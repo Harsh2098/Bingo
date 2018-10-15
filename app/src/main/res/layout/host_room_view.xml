@@ -19,7 +19,7 @@
             android:layout_width="240dp"
             android:layout_height="wrap_content"
             android:inputType="text"
-            android:maxLength="16"
+            android:maxLength="15"
             android:maxLines="1"
             android:textColor="@color/neon_green"
             android:textSize="18sp" />
