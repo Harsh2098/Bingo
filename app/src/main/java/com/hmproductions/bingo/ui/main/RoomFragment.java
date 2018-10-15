@@ -354,7 +354,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     private void setupAds() {
         if (getView() != null && getContext() != null) {
-            // TODO (Release): Change App ID
             LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             layoutParams.setMargins(0, 0, 0, (int) convertDpToPixel(getContext(), 50));
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);

@@ -11,8 +11,10 @@ android {
         applicationId "com.hmproductions.bingo"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+
+        // TODO (Release): Increment version code
+        versionCode 2
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

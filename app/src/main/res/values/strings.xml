@@ -90,6 +90,8 @@
 
     <string name="bingo_app_id_admob">ca-app-pub-1911680405944713~3289508287</string>
     <string name="game_interstitial_ad_id">ca-app-pub-1911680405944713/7765430605</string>
+    <string name="room_banner_ad_id">ca-app-pub-1911680405944713/2683552364</string>
+
     <string name="tutorial">Tutorial</string>
     <string name="skip_tutorial">Skip</string>
     <string name="enable">Enable</string>

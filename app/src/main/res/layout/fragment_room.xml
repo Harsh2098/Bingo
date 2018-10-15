@@ -152,7 +152,7 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <!-- Original banner ID ca-app-pub-1911680405944713/2683552364 -->
+    <!--TODO (Release): Banner Ad Id -->
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/room_fragment_banner"

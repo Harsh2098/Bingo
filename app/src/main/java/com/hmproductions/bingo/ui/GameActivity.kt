@@ -540,7 +540,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     private fun setupAds() {
 
-        // TODO (Release): Ad Unit ID
+        // TODO (Release): Interstitial Ad Unit ID
         afterGameInterstitialAd = InterstitialAd(this)
 
         afterGameInterstitialAd.adUnitId = getString(R.string.sample_interstitial_ad_id)
