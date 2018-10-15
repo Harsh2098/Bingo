@@ -41,7 +41,6 @@ import com.google.android.gms.ads.InterstitialAd
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.google.firebase.auth.FirebaseAuth.getInstance
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.hmproductions.bingo.BingoActionServiceGrpc
 import com.hmproductions.bingo.BingoStreamServiceGrpc
@@ -134,6 +133,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private var myTurn = false
     private var wasDisconnected = true
     private var gameTimerStarted = false
+    private var chatListenerAttached = false
 
     private var gameGridCellList = ArrayList<GridCell>()
     private var playersList = ArrayList<Player>()
@@ -146,7 +146,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseAuthStateListener: AuthStateListener
     private lateinit var firebaseChildEventListener: ChildEventListener
-    private var firebaseUser: FirebaseUser? = null
 
     private lateinit var afterGameInterstitialAd: InterstitialAd
 
@@ -195,7 +194,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         leaderBoardRecyclerView.adapter = LeaderboardRecyclerAdapter(this@GameActivity, intent.getParcelableArrayListExtra(LEADER_BOARD_LIST_KEY))
                         leaderBoardRecyclerView.layoutManager = GridLayoutManager(this@GameActivity,
-                                if(isTablet(this@GameActivity)) LEADERBOARD_TAB_COL_SPAN else LEADERBOARD_COL_SPAN)
+                                if (isTablet(this@GameActivity)) LEADERBOARD_TAB_COL_SPAN else LEADERBOARD_COL_SPAN)
                         leaderBoardRecyclerView.setHasFixedSize(true)
 
                         if (gameCompleted) {
@@ -203,7 +202,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                             winnerTextBuilder.insert(winnerTextBuilder.lastIndexOf(" "), ", ${getNameFromId(playersList, winnerId)!!}")
                             turnOrderTextView.text = winnerTextBuilder.toString()
 
-                            if(turnOrderTextView.text.toString().length > 27) {
+                            if (turnOrderTextView.text.toString().length > 27) {
                                 turnOrderTextView.text = shortenName(turnOrderTextView.text.toString(), 27)
                             }
                         } else {
@@ -421,23 +420,26 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     notificationBubbleTextView.visibility = View.VISIBLE
                     notificationBubbleTextView.text = if (messageCount - READ_COUNT > 9) "9+" else (messageCount - READ_COUNT).toString()
                 } else {
-                    if(READ_COUNT < messageCount)
+                    if (READ_COUNT < messageCount)
                         READ_COUNT = messageCount
                 }
             }
         }
 
         firebaseAuthStateListener = FirebaseAuth.AuthStateListener { _ ->
-            if (firebaseAuth.currentUser != null) {
+            if (firebaseAuth.currentUser != null && !chatListenerAttached) {
                 chatDatabaseReference?.addChildEventListener(firebaseChildEventListener)
+                chatListenerAttached = true
             } else {
                 firebaseAuth.signInAnonymously().addOnCompleteListener(this@GameActivity) {
-                    if (it.isSuccessful) {
-                        firebaseUser = firebaseAuth.currentUser
+                    if (it.isSuccessful && !chatListenerAttached) {
                         chatDatabaseReference?.addChildEventListener(firebaseChildEventListener)
+                        chatListenerAttached = true
+
                     } else {
                         showChatRecyclerView(false)
                         chatDatabaseReference?.removeEventListener(firebaseChildEventListener)
+                        chatListenerAttached = false
                         snackBar.setText("Chat functionality suspended")
                         showSnackBar(true)
                         Handler().postDelayed({
@@ -473,7 +475,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
             override fun onFinish() {
                 timeLimitProgressBar.progress = timeLimitProgressBar.max
-                currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit)/1000}"
+                currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit) / 1000}"
 
                 clickCellAsynchronously(TURN_SKIPPED_CODE)
             }
@@ -546,7 +548,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         afterGameInterstitialAd.adListener = object : AdListener() {
             override fun onAdClosed() {
                 toast("Waiting for other players")
-                Handler().postDelayed( { startNextRoundAsynchronously() }, 500)
+                Handler().postDelayed({ startNextRoundAsynchronously() }, 500)
             }
         }
     }
@@ -677,8 +679,10 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     .setCancelable(true)
                     .setTitle("Mic is disabled")
                     .setMessage("Do you want to enable text to speech feature ?")
-                    .setPositiveButton(R.string.enable) { _, _ -> ActivityCompat.requestPermissions(
-                            this, arrayOf(Manifest.permission.RECORD_AUDIO), SettingsFragment.RECORD_AUDIO_RC) }
+                    .setPositiveButton(R.string.enable) { _, _ ->
+                        ActivityCompat.requestPermissions(
+                                this, arrayOf(Manifest.permission.RECORD_AUDIO), SettingsFragment.RECORD_AUDIO_RC)
+                    }
                     .setNegativeButton(R.string.no) { dI, _ -> dI.dismiss() }
                     .show()
         else
@@ -708,7 +712,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if(requestCode == SettingsFragment.RECORD_AUDIO_RC && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == SettingsFragment.RECORD_AUDIO_RC && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             preferences.edit().putBoolean(getString(R.string.tts_preference_key), true).apply()
             onImageButtonClick()
         } else {
@@ -939,7 +943,9 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     override fun onPause() {
         super.onPause()
+        chatDatabaseReference?.removeEventListener(firebaseChildEventListener)
         firebaseAuth.removeAuthStateListener(firebaseAuthStateListener)
+        chatListenerAttached = false
         connectivityManager.unregisterNetworkCallback(networkCallback)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver)
     }
@@ -958,7 +964,13 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         rowCompletedSound.release()
     }
 
-    override fun onBackPressed() = onQuitButtonClick()
+    override fun onBackPressed() {
+        if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            onHideChatButtonClick()
+            return
+        }
+        onQuitButtonClick()
+    }
 
     // ================================== Speech Recognition Methods Implementations ==================================
 

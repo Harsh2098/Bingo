@@ -165,6 +165,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
     private Player fakePlayer = new Player("", "", -1, false);
     private boolean wasDisconnected = true;
+    private boolean chatListenerAttached = false;
     private int messageCount = 0;
 
     private AdView roomBannerAdView;
@@ -325,15 +326,18 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         };
 
         firebaseAuthStateListener = firebaseAuth -> {
-            if (firebaseAuth.getCurrentUser() != null) {
+            if (firebaseAuth.getCurrentUser() != null && !chatListenerAttached) {
                 chatDatabaseReference.addChildEventListener(firebaseChildEventListener);
+                chatListenerAttached = true;
             } else {
                 firebaseAuth.signInAnonymously().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+                    if (task.isSuccessful() && !chatListenerAttached) {
                         chatDatabaseReference.addChildEventListener(firebaseChildEventListener);
+                        chatListenerAttached = true;
                     } else {
                         showChatRecyclerView(false);
                         chatDatabaseReference.removeEventListener(firebaseChildEventListener);
+                        chatListenerAttached = false;
                     }
                 });
             }
