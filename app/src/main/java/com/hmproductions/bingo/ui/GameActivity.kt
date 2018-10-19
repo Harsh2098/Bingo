@@ -76,6 +76,7 @@ import kotlinx.android.synthetic.main.chat_layout.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -361,17 +362,25 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             setHasFixedSize(false)
         }
 
-        messageEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {}
+        with(messageEditText) {
+            addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(p0: Editable?) {}
 
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
-            override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                sendButton.isEnabled = charSequence.toString().trim { it <= ' ' }.isNotEmpty()
+                override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    sendButton.isEnabled = charSequence.toString().trim { it <= ' ' }.isNotEmpty()
+                }
+            })
+
+            filters = arrayOf<InputFilter>(InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT))
+
+            setOnClickListener {
+                Handler().postDelayed({
+                    chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter?.itemCount ?: 1-1)
+                }, 500)
             }
-        })
-
-        messageEditText.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT))
+        }
 
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -548,7 +557,10 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         afterGameInterstitialAd.adListener = object : AdListener() {
             override fun onAdClosed() {
                 toast("Waiting for other players")
-                Handler().postDelayed({ startNextRoundAsynchronously() }, 500)
+                Handler().postDelayed({
+                    startNextRoundAsynchronously()
+                    contentView?.hideKeyboard()
+                }, 400)
             }
         }
     }
@@ -656,7 +668,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     fun onChatButtonClick() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         READ_COUNT = messageCount
-    }
+    }// todo: chat player color, timer stops if not your turn, not your turn? your turn, scroll to bottom when keyboard opens while chat
+
 
     @OnClick(R.id.nextRoundButton)
     fun onNextRoundButtonClick() {
@@ -936,6 +949,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     override fun onResume() {
         super.onResume()
         firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
+        messageCount = 0
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
         LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
                 IntentFilter(Constants.GRID_CELL_CLICK_ACTION))
@@ -965,7 +979,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     }
 
     override fun onBackPressed() {
-        if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
             onHideChatButtonClick()
             return
         }

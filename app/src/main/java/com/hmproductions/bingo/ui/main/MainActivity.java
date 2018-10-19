@@ -15,11 +15,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -52,6 +54,7 @@ import butterknife.ButterKnife;
 import static com.hmproductions.bingo.ui.main.RoomFragment.ROOM_NAME_BUNDLE_KEY;
 import static com.hmproductions.bingo.ui.main.RoomFragment.TIME_LIMIT_BUNDLE_KEY;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_OPENED_KEY;
+import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboardFrom;
 
 public class MainActivity extends AppCompatActivity implements
         ConnectionUtils.OnNetworkDownHandler,
@@ -127,6 +130,12 @@ public class MainActivity extends AppCompatActivity implements
                 return;
             }
         }
+
+        playerNameEditText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO)
+                hideKeyboardFrom(this, getCurrentFocus());
+            return false;
+        });
 
         currentPlayerId = currentRoomId = -1;
 

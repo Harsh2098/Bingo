@@ -20,12 +20,12 @@ public class Constants {
     public static final String FIRST_TIME_WON_KEY = "first-time-won-key";
 
     // TODO (Release) : Change min players
-    public static final int MIN_PLAYERS = 2;
+    public static final int MIN_PLAYERS = 1;
     public static final int MAX_PLAYERS = 4;
     static final int MAX_SERVER_CAPACITY = 10001;
 
     public static final int SERVER_PORT = 8080;
-    public static final String SERVER_ADDRESS = "35.187.246.194"; // Compute Engine - 35.187.246.194 Last known home public IP - 116.88.119.133
+    public static final String SERVER_ADDRESS = "10.2.65.145"; // Compute Engine - 35.187.246.194 Last known home public IP - 116.88.119.133
 
     public static final int ADD_PLAYER_LOADER_ID = 101;
     public static final int REMOVE_PLAYER_LOADER_ID = 201;
