@@ -9,7 +9,7 @@
         android:id="@+id/authorTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/neon_pink"
+        android:textColor="@color/primaryTextColor"
         android:textSize="16sp" />
 
     <TextView
@@ -26,6 +26,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:textColor="@color/neon_pink" />
+        android:textColor="@color/primaryTextColor" />
 
 </RelativeLayout>

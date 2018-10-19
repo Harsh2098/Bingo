@@ -1,6 +1,7 @@
 package com.hmproductions.bingo.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import com.hmproductions.bingo.R;
 import com.hmproductions.bingo.data.Message;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapter.MessageViewHolder> {
 
@@ -36,6 +38,9 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         holder.authorTextView.setText(currentMessage.getAuthor());
         holder.timeStampTextView.setText(currentMessage.getTimeStamp());
         holder.contentTextView.setText(currentMessage.getContent());
+
+        int colorPosition = Arrays.asList(context.getResources().getStringArray(R.array.colorsName)).indexOf(currentMessage.getColor());
+        holder.authorTextView.setTextColor(Color.parseColor(context.getResources().getStringArray(R.array.colorsHex)[colorPosition]));
     }
 
     public void addMessage(Message message) {

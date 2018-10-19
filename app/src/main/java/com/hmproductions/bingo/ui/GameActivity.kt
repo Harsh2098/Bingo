@@ -76,7 +76,6 @@ import kotlinx.android.synthetic.main.chat_layout.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -668,8 +667,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     fun onChatButtonClick() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         READ_COUNT = messageCount
-    }// todo: chat player color, timer stops if not your turn, not your turn? your turn, scroll to bottom when keyboard opens while chat
-
+    }// todo: timer stops if not your turn, not your turn? your turn,
 
     @OnClick(R.id.nextRoundButton)
     fun onNextRoundButtonClick() {
@@ -708,7 +706,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         calendar.timeInMillis = System.currentTimeMillis()
         val time = SimpleDateFormat("hh:mm a", Locale.US).format(calendar.time)
 
-        val newMessage = Message(messageEditText.text.toString(), getNameFromId(playersList, playerId), time)
+        val newMessage = Message(messageEditText.text.toString(), getNameFromId(playersList, playerId), time, getColorFromId(playersList, playerId))
         chatDatabaseReference?.push()?.setValue(newMessage)
 
         messageEditText.setText("")

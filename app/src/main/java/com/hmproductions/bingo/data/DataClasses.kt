@@ -19,8 +19,8 @@ class LeaderboardPlayer(val name: String, val color: String, val winCount: Int) 
 
 data class Room(val roomId: Int, val count: Int, val maxSize: Int, val name: String, val timeLimit: TimeLimitUtils.TIME_LIMIT, val passwordExists: Boolean)
 
-data class Message(val content: String, val author: String, val timeStamp: String) {
-    constructor() : this("", "", "")
+data class Message(val content: String, val author: String, val timeStamp: String, val color: String) {
+    constructor() : this("", "", "", "#FFFFFF")
 }
 
 fun View.hideKeyboard() {

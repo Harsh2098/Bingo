@@ -91,6 +91,7 @@ import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.READ_COUNT;
 import static com.hmproductions.bingo.utils.Miscellaneous.convertDpToPixel;
+import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
 import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboardFrom;
@@ -275,6 +276,10 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
 
         messageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
 
+        messageEditText.setOnClickListener((view ->
+            new Handler().postDelayed(() -> chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter.getItemCount() - 1), 500)
+        ));
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         chatDateTextView.setText(new SimpleDateFormat("dd MMM", Locale.US).format(calendar.getTime()));
@@ -424,9 +429,10 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         calendar.setTimeInMillis(System.currentTimeMillis());
 
         String name = getNameFromId(playersList, currentPlayerId);
-        if (name != null) {
+        String color = getColorFromId(playersList, currentPlayerId);
+        if (name != null && color != null) {
             Message newMessage = new Message(messageEditText.getText().toString(), name,
-                    new SimpleDateFormat("hh:mm a", Locale.US).format(calendar.getTime()));
+                    new SimpleDateFormat("hh:mm a", Locale.US).format(calendar.getTime()), color);
 
             chatDatabaseReference.push().setValue(newMessage);
         }
