@@ -1,9 +1,6 @@
 package com.hmproductions.bingo.utils;
 
 import com.hmproductions.bingo.data.Room;
-import com.hmproductions.bingo.filter.TerminationFilter;
-
-import java.util.TimerTask;
 
 public class TimeUtils {
 

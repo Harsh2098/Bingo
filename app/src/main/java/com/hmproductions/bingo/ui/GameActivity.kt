@@ -334,7 +334,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         snackBar = Snackbar.make(findViewById<View>(android.R.id.content), "Internet connection unavailable", Snackbar.LENGTH_INDEFINITE)
         snackBar.view.backgroundColor = ContextCompat.getColor(this@GameActivity, R.color.dark_blue_background)
-        snackBar.setAction(getString(R.string.restart)) { onNetworkDownError(0) }
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
 
         gridRecyclerAdapter = GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this)
@@ -817,9 +816,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 uiThread { onNetworkDownError() }
             }
         }
-
-        // Prevents random stall if user loses connection 5s wait if player doesn't quit after that show snackbar and 10s force exit
-        Handler().postDelayed({ onNetworkDownError(5000) }, 10000)
     }
 
     // Next Round request 
@@ -892,7 +888,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         }
     }
 
-    private fun onNetworkDownError(delay: Long = 30000) {
+    private fun onNetworkDownError() {
         showSnackBar(true)
         gameTimer?.cancel()
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -903,19 +899,21 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 Constants.SESSION_ID = null
                 finish()
             }
-        }, delay)
+        }, 30000)
     }
 
-    private fun showSnackBar(show: Boolean) = if (show) {
-        quitButton.hide()
-        nextRoundButton.hide()
-        sendButton.hide()
-        snackBar.show()
-    } else {
-        quitButton.show()
-        nextRoundButton.show()
-        sendButton.show()
-        snackBar.dismiss()
+    private fun showSnackBar(show: Boolean) {
+        if (show) {
+            quitButton.hide()
+            nextRoundButton.hide()
+            sendButton.hide()
+            snackBar.show()
+        } else {
+            quitButton.show()
+            nextRoundButton.show()
+            sendButton.show()
+            snackBar.dismiss()
+        }
     }
 
     private fun makeBingoLookSmaller() {
