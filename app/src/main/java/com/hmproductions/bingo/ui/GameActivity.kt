@@ -425,14 +425,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 chatRecyclerView.smoothScrollToPosition(chatRecyclerAdapter?.itemCount ?: 1-1)
                 messageCount++
 
-                if (((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) ||
-                                (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount > READ_COUNT) {
-                    notificationBubbleTextView.visibility = View.VISIBLE
-                    notificationBubbleTextView.text = if (messageCount - READ_COUNT > 9) "9+" else (messageCount - READ_COUNT).toString()
-                } else {
-                    if (READ_COUNT < messageCount)
-                        READ_COUNT = messageCount
-                }
+                showNotificationBubbleIfNecessary()
             }
         }
 
@@ -520,6 +513,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     showSnackBar(false)
                     doubleBounceProgressBar.visibility = View.INVISIBLE
                     chatButton.visibility = View.VISIBLE
+                    showNotificationBubbleIfNecessary()
                 }
             }
 
@@ -527,8 +521,10 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 super.onLost(network)
                 if (!getConnectionInfo(this@GameActivity)) wasDisconnected = true
                 runOnUiThread {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     doubleBounceProgressBar.visibility = View.VISIBLE
                     chatButton.visibility = View.GONE
+                    notificationBubbleTextView.visibility = View.GONE
                     onNetworkDownError()
                 }
             }
@@ -743,6 +739,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             if (hide) {
                 doubleBounceProgressBar.visibility = View.VISIBLE
                 chatButton.visibility = View.GONE
+                notificationBubbleTextView.visibility = View.GONE
             }
         }, 500)
 
@@ -755,6 +752,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     hide = false
                     doubleBounceProgressBar.visibility = View.INVISIBLE
                     chatButton.visibility = View.VISIBLE
+                    showNotificationBubbleIfNecessary()
 
                     if (data.statusCode == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR || data.statusCode == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
                         toast(data.statusMessage)
@@ -844,6 +842,17 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     toast("Increase volume for better experience")
                     preferences.edit().putBoolean(VOLUME_ALERT_KEY, false).apply()
             }
+        }
+    }
+
+    private fun showNotificationBubbleIfNecessary() {
+        if (((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) ||
+                        (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount > READ_COUNT) {
+            notificationBubbleTextView.visibility = View.VISIBLE
+            notificationBubbleTextView.text = if (messageCount - READ_COUNT > 9) "9+" else (messageCount - READ_COUNT).toString()
+        } else {
+            if (READ_COUNT < messageCount)
+                READ_COUNT = messageCount
         }
     }
 
@@ -958,6 +967,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         super.onResume()
         firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
         messageCount = 0
+        contentView?.hideKeyboard()
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
         LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
                 IntentFilter(Constants.GRID_CELL_CLICK_ACTION))
