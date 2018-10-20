@@ -13,8 +13,8 @@ android {
         targetSdkVersion 28
 
         // TODO (Release): Increment version code
-        versionCode 2
-        versionName "1.1"
+        versionCode 4
+        versionName "2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

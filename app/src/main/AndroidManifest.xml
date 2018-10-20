@@ -48,8 +48,8 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/sample_app_id_admob"/>
-
+            android:value="@string/bingo_app_id_admob"/>
+        <!-- TODO (Release) : Change meta data with original App ID -->
     </application>
 
 </manifest>

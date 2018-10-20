@@ -666,7 +666,7 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                 networkDownHandler.onNetworkDownError();
             } else {
                 if (data.getStatusCode() == SetPlayerReadyResponse.StatusCode.SERVER_ERROR) {
-                    Toast.makeText(getContext(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
+                    if(getContext() != null) Toast.makeText(getContext(), data.getStatusMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         }

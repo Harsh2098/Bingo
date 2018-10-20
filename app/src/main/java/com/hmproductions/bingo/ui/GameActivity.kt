@@ -296,6 +296,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                         } else {
                             myTurn = false
                         }
+
+                        contentView?.hideKeyboard()
                     }
 
                     NEXT_ROUND_VALUE -> recreate()
@@ -560,7 +562,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 }, 400)
             }
         }
-    }
+    }// todo keyboard pop up when new round started
 
     // Returns the number of lines completed
     fun numberOfLinesCompleted(): Int {
