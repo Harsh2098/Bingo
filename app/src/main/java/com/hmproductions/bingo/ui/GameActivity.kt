@@ -211,6 +211,10 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                             gameCompleted = true
                         }
                         gameTimer?.cancel()
+
+                        if (preferences.getBoolean(getString(R.string.tts_preference_key), false)) {
+                            speechRecognizer.stopListening()
+                        }
                     }
 
                     PLAYER_QUIT_VALUE -> {
@@ -230,6 +234,10 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         quitIntent.putExtra(PLAYER_ID, playerId)
                         quitIntent.putExtra(ROOM_ID, roomId)
+
+                        if (preferences.getBoolean(getString(R.string.tts_preference_key), false)) {
+                            speechRecognizer.stopListening()
+                        }
 
                         gameTimer?.cancel()
                         toast(getNameFromId(playersList, winnerId) + " left")
@@ -326,6 +334,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         snackBar = Snackbar.make(findViewById<View>(android.R.id.content), "Internet connection unavailable", Snackbar.LENGTH_INDEFINITE)
         snackBar.view.backgroundColor = ContextCompat.getColor(this@GameActivity, R.color.dark_blue_background)
+        snackBar.setAction(getString(R.string.restart)) { onNetworkDownError(0) }
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
 
         gridRecyclerAdapter = GameGridRecyclerAdapter(this, GRID_SIZE, gameGridCellList, this)
@@ -343,11 +352,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         speechRecognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         speechRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-        speechRecognizer.setRecognitionListener(this)
-
-        // todo your turn my turn?
 
         setupAds()
     }
@@ -429,9 +433,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                                 (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount > READ_COUNT) {
                     notificationBubbleTextView.visibility = View.VISIBLE
                     notificationBubbleTextView.text = if (messageCount - READ_COUNT > 9) "9+" else (messageCount - READ_COUNT).toString()
-                } else {
-                    if (READ_COUNT < messageCount)
-                        READ_COUNT = messageCount
+                } else if (READ_COUNT < messageCount) {
+                    READ_COUNT = messageCount
                 }
             }
         }
@@ -484,7 +487,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             }
 
             override fun onFinish() {
-                if(myTurn) {
+                if (myTurn) {
                     timeLimitProgressBar.progress = timeLimitProgressBar.max
                     currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit) / 1000}"
 
@@ -520,6 +523,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     showSnackBar(false)
                     doubleBounceProgressBar.visibility = View.INVISIBLE
                     chatButton.visibility = View.VISIBLE
+
+                    if (((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) ||
+                                    (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount > READ_COUNT) {
+                        notificationBubbleTextView.visibility = View.VISIBLE
+                        notificationBubbleTextView.text = if (messageCount - READ_COUNT > 9) "9+" else (messageCount - READ_COUNT).toString()
+                    }
                 }
             }
 
@@ -529,6 +538,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 runOnUiThread {
                     doubleBounceProgressBar.visibility = View.VISIBLE
                     chatButton.visibility = View.GONE
+                    notificationBubbleTextView.visibility = View.GONE
                     onNetworkDownError()
                 }
             }
@@ -743,6 +753,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             if (hide) {
                 doubleBounceProgressBar.visibility = View.VISIBLE
                 chatButton.visibility = View.GONE
+                notificationBubbleTextView.visibility = View.GONE
             }
         }, 500)
 
@@ -755,6 +766,11 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                     hide = false
                     doubleBounceProgressBar.visibility = View.INVISIBLE
                     chatButton.visibility = View.VISIBLE
+                    if (((bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) ||
+                                    (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)) && messageCount > READ_COUNT) {
+                        notificationBubbleTextView.visibility = View.VISIBLE
+                        notificationBubbleTextView.text = if (messageCount - READ_COUNT > 9) "9+" else (messageCount - READ_COUNT).toString()
+                    }
 
                     if (data.statusCode == ClickGridCellResponse.StatusCode.INTERNAL_SERVER_ERROR || data.statusCode == ClickGridCellResponse.StatusCode.NOT_PLAYER_TURN)
                         toast(data.statusMessage)
@@ -801,6 +817,9 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 uiThread { onNetworkDownError() }
             }
         }
+
+        // Prevents random stall if user loses connection 5s wait if player doesn't quit after that show snackbar and 10s force exit
+        Handler().postDelayed({ onNetworkDownError(5000) }, 10000)
     }
 
     // Next Round request 
@@ -838,11 +857,11 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             editor.putBoolean(FIRST_TIME_PLAYED_KEY, false)
             editor.putBoolean(getString(R.string.tutorial_preference_key), false)
             editor.apply()
-        } else if(preferences.getBoolean(VOLUME_ALERT_KEY, true)) {
+        } else if (preferences.getBoolean(VOLUME_ALERT_KEY, true)) {
             with(getSystemService(Context.AUDIO_SERVICE) as AudioManager) {
-                if(getStreamVolume(AudioManager.STREAM_MUSIC) < 0.3 * getStreamMaxVolume(AudioManager.STREAM_MUSIC))
+                if (getStreamVolume(AudioManager.STREAM_MUSIC) < 0.3 * getStreamMaxVolume(AudioManager.STREAM_MUSIC))
                     toast("Increase volume for better experience")
-                    preferences.edit().putBoolean(VOLUME_ALERT_KEY, false).apply()
+                preferences.edit().putBoolean(VOLUME_ALERT_KEY, false).apply()
             }
         }
     }
@@ -873,9 +892,10 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         }
     }
 
-    private fun onNetworkDownError() {
+    private fun onNetworkDownError(delay: Long = 30000) {
         showSnackBar(true)
         gameTimer?.cancel()
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
         Handler().postDelayed({
             if (!getConnectionInfo(this)) {
@@ -883,7 +903,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                 Constants.SESSION_ID = null
                 finish()
             }
-        }, 30000)
+        }, delay)
     }
 
     private fun showSnackBar(show: Boolean) = if (show) {
@@ -956,8 +976,15 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     override fun onResume() {
         super.onResume()
+        chatRecyclerAdapter?.clearAllMessages()
         firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
         messageCount = 0
+
+        contentView?.hideKeyboard()
+
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+        speechRecognizer.setRecognitionListener(this)
+
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
         LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
                 IntentFilter(Constants.GRID_CELL_CLICK_ACTION))
@@ -968,6 +995,9 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         chatDatabaseReference?.removeEventListener(firebaseChildEventListener)
         firebaseAuth.removeAuthStateListener(firebaseAuthStateListener)
         chatListenerAttached = false
+
+        speechRecognizer.destroy()
+
         connectivityManager.unregisterNetworkCallback(networkCallback)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(gridCellReceiver)
     }
