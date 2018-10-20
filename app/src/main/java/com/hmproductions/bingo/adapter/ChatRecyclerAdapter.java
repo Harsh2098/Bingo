@@ -50,6 +50,13 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         notifyItemInserted(messageArrayList.size()-1);
     }
 
+    public void clearAllMessages() {
+        if(messageArrayList != null) {
+            messageArrayList.clear();
+            notifyDataSetChanged();
+        }
+    }
+
     @Override
     public int getItemCount() {
         if (messageArrayList == null || messageArrayList.size() == 0) return 0;

@@ -347,8 +347,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         speechRecognizer.setRecognitionListener(this)
 
-        // todo your turn my turn?
-
         setupAds()
     }
 
@@ -968,6 +966,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
         messageCount = 0
         contentView?.hideKeyboard()
+        chatRecyclerAdapter?.clearAllMessages()
+
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
         LocalBroadcastManager.getInstance(this).registerReceiver(gridCellReceiver,
                 IntentFilter(Constants.GRID_CELL_CLICK_ACTION))
