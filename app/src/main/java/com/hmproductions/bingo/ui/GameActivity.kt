@@ -3,6 +3,7 @@ package com.hmproductions.bingo.ui
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.ConnectivityManager
 import android.net.Network
@@ -255,7 +256,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
                         myTurn = currentPlayerId == playerId
 
-                        startGameTimer(myTurn)
+                        startGameTimer(true)
 
                         if (myTurn) {
 
@@ -263,7 +264,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
                             gameRecyclerView.isEnabled = true
 
                         } else {
-                            gameTimer?.cancel()
                             gameRecyclerView.isEnabled = false
                         }
 
@@ -346,6 +346,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         speechRecognizer.setRecognitionListener(this)
+
+        // todo your turn my turn?
 
         setupAds()
     }
@@ -482,10 +484,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             }
 
             override fun onFinish() {
-                timeLimitProgressBar.progress = timeLimitProgressBar.max
-                currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit) / 1000}"
+                if(myTurn) {
+                    timeLimitProgressBar.progress = timeLimitProgressBar.max
+                    currentTimeTextView.text = "${getExactValueFromEnum(currentTimeLimit) / 1000}"
 
-                clickCellAsynchronously(TURN_SKIPPED_CODE)
+                    clickCellAsynchronously(TURN_SKIPPED_CODE)
+                }
             }
         }
     }
@@ -555,7 +559,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         afterGameInterstitialAd.loadAd(AdRequest.Builder().build())
         afterGameInterstitialAd.adListener = object : AdListener() {
             override fun onAdClosed() {
-                toast("Waiting for other players")
+                turnOrderTextView.text = getString(R.string.waiting_for_others)
                 Handler().postDelayed({
                     startNextRoundAsynchronously()
                     contentView?.hideKeyboard()
@@ -667,7 +671,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     fun onChatButtonClick() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         READ_COUNT = messageCount
-    }// todo: timer stops if not your turn, not your turn? your turn,
+    }
 
     @OnClick(R.id.nextRoundButton)
     fun onNextRoundButtonClick() {
@@ -819,7 +823,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         if (preferences.getBoolean(FIRST_TIME_PLAYED_KEY, true)) {
             TapTargetView.showFor(this,
                     TapTarget
-                            .forView(findViewById(R.id.talkToSpeakImageButton), "How to use Mic", "Call out your number after the beep. Tap here if mic doesn't recognise number in the first time.")
+                            .forView(findViewById(R.id.talkToSpeakImageButton), "How to use Mic", "Call out your number after the beep. Tap here only if mic doesn't recognise number in the first beep.")
                             .targetRadius(50)
                             .icon(getDrawable(R.drawable.mic_icon_white))
                             .cancelable(true),
@@ -834,6 +838,12 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             editor.putBoolean(FIRST_TIME_PLAYED_KEY, false)
             editor.putBoolean(getString(R.string.tutorial_preference_key), false)
             editor.apply()
+        } else if(preferences.getBoolean(VOLUME_ALERT_KEY, true)) {
+            with(getSystemService(Context.AUDIO_SERVICE) as AudioManager) {
+                if(getStreamVolume(AudioManager.STREAM_MUSIC) < 0.3 * getStreamMaxVolume(AudioManager.STREAM_MUSIC))
+                    toast("Increase volume for better experience")
+                    preferences.edit().putBoolean(VOLUME_ALERT_KEY, false).apply()
+            }
         }
     }
 

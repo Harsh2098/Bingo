@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +53,7 @@ import butterknife.ButterKnife;
 import static com.hmproductions.bingo.ui.main.RoomFragment.ROOM_NAME_BUNDLE_KEY;
 import static com.hmproductions.bingo.ui.main.RoomFragment.TIME_LIMIT_BUNDLE_KEY;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_OPENED_KEY;
+import static com.hmproductions.bingo.utils.Constants.VOLUME_ALERT_KEY;
 import static com.hmproductions.bingo.utils.Miscellaneous.hideKeyboardFrom;
 
 public class MainActivity extends AppCompatActivity implements
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements
 
         new Handler().postDelayed(this::startTapTargetSequence, 500);
         preferences.edit().putBoolean(FIRST_TIME_OPENED_KEY, false).apply();
+        preferences.edit().putBoolean(VOLUME_ALERT_KEY, true).apply();
 
         // TODO (Release): Change AdMob App ID
         MobileAds.initialize(this, getString(R.string.sample_app_id_admob));
@@ -335,12 +336,12 @@ public class MainActivity extends AppCompatActivity implements
         snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.dark_blue_background));
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-        if (message.equals("No rooms available"))
+        if (message.equals("No rooms available") && currentFragment != null)
             snackbar.setAction("Host", view -> ((HomeFragment) currentFragment).onHostButtonClick());
-        else if (message.equals("Room does not exist"))
+        else if (message.equals("Room does not exist") && currentFragment != null)
             snackbar.setAction("Refresh", view -> ((HomeFragment) currentFragment).onRefresh());
 
-        if (currentFragment.getView() != null) {
+        if (currentFragment != null && currentFragment.getView() != null) {
             FloatingActionButton hostFab = currentFragment.getView().findViewById(R.id.host_fab);
 
             hostFab.hide();
