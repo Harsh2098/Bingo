@@ -27,7 +27,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -36,9 +35,6 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.google.firebase.auth.FirebaseAuth.getInstance
@@ -147,8 +143,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseAuthStateListener: AuthStateListener
     private lateinit var firebaseChildEventListener: ChildEventListener
-
-    private lateinit var afterGameInterstitialAd: InterstitialAd
 
     private val gridCellReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -348,8 +342,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         speechRecognizer.setRecognitionListener(this)
-
-        setupAds()
     }
 
     // Setting up bottom sheet
@@ -429,7 +421,7 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
             }
         }
 
-        firebaseAuthStateListener = FirebaseAuth.AuthStateListener { _ ->
+        firebaseAuthStateListener = FirebaseAuth.AuthStateListener {
             if (firebaseAuth.currentUser != null && !chatListenerAttached) {
                 chatDatabaseReference?.addChildEventListener(firebaseChildEventListener)
                 chatListenerAttached = true
@@ -546,24 +538,6 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
         }
     }
 
-    private fun setupAds() {
-
-        // TODO (Release): Interstitial Ad Unit ID
-        afterGameInterstitialAd = InterstitialAd(this)
-
-        afterGameInterstitialAd.adUnitId = getString(R.string.sample_interstitial_ad_id)
-        afterGameInterstitialAd.loadAd(AdRequest.Builder().build())
-        afterGameInterstitialAd.adListener = object : AdListener() {
-            override fun onAdClosed() {
-                turnOrderTextView.text = getString(R.string.waiting_for_others)
-                Handler().postDelayed({
-                    startNextRoundAsynchronously()
-                    contentView?.hideKeyboard()
-                }, 400)
-            }
-        }
-    }// todo keyboard pop up when new round started
-
     // Returns the number of lines completed
     fun numberOfLinesCompleted(): Int {
 
@@ -671,14 +645,8 @@ class GameActivity : AppCompatActivity(), GameGridRecyclerAdapter.GridCellClickL
 
     @OnClick(R.id.nextRoundButton)
     fun onNextRoundButtonClick() {
-        with(afterGameInterstitialAd) {
-            if (isLoaded) {
-                show()
-            } else {
-                Log.v(CLASSIC_TAG, "Did not load !")
-                adListener.onAdClosed()
-            }
-        }
+        startNextRoundAsynchronously()
+        contentView?.hideKeyboard()
     }
 
     @OnClick(R.id.talkToSpeakImageButton)

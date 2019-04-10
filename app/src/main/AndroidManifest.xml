@@ -45,11 +45,6 @@
         <activity
             android:name=".ui.TutorialActivity"
             android:screenOrientation="portrait"/>
-
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/bingo_app_id_admob"/>
-        <!-- TODO (Release) : Change meta data with original App ID -->
     </application>
 
 </manifest>

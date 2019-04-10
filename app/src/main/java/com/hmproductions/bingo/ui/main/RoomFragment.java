@@ -28,16 +28,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -90,7 +85,6 @@ import static com.hmproductions.bingo.utils.Constants.DEFAULT_MSG_LENGTH_LIMIT;
 import static com.hmproductions.bingo.utils.Constants.FIRST_TIME_JOINED_KEY;
 import static com.hmproductions.bingo.utils.Constants.PLAYER_ID_KEY;
 import static com.hmproductions.bingo.utils.Constants.READ_COUNT;
-import static com.hmproductions.bingo.utils.Miscellaneous.convertDpToPixel;
 import static com.hmproductions.bingo.utils.Miscellaneous.getColorFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getNameFromId;
 import static com.hmproductions.bingo.utils.Miscellaneous.getTimeLimitString;
@@ -169,8 +163,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
     private boolean chatListenerAttached = false;
     private int messageCount = 0;
 
-    private AdView roomBannerAdView;
-
     private BottomSheetBehavior<CardView> bottomSheetBehavior;
 
     public RoomFragment() {
@@ -222,12 +214,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
         playersRecyclerView.setHasFixedSize(false);
 
         return customView;
-    }
-
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        setupAds();
     }
 
     // Setting up bottom sheet
@@ -355,26 +341,6 @@ public class RoomFragment extends Fragment implements PlayersRecyclerAdapter.OnP
                 return currentPlayer.isReady();
         }
         return true;
-    }
-
-    private void setupAds() {
-        if (getView() != null && getContext() != null) {
-            LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-            layoutParams.setMargins(0, 0, 0, (int) convertDpToPixel(getContext(), 50));
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-
-            roomBannerAdView = getView().findViewById(R.id.room_fragment_banner);
-
-            roomBannerAdView.setAdListener(new AdListener() {
-                @Override
-                public void onAdLoaded() {
-                    roomBannerAdView.setVisibility(View.VISIBLE);
-                    bottomLinearLayout.setLayoutParams(layoutParams);
-                }
-            });
-
-            roomBannerAdView.loadAd(new AdRequest.Builder().build());
-        }
     }
 
     private void setupNetworkCallback() {

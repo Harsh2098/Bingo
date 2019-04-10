@@ -152,16 +152,4 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <!--TODO (Release): Banner Ad Id -->
-
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/room_fragment_banner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:visibility="invisible"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/sample_banner_ad_unit_id" />
-
 </RelativeLayout>
