@@ -20,7 +20,7 @@ Demo repo link:-
 https://github.com/Harsh2098/Android-Multiplayer-Tutorial
 
 Learn how to write .proto files:-
-https://www.youtube.com/redirect?q=https%3A%2F%2Fdevelopers.google.com%2Fprotocol-buffers%2Fdocs%2Fproto3&v=1NAUuKmal1A&event=video_description&redir_token=R26Q8wvi8WEd9MXGAMK8v_GKv9h8MTU1MjQ2NDMzNUAxNTUyMzc3OTM1
+https://developers.google.com/protocol-buffers/docs/proto3
 
 You'll need to remove debug.java... in app level gradle file to generate signed APKs
 
