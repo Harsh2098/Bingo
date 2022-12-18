@@ -1,8 +1,8 @@
 {
   "project_info": {
-    "project_number": "487751164027",
-    "firebase_url": "https://bingo-203919.firebaseio.com",
-    "project_id": "bingo-203919",
+    "project_number": "487751164028",
+    "firebase_url": "https://bingo.firebaseio.com",
+    "project_id": "bingo",
     "storage_bucket": "bingo-203919.appspot.com"
   },
   "client": [
@@ -15,13 +15,13 @@
       },
       "oauth_client": [
         {
-          "client_id": "487751164027-6pq1qeed8fj8rr3efsn3tk6j71bgr60t.apps.googleusercontent.com",
+          "client_id": "487751165027",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA2pIqvcoSJeP-zOcSp4nSAn_ddgsp10vM"
+          "current_key": "insert_your_key"
         }
       ],
       "services": {
@@ -36,7 +36,7 @@
           "status": 2
         }
       },
-      "admob_app_id": "ca-app-pub-1911680405944713~3289508287"
+      "admob_app_id": "ca-app-pub-insert-here"
     }
   ],
   "configuration_version": "1"
